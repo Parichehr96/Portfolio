@@ -1,26 +1,62 @@
 @import "tailwindcss";
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
-}
-
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+/* === Marquee (seamless loop) ===
+   Two identical copies of content render inside .marquee-track.
+   Each direct child has margin-right: 20px (replacing flex gap) so that
+   the trailing margin on copy-1's last child provides the spacing to
+   copy-2's first child. Because spacing comes from margin-right (not gap),
+   the track width = 2 × (one copy's width incl. its trailing margin),
+   so translateX(-50%) advances by exactly one copy + seam gap and loops
+   with no visible jump. */
+@keyframes marquee {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(-50%);
   }
 }
 
-body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+.marquee-track {
+  animation: marquee 40s linear infinite;
+}
+
+.marquee-track > * {
+  margin-right: 20px;
+}
+
+/* === Page transitions ===
+   Every page root applies .page-enter, which re-runs its animation
+   whenever the route changes (Next.js remounts the page component). */
+@keyframes page-fade-in {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.page-enter {
+  animation: page-fade-in 320ms ease-out both;
+}
+
+/* === Home layout — height-responsive padding ===
+   Compresses outer padding on short viewports so the home page fits a 13"
+   MacBook Chrome viewport without scrolling. On viewports ≥ 900px tall,
+   the Figma-exact 48px padding is restored. */
+:root {
+  --main-pt: 0px;
+  --main-pb: 24px;
+  --top-row-offset: 324px;
+}
+
+@media (min-height: 900px) {
+  :root {
+    --main-pt: 48px;
+    --main-pb: 48px;
+    --top-row-offset: 396px;
+  }
 }
