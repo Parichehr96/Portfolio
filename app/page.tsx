@@ -52,18 +52,18 @@ export default function Home() {
           fontFamily: SOLWAY_REGULAR,
         }}
       >
-        {/* Background illustration — fades up at 0.6s.
+        {/* Background illustration — slides down from top at 1.0s.
             Centering uses negative margin (not translateX) so it doesn't
             collide with the keyframe's transform property. */}
         <div
-          className="anim-fade-up absolute pointer-events-none"
+          className="anim-fade-down absolute pointer-events-none"
           style={{
             left: "50%",
             marginLeft: -434,
             top: 114,
             width: 868,
             height: 868,
-            animationDelay: "0.6s",
+            animationDelay: "1.0s",
           }}
         >
           <img
@@ -75,9 +75,9 @@ export default function Home() {
 
         {/* Layout content */}
         <div className="absolute inset-0 flex flex-col items-center pt-[80px] pb-[160px] px-[120px] gap-[20px]">
-          {/* "Parichehr" — display name (fades in at 0s) */}
+          {/* "Parichehr" — display name (slides down from above at 0s) */}
           <p
-            className="anim-fade font-normal text-[#1F2753] text-center shrink-0"
+            className="anim-fade-down font-normal text-[#1F2753] text-center shrink-0"
             style={{
               fontSize: 240,
               lineHeight: "260px",
@@ -91,25 +91,25 @@ export default function Home() {
           </p>
 
           {/* "Talebzadeh" — "Product Designer" — fills middle space.
-              Part of the "other texts" group, fades in at 0.3s. */}
+              Part of the "other texts" group, slides down at 0.5s. */}
           <div
-            className="anim-fade w-full flex items-start justify-center text-[#1F2753] flex-1 min-h-px"
+            className="anim-fade-down w-full flex items-start justify-center text-[#1F2753] flex-1 min-h-px"
             style={{
               fontWeight: 300,
               fontSize: 24,
               lineHeight: "36px",
               letterSpacing: "5px",
-              animationDelay: "0.3s",
+              animationDelay: "0.5s",
             }}
           >
             <p className="flex-1 min-w-0">Talebzadeh</p>
             <p className="whitespace-nowrap shrink-0">Product Designer</p>
           </div>
 
-          {/* Bio + 2026 — also part of the "other texts" group, 0.3s */}
+          {/* Bio + 2026 — also part of the "other texts" group, 0.5s */}
           <div
-            className="anim-fade w-full flex items-end justify-center text-[#1F2753] shrink-0"
-            style={{ fontWeight: 300, animationDelay: "0.3s" }}
+            className="anim-fade-down w-full flex items-end justify-center text-[#1F2753] shrink-0"
+            style={{ fontWeight: 300, animationDelay: "0.5s" }}
           >
             <p
               className="shrink-0"

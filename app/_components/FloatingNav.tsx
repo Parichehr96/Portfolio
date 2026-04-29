@@ -60,19 +60,19 @@ export default function FloatingNav() {
 
   return (
     <nav className="relative w-[382px] h-[88px] shrink-0">
-      {/* Union backdrop — fades in at 0.9s, after the rest of the page. */}
+      {/* Union backdrop — fades in at 1.5s, after the rest of the page. */}
       <img
         src="/assets/nav-pill.svg"
         alt=""
         aria-hidden
         className="anim-fade absolute inset-0 w-full h-full pointer-events-none block"
-        style={{ animationDelay: "0.9s" }}
+        style={{ animationDelay: "1.5s" }}
       />
 
       {ITEMS.map((item, i) => {
         const active = !!item.href && pathname === item.href;
-        // Items pop in left-to-right starting at 1.2s, every 0.2s.
-        const itemDelay = 1.2 + i * 0.2;
+        // Items pop in left-to-right starting at 2.0s, every 0.4s.
+        const itemDelay = 2.0 + i * 0.4;
         const pill = (
           <span
             className={

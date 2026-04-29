@@ -1,16 +1,17 @@
 @import "tailwindcss";
 
 /* === Sequenced home-page load animation ===
-   Timeline (no gaps between segments):
-     0.0s  → Parichehr name fades in over 0.3s
-     0.3s  → all other texts fade in over 0.3s
-     0.6s  → illustration slides up + fades in over 0.3s
-     0.9s  → nav Union backdrop fades in over 0.3s
-     1.2s  → Home item pops in over 0.2s
-     1.4s  → About item pops in
-     1.6s  → Work  item pops in
-     1.8s  → Contact item pops in (sequence ends at 2.0s)
-   Each element is hidden (`both` fill) until its delay elapses, then plays. */
+   Timeline (no gaps between segments, total 3.6s):
+     0.0s  → Parichehr name fades in from above (0.5s)
+     0.5s  → all other texts fade in from above (0.5s)
+     1.0s  → illustration fades in + slides from top (0.5s)
+     1.5s  → nav Union backdrop fades in (0.5s)
+     2.0s  → Home item pops in (0.4s)
+     2.4s  → About item pops in
+     2.8s  → Work  item pops in
+     3.2s  → Contact item pops in (sequence ends at 3.6s)
+   Each element uses fill-mode: both, so it stays hidden until its
+   delay elapses, then plays. */
 
 @keyframes anim-fade {
   from {
@@ -21,10 +22,10 @@
   }
 }
 
-@keyframes anim-fade-up {
+@keyframes anim-fade-down {
   from {
     opacity: 0;
-    transform: translateY(24px);
+    transform: translateY(-24px);
   }
   to {
     opacity: 1;
@@ -44,13 +45,13 @@
 }
 
 .anim-fade {
-  animation: anim-fade 0.3s ease-out both;
+  animation: anim-fade 0.5s ease-out both;
 }
 
-.anim-fade-up {
-  animation: anim-fade-up 0.3s ease-out both;
+.anim-fade-down {
+  animation: anim-fade-down 0.5s ease-out both;
 }
 
 .anim-pop-up {
-  animation: anim-pop-up 0.2s ease-out both;
+  animation: anim-pop-up 0.4s ease-out both;
 }
