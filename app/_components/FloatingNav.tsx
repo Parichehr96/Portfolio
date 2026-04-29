@@ -60,16 +60,19 @@ export default function FloatingNav() {
 
   return (
     <nav className="relative w-[382px] h-[88px] shrink-0">
-      {/* Union backdrop — single cream shape unifying the 4 slots */}
+      {/* Union backdrop — fades in at 0.9s, after the rest of the page. */}
       <img
         src="/assets/nav-pill.svg"
         alt=""
         aria-hidden
-        className="absolute inset-0 w-full h-full pointer-events-none block"
+        className="anim-fade absolute inset-0 w-full h-full pointer-events-none block"
+        style={{ animationDelay: "0.9s" }}
       />
 
-      {ITEMS.map((item) => {
+      {ITEMS.map((item, i) => {
         const active = !!item.href && pathname === item.href;
+        // Items pop in left-to-right starting at 1.2s, every 0.2s.
+        const itemDelay = 1.2 + i * 0.2;
         const pill = (
           <span
             className={
@@ -86,14 +89,15 @@ export default function FloatingNav() {
             />
           </span>
         );
-        const slotClass = "absolute top-[8px] w-[88px] h-[72px]";
+        const slotClass = "anim-pop-up absolute top-[8px] w-[88px] h-[72px]";
+        const slotStyle = { left: item.left, animationDelay: `${itemDelay}s` };
         return item.href ? (
           <Link
             key={item.label}
             href={item.href}
             aria-label={item.label}
             className={slotClass}
-            style={{ left: item.left }}
+            style={slotStyle}
           >
             {pill}
           </Link>
@@ -102,7 +106,7 @@ export default function FloatingNav() {
             key={item.label}
             aria-label={item.label}
             className={slotClass}
-            style={{ left: item.left }}
+            style={slotStyle}
           >
             {pill}
           </span>
