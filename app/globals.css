@@ -59,3 +59,46 @@
 .anim-pop-up {
   animation: anim-pop-up 0.4s ease-out both;
 }
+
+/* === About-page entrance: "the hand is coming down" ===
+   The illustration starts shifted toward the home position (up + right)
+   and slightly larger, then sweeps DOWN-LEFT into its final About spot.
+   Visual effect: as the picture moves down, the bottom of the home
+   image (where the hand was) leaves the frame — the hand drops out
+   of view as the new face crop settles into place. */
+@keyframes hand-comes-down {
+  from {
+    opacity: 0;
+    transform: translate(220px, -120px) scale(1.08);
+  }
+  to {
+    opacity: 1;
+    transform: translate(0, 0) scale(1);
+  }
+}
+
+.anim-hand-down {
+  animation: hand-comes-down 0.9s cubic-bezier(0.4, 0, 0.2, 1) both;
+}
+
+/* === Custom scrollbar for the About bio area ===
+   Track 2 px Cream Dark, thumb 4 px Navy light. Matches Figma's
+   "Temporary Frame" / "Nested Temporary Frame" indicator. */
+.scrollbar-bio {
+  scrollbar-width: thin;
+  scrollbar-color: #28315f #edeae4;
+}
+
+.scrollbar-bio::-webkit-scrollbar {
+  width: 4px;
+}
+
+.scrollbar-bio::-webkit-scrollbar-track {
+  background: #edeae4;
+  border-radius: 2px;
+}
+
+.scrollbar-bio::-webkit-scrollbar-thumb {
+  background: #28315f;
+  border-radius: 2px;
+}

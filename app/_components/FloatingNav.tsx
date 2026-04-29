@@ -25,8 +25,8 @@ type Item = {
   inactiveIcon: string;
 };
 
-// About / Work / Contact pages don't exist yet — their entries omit `href`
-// and render as non-clickable visuals. Add the href when each page lands.
+// Work / Contact pages don't exist yet — their entries omit `href` and render
+// as non-clickable visuals. Add the href when each page lands.
 const ITEMS: Item[] = [
   {
     href: "/",
@@ -36,6 +36,7 @@ const ITEMS: Item[] = [
     inactiveIcon: "/assets/icon-nav-home-inactive.svg",
   },
   {
+    href: "/about",
     label: "About",
     left: 100,
     activeIcon: "/assets/icon-nav-about-active.svg",
@@ -55,29 +56,39 @@ const ITEMS: Item[] = [
   },
 ];
 
-export default function FloatingNav() {
+type FloatingNavProps = {
+  /** Base animation delay in seconds. Backdrop fades in at this offset
+   *  (0.5s duration), then items pop in starting `+0.5s` later, every
+   *  `0.3s`. Defaults to 2.0 (matches the home page's load sequence). */
+  startDelay?: number;
+};
+
+export default function FloatingNav({ startDelay = 2.0 }: FloatingNavProps) {
   const pathname = usePathname();
+  const itemBase = startDelay + 0.5;
 
   return (
     <nav className="relative w-[382px] h-[88px] shrink-0">
-      {/* Union backdrop — fades in at 2.0s for 0.5s. */}
+      {/* Union backdrop — fades in at startDelay for 0.5s. */}
       <img
         src="/assets/nav-pill.svg"
         alt=""
         aria-hidden
         className="anim-fade absolute inset-0 w-full h-full pointer-events-none block"
-        style={{ animationDelay: "2.0s" }}
+        style={{ animationDelay: `${startDelay}s` }}
       />
 
       {ITEMS.map((item, i) => {
         const active = !!item.href && pathname === item.href;
-        // Items pop in left-to-right starting at 2.5s, every 0.3s, 0.3s each.
-        const itemDelay = 2.5 + i * 0.3;
+        // Items pop in left-to-right after the backdrop, every 0.3s, 0.3s each.
+        const itemDelay = itemBase + i * 0.3;
         const pill = (
           <span
             className={
               "absolute left-0 right-0 top-1/2 -translate-y-1/2 h-[76px] rounded-full flex items-center justify-center transition-colors duration-200 " +
-              (active ? "bg-[#1F2753]" : "bg-white")
+              (active
+                ? "bg-[#1F2753]"
+                : "bg-white group-hover:bg-[#1F2753]/10")
             }
           >
             <img
@@ -89,7 +100,8 @@ export default function FloatingNav() {
             />
           </span>
         );
-        const slotClass = "anim-pop-up absolute top-[8px] w-[88px] h-[72px]";
+        const slotClass =
+          "anim-pop-up group absolute top-[8px] w-[88px] h-[72px]";
         const slotStyle = {
           left: item.left,
           animationDelay: `${itemDelay}s`,

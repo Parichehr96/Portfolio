@@ -4,7 +4,7 @@ import "./globals.css";
 
 const solway = Solway({
   subsets: ["latin"],
-  weight: ["300", "400"],
+  weight: ["300", "400", "500"],
   variable: "--font-solway",
   display: "swap",
 });
