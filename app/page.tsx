@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import FloatingNav from "./_components/FloatingNav";
+import { useShouldAnimate } from "./_components/useShouldAnimate";
 
 /* === FIGMA DESIGN TOKENS (Home, node 288:1718) ===
    Frame: 1512 × 982, bg #FFFFFF
@@ -24,6 +25,10 @@ const SOLWAY_REGULAR = "var(--font-solway), serif";
 export default function Home() {
   // Scale the 1512×982 design to fit any desktop viewport without scrolling.
   const [scale, setScale] = useState(1);
+  // Sequenced entrance only on the first session render. After any soft
+  // navigation, we render with no animation classes so revisiting Home
+  // shows everything in place immediately.
+  const shouldAnimate = useShouldAnimate();
 
   useEffect(() => {
     const apply = () => {
@@ -56,15 +61,19 @@ export default function Home() {
             Centering uses negative margin (not translateX) so it doesn't
             collide with the keyframe's transform property. */}
         <div
-          className="anim-fade-down absolute pointer-events-none"
+          className={
+            "absolute pointer-events-none " +
+            (shouldAnimate ? "anim-fade-down" : "")
+          }
           style={{
             left: "50%",
             marginLeft: -434,
             top: 114,
             width: 868,
             height: 868,
-            animationDelay: "1.6s",
-            animationDuration: "0.4s",
+            ...(shouldAnimate
+              ? { animationDelay: "1.6s", animationDuration: "0.4s" }
+              : {}),
           }}
         >
           <img
@@ -78,15 +87,19 @@ export default function Home() {
         <div className="absolute inset-0 flex flex-col items-center pt-[80px] pb-[160px] px-[120px] gap-[20px]">
           {/* "Parichehr" — display name (slides down at 0s for 0.4s) */}
           <p
-            className="anim-fade-down font-normal text-[#1F2753] text-center shrink-0"
+            className={
+              "font-normal text-[#1F2753] text-center shrink-0 " +
+              (shouldAnimate ? "anim-fade-down" : "")
+            }
             style={{
               fontSize: 240,
               lineHeight: "260px",
               letterSpacing: "16px",
               minWidth: "100%",
               width: "min-content",
-              animationDelay: "0s",
-              animationDuration: "0.4s",
+              ...(shouldAnimate
+                ? { animationDelay: "0s", animationDuration: "0.4s" }
+                : {}),
             }}
           >
             Parichehr
@@ -105,14 +118,27 @@ export default function Home() {
             }}
           >
             <p
-              className="anim-fade-down flex-1 min-w-0"
-              style={{ animationDelay: "0.4s", animationDuration: "0.3s" }}
+              className={
+                "flex-1 min-w-0 " + (shouldAnimate ? "anim-fade-down" : "")
+              }
+              style={
+                shouldAnimate
+                  ? { animationDelay: "0.4s", animationDuration: "0.3s" }
+                  : undefined
+              }
             >
               Talebzadeh
             </p>
             <p
-              className="anim-fade-down whitespace-nowrap shrink-0"
-              style={{ animationDelay: "0.7s", animationDuration: "0.3s" }}
+              className={
+                "whitespace-nowrap shrink-0 " +
+                (shouldAnimate ? "anim-fade-down" : "")
+              }
+              style={
+                shouldAnimate
+                  ? { animationDelay: "0.7s", animationDuration: "0.3s" }
+                  : undefined
+              }
             >
               Product Designer
             </p>
@@ -124,13 +150,14 @@ export default function Home() {
             style={{ fontWeight: 300 }}
           >
             <p
-              className="anim-fade-down shrink-0"
+              className={"shrink-0 " + (shouldAnimate ? "anim-fade-down" : "")}
               style={{
                 fontSize: 16,
                 lineHeight: "28px",
                 width: 316,
-                animationDelay: "1.0s",
-                animationDuration: "0.3s",
+                ...(shouldAnimate
+                  ? { animationDelay: "1.0s", animationDuration: "0.3s" }
+                  : {}),
               }}
             >
               designing digital products, containing interaction, experience,
@@ -138,13 +165,17 @@ export default function Home() {
               team for modern businesses.
             </p>
             <p
-              className="anim-fade-down flex-1 min-w-0 text-right"
+              className={
+                "flex-1 min-w-0 text-right " +
+                (shouldAnimate ? "anim-fade-down" : "")
+              }
               style={{
                 fontSize: 20,
                 lineHeight: "36px",
                 letterSpacing: "5px",
-                animationDelay: "1.3s",
-                animationDuration: "0.3s",
+                ...(shouldAnimate
+                  ? { animationDelay: "1.3s", animationDuration: "0.3s" }
+                  : {}),
               }}
             >
               2026

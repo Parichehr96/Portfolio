@@ -2,19 +2,19 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { useShouldAnimate } from "./useShouldAnimate";
 
 /* === FIGMA DESIGN TOKENS (Nav, instance 288:1727) ===
    Bar:    382 × 88. The Union SVG (#F9F5EB Cream) is the backdrop —
-           it fills the full 382 × 88 box, providing the cream rim and
-           inter-slot connectors. Items overlay it with their own bg.
+           it fills the full 382 × 88 box.
    Slot:   each at top=8, w=88, h=72 — at left = 6 / 100 / 194 / 288.
-   Pill:   inside each slot, an 88 × 76 pill is vertically centered
-           (translate -50% from top-1/2), so it pops 2 px above/below
-           the 72 px slot but stays inside the 88 px Union.
-   Active:   bg Navy #1F2753 with white-themed icon.
-   Inactive: bg White with navy-themed icon — the cream Union rim
-             and inter-slot strip show as the visible "ring".
+   Pill:   inside each slot, an 88 × 76 pill is vertically centered.
+   Active:   bg Navy #1F2753, white-themed icon.
+   Inactive: bg White, navy-themed icon.
+   Hover:    on inactive items, bg switches to Navy at 10 % opacity.
    Icon:   40 × 40 inside each pill.
+   Order:  Home, Work, About me, Contact (per Figma icon glyphs —
+           dashboard / work-from-home / portrait / team chat).
 =================================================== */
 
 type Item = {
@@ -25,8 +25,8 @@ type Item = {
   inactiveIcon: string;
 };
 
-// Work / Contact pages don't exist yet — their entries omit `href` and render
-// as non-clickable visuals. Add the href when each page lands.
+// Contact page doesn't exist yet — its entry omits `href` and renders as
+// a non-clickable visual. Add the href when the page lands.
 const ITEMS: Item[] = [
   {
     href: "/",
@@ -36,17 +36,17 @@ const ITEMS: Item[] = [
     inactiveIcon: "/assets/icon-nav-home-inactive.svg",
   },
   {
-    href: "/about",
-    label: "About",
-    left: 100,
-    activeIcon: "/assets/icon-nav-about-active.svg",
-    inactiveIcon: "/assets/icon-nav-about-inactive.svg",
-  },
-  {
     label: "Work",
-    left: 194,
+    left: 100,
     activeIcon: "/assets/icon-nav-work-active.svg",
     inactiveIcon: "/assets/icon-nav-work-inactive.svg",
+  },
+  {
+    href: "/about",
+    label: "About me",
+    left: 194,
+    activeIcon: "/assets/icon-nav-about-active.svg",
+    inactiveIcon: "/assets/icon-nav-about-inactive.svg",
   },
   {
     label: "Contact",
@@ -57,30 +57,34 @@ const ITEMS: Item[] = [
 ];
 
 type FloatingNavProps = {
-  /** Base animation delay in seconds. Backdrop fades in at this offset
-   *  (0.5s duration), then items pop in starting `+0.5s` later, every
-   *  `0.3s`. Defaults to 2.0 (matches the home page's load sequence). */
+  /** Base animation delay in seconds (only applies on the first render
+   *  of the JS session — soft navigations skip animations entirely).
+   *  Backdrop fades in at this offset, items pop in starting +0.5s
+   *  later, every 0.3s. Defaults to 2.0 for the home load sequence. */
   startDelay?: number;
 };
 
 export default function FloatingNav({ startDelay = 2.0 }: FloatingNavProps) {
   const pathname = usePathname();
+  const shouldAnimate = useShouldAnimate();
   const itemBase = startDelay + 0.5;
 
   return (
     <nav className="relative w-[382px] h-[88px] shrink-0">
-      {/* Union backdrop — fades in at startDelay for 0.5s. */}
+      {/* Union backdrop. Animated only on first session render. */}
       <img
         src="/assets/nav-pill.svg"
         alt=""
         aria-hidden
-        className="anim-fade absolute inset-0 w-full h-full pointer-events-none block"
-        style={{ animationDelay: `${startDelay}s` }}
+        className={
+          "absolute inset-0 w-full h-full pointer-events-none block " +
+          (shouldAnimate ? "anim-fade" : "")
+        }
+        style={shouldAnimate ? { animationDelay: `${startDelay}s` } : undefined}
       />
 
       {ITEMS.map((item, i) => {
         const active = !!item.href && pathname === item.href;
-        // Items pop in left-to-right after the backdrop, every 0.3s, 0.3s each.
         const itemDelay = itemBase + i * 0.3;
         const pill = (
           <span
@@ -101,12 +105,13 @@ export default function FloatingNav({ startDelay = 2.0 }: FloatingNavProps) {
           </span>
         );
         const slotClass =
-          "anim-pop-up group absolute top-[8px] w-[88px] h-[72px]";
-        const slotStyle = {
-          left: item.left,
-          animationDelay: `${itemDelay}s`,
-          animationDuration: "0.3s",
-        };
+          "group absolute top-[8px] w-[88px] h-[72px] " +
+          (shouldAnimate ? "anim-pop-up" : "");
+        const slotStyle: React.CSSProperties = { left: item.left };
+        if (shouldAnimate) {
+          slotStyle.animationDelay = `${itemDelay}s`;
+          slotStyle.animationDuration = "0.3s";
+        }
         return item.href ? (
           <Link
             key={item.label}

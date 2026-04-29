@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import FloatingNav from "../_components/FloatingNav";
+import { useShouldAnimate } from "../_components/useShouldAnimate";
 
 /* === FIGMA DESIGN TOKENS (AboutMe, node 302:2532) ===
    Frame: 1512 × 982, bg #FFFFFF — same scale-to-fit pattern as Home.
@@ -206,6 +207,10 @@ function CustomScrollbar({
 export default function About() {
   const [scale, setScale] = useState(1);
   const scrollRef = useRef<HTMLDivElement | null>(null);
+  // Entrance animations only run on the first render of a JS session.
+  // Soft navigation between pages keeps the module loaded, so subsequent
+  // mounts see false and skip the animations entirely.
+  const shouldAnimate = useShouldAnimate();
 
   useEffect(() => {
     const apply = () => {
@@ -232,10 +237,14 @@ export default function About() {
           fontFamily: "var(--font-solway), serif",
         }}
       >
-        {/* Illustration (face crop) — sweeps in from upper-right.
-            Centering: left=calc(50% - 381) - half-width (=408)  =>  -33 px. */}
+        {/* Illustration (face crop) — sweeps in from upper-right on first
+            session render only. On soft navigation the hook returns false
+            and we omit the class, so the picture appears without animation. */}
         <div
-          className="anim-hand-down absolute pointer-events-none"
+          className={
+            "absolute pointer-events-none " +
+            (shouldAnimate ? "anim-hand-down" : "")
+          }
           style={{
             left: "calc(50% - 789px)",
             top: 167,
@@ -252,8 +261,15 @@ export default function About() {
 
         {/* Bio Section header */}
         <div
-          className="anim-fade-down absolute left-[120px] top-[80px] flex flex-col items-start gap-[12px]"
-          style={{ width: 1272, animationDelay: "0s", animationDuration: "0.4s" }}
+          className={
+            "absolute left-[120px] top-[80px] flex flex-col items-start gap-[12px] " +
+            (shouldAnimate ? "anim-fade-down" : "")
+          }
+          style={
+            shouldAnimate
+              ? { width: 1272, animationDelay: "0s", animationDuration: "0.4s" }
+              : { width: 1272 }
+          }
         >
           <p
             className="w-full text-[#1F2753]"
@@ -282,7 +298,9 @@ export default function About() {
 
         {/* Bio Container — illustration overlaps left, content scrolls right */}
         <div
-          className="anim-fade absolute flex items-start"
+          className={
+            "absolute flex items-start " + (shouldAnimate ? "anim-fade" : "")
+          }
           style={{
             left: 120,
             top: 314,
@@ -291,14 +309,14 @@ export default function About() {
             paddingLeft: 634,
             paddingBottom: 160,
             gap: 40,
-            animationDelay: "0.4s",
-            animationDuration: "0.5s",
+            ...(shouldAnimate
+              ? { animationDelay: "0.4s", animationDuration: "0.5s" }
+              : {}),
           }}
         >
           <div
             ref={scrollRef}
-            className="scrollbar-bio flex-1 min-w-0 h-full overflow-y-auto flex flex-col items-start gap-[40px] pr-[8px]"
-            style={{ scrollbarGutter: "stable" }}
+            className="no-scrollbar flex-1 min-w-0 h-full overflow-y-auto flex flex-col items-start gap-[40px]"
           >
             <BioText />
             <ListSection title="My Academic Background" items={ACADEMIC} />
@@ -311,7 +329,10 @@ export default function About() {
         </div>
 
         {/* Floating nav — backdrop fades at 0.6s, items pop after.
-            (Home uses the default 2.0s; About is a quicker entry.) */}
+            (Home uses the default 2.0s; About is a quicker entry.)
+            FloatingNav internally uses useShouldAnimate, so on soft
+            navigation it skips the entrance animation and only
+            transitions the active-state colors. */}
         <div className="absolute" style={{ left: 565, top: 854 }}>
           <FloatingNav startDelay={0.6} />
         </div>

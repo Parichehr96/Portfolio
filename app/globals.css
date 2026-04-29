@@ -81,24 +81,13 @@
   animation: hand-comes-down 0.9s cubic-bezier(0.4, 0, 0.2, 1) both;
 }
 
-/* === Custom scrollbar for the About bio area ===
-   Track 2 px Cream Dark, thumb 4 px Navy light. Matches Figma's
-   "Temporary Frame" / "Nested Temporary Frame" indicator. */
-.scrollbar-bio {
-  scrollbar-width: thin;
-  scrollbar-color: #28315f #edeae4;
+/* Hide native scrollbar entirely. The About bio area uses a custom
+   2 px / 4 px indicator rendered as a sibling element instead. */
+.no-scrollbar {
+  scrollbar-width: none;
+  -ms-overflow-style: none;
 }
 
-.scrollbar-bio::-webkit-scrollbar {
-  width: 4px;
-}
-
-.scrollbar-bio::-webkit-scrollbar-track {
-  background: #edeae4;
-  border-radius: 2px;
-}
-
-.scrollbar-bio::-webkit-scrollbar-thumb {
-  background: #28315f;
-  border-radius: 2px;
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
 }
