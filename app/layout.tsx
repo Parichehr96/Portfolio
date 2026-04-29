@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Space_Grotesk } from "next/font/google";
+import { Space_Grotesk, Solway } from "next/font/google";
 import "./globals.css";
 
 const spaceGrotesk = Space_Grotesk({
@@ -9,17 +9,24 @@ const spaceGrotesk = Space_Grotesk({
   display: "swap",
 });
 
+const solway = Solway({
+  subsets: ["latin"],
+  weight: ["300", "400"],
+  variable: "--font-solway",
+  display: "swap",
+});
+
 export const metadata: Metadata = {
   title: "Parichehr Talebzadeh — Product Designer",
   description:
-    "Portfolio of Parichehr Talebzadeh. Complexity is inevitable; confusion is optional.",
+    "Portfolio of Parichehr Talebzadeh. Designing digital products, containing interaction, experience, interface, design system, and content, within various product teams for modern businesses.",
 };
 
 export default function RootLayout({
   children,
 }: Readonly<{ children: React.ReactNode }>) {
   return (
-    <html lang="en" className={spaceGrotesk.variable}>
+    <html lang="en" className={`${spaceGrotesk.variable} ${solway.variable}`}>
       <body className="bg-[#F9F5EB] text-[#1F2753] antialiased font-[family-name:var(--font-space-grotesk)]">
         {children}
       </body>
