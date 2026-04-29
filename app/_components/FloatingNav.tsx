@@ -12,12 +12,14 @@ import { usePathname } from "next/navigation";
 =================================================== */
 
 type Item = {
-  href: string;
+  href?: string;
   label: string;
   activeIcon: string;
   inactiveIcon: string;
 };
 
+// About / Work / Contact pages don't exist yet — their entries omit `href`
+// and render as non-clickable visuals. Add the href when each page lands.
 const ITEMS: Item[] = [
   {
     href: "/",
@@ -26,19 +28,16 @@ const ITEMS: Item[] = [
     inactiveIcon: "/assets/icon-nav-home-inactive.svg",
   },
   {
-    href: "/about",
     label: "About",
     activeIcon: "/assets/icon-nav-about-active.svg",
     inactiveIcon: "/assets/icon-nav-about-inactive.svg",
   },
   {
-    href: "/work",
     label: "Work",
     activeIcon: "/assets/icon-nav-work-active.svg",
     inactiveIcon: "/assets/icon-nav-work-inactive.svg",
   },
   {
-    href: "/contact",
     label: "Contact",
     activeIcon: "/assets/icon-nav-contact-active.svg",
     inactiveIcon: "/assets/icon-nav-contact-inactive.svg",
@@ -51,25 +50,36 @@ export default function FloatingNav() {
   return (
     <nav className="bg-[#F9F5EB] w-[382px] h-[88px] rounded-full flex items-center px-[6px] gap-[6px] shrink-0">
       {ITEMS.map((item) => {
-        const active = pathname === item.href;
-        return (
+        const active = !!item.href && pathname === item.href;
+        const slotClass =
+          "w-[88px] h-[76px] flex items-center justify-center rounded-full shrink-0 transition-colors duration-200 " +
+          (active ? "bg-[#1F2753]" : "bg-white");
+        const icon = (
+          <img
+            src={active ? item.activeIcon : item.inactiveIcon}
+            alt=""
+            width={40}
+            height={40}
+            className="w-[40px] h-[40px] block"
+          />
+        );
+        return item.href ? (
           <Link
-            key={item.href}
+            key={item.label}
             href={item.href}
             aria-label={item.label}
-            className={
-              "w-[88px] h-[76px] flex items-center justify-center rounded-full shrink-0 transition-colors duration-200 " +
-              (active ? "bg-[#1F2753]" : "bg-white")
-            }
+            className={slotClass}
           >
-            <img
-              src={active ? item.activeIcon : item.inactiveIcon}
-              alt=""
-              width={40}
-              height={40}
-              className="w-[40px] h-[40px] block"
-            />
+            {icon}
           </Link>
+        ) : (
+          <span
+            key={item.label}
+            aria-label={item.label}
+            className={slotClass}
+          >
+            {icon}
+          </span>
         );
       })}
     </nav>
