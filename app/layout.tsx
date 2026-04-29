@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Solway } from "next/font/google";
 import "./globals.css";
+import ScaledShell from "./_components/ScaledShell";
 
 const solway = Solway({
   subsets: ["latin"],
@@ -21,7 +22,7 @@ export default function RootLayout({
   return (
     <html lang="en" className={solway.variable}>
       <body className="bg-white text-[#1F2753] antialiased font-[family-name:var(--font-solway)]">
-        {children}
+        <ScaledShell>{children}</ScaledShell>
       </body>
     </html>
   );

@@ -1,21 +1,22 @@
 @import "tailwindcss";
 
 /* === Sequenced home-page load animation ===
-   Timeline (no gaps between segments, total 3.7s):
+   Plays only on the very first visit / hard refresh of `/`.
+   Timeline (no gaps between segments, total 3.7 s):
      0.0s  → Parichehr name fades down from above (0.4s)
-     0.4s  → Talebzadeh         fades down (0.3s)  ┐ "other texts"
-     0.7s  → Product Designer   fades down (0.3s)  │  in TL → TR → BL → BR
+     0.4s  → Talebzadeh         fades down (0.3s)  ┐
+     0.7s  → Product Designer   fades down (0.3s)  │  TL → TR → BL → BR
      1.0s  → bio                fades down (0.3s)  │  reading order
      1.3s  → 2026               fades down (0.3s)  ┘
      1.6s  → illustration fades down from top (0.4s)
      2.0s  → nav Union backdrop fades in (0.5s)
      2.5s  → Home    item pops in (0.3s)
-     2.8s  → About   item pops in
-     3.1s  → Work    item pops in
-     3.4s  → Contact item pops in (sequence ends at 3.7s)
-   Each element uses fill-mode: both, so it stays hidden until its
-   delay elapses, then plays. Per-element duration overrides come
-   from inline `animationDuration` styles. */
+     2.8s  → Work    item pops in
+     3.1s  → About   item pops in
+     3.4s  → Contact item pops in
+   Each animated element uses fill-mode: both, so it stays hidden until
+   its delay elapses, then plays. Per-element duration overrides are
+   applied via inline `animationDuration`. */
 
 @keyframes anim-fade {
   from {
@@ -60,25 +61,18 @@
   animation: anim-pop-up 0.4s ease-out both;
 }
 
-/* === About-page entrance: "the hand is coming down" ===
-   The illustration starts shifted toward the home position (up + right)
-   and slightly larger, then sweeps DOWN-LEFT into its final About spot.
-   Visual effect: as the picture moves down, the bottom of the home
-   image (where the hand was) leaves the frame — the hand drops out
-   of view as the new face crop settles into place. */
-@keyframes hand-comes-down {
-  from {
-    opacity: 0;
-    transform: translate(220px, -120px) scale(1.08);
-  }
-  to {
-    opacity: 1;
-    transform: translate(0, 0) scale(1);
-  }
-}
-
-.anim-hand-down {
-  animation: hand-comes-down 0.9s cubic-bezier(0.4, 0, 0.2, 1) both;
+/* === Cross-page shared element transition for the hero illustration ===
+   Both the home and about pages mark their illustration with
+   `viewTransitionName: "hero-illustration"`. When a Link is wrapped in
+   `document.startViewTransition`, the browser snapshots the old
+   element + the new element and animates between them — interpolating
+   position and size while crossfading their pixels. As the centered
+   home image with the hand morphs into the corner-anchored about face
+   crop, the hand naturally drops down out of the frame. */
+::view-transition-old(hero-illustration),
+::view-transition-new(hero-illustration) {
+  animation-duration: 800ms;
+  animation-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 /* Hide native scrollbar entirely. The About bio area uses a custom
