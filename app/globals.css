@@ -1,17 +1,21 @@
 @import "tailwindcss";
 
 /* === Sequenced home-page load animation ===
-   Timeline (no gaps between segments, total 3.6s):
-     0.0s  → Parichehr name fades in from above (0.5s)
-     0.5s  → all other texts fade in from above (0.5s)
-     1.0s  → illustration fades in + slides from top (0.5s)
-     1.5s  → nav Union backdrop fades in (0.5s)
-     2.0s  → Home item pops in (0.4s)
-     2.4s  → About item pops in
-     2.8s  → Work  item pops in
-     3.2s  → Contact item pops in (sequence ends at 3.6s)
+   Timeline (no gaps between segments, total 3.7s):
+     0.0s  → Parichehr name fades down from above (0.4s)
+     0.4s  → Talebzadeh         fades down (0.3s)  ┐ "other texts"
+     0.7s  → Product Designer   fades down (0.3s)  │  in TL → TR → BL → BR
+     1.0s  → bio                fades down (0.3s)  │  reading order
+     1.3s  → 2026               fades down (0.3s)  ┘
+     1.6s  → illustration fades down from top (0.4s)
+     2.0s  → nav Union backdrop fades in (0.5s)
+     2.5s  → Home    item pops in (0.3s)
+     2.8s  → About   item pops in
+     3.1s  → Work    item pops in
+     3.4s  → Contact item pops in (sequence ends at 3.7s)
    Each element uses fill-mode: both, so it stays hidden until its
-   delay elapses, then plays. */
+   delay elapses, then plays. Per-element duration overrides come
+   from inline `animationDuration` styles. */
 
 @keyframes anim-fade {
   from {

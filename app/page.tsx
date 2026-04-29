@@ -52,7 +52,7 @@ export default function Home() {
           fontFamily: SOLWAY_REGULAR,
         }}
       >
-        {/* Background illustration — slides down from top at 1.0s.
+        {/* Background illustration — slides down from top at 1.6s (0.4s).
             Centering uses negative margin (not translateX) so it doesn't
             collide with the keyframe's transform property. */}
         <div
@@ -63,7 +63,8 @@ export default function Home() {
             top: 114,
             width: 868,
             height: 868,
-            animationDelay: "1.0s",
+            animationDelay: "1.6s",
+            animationDuration: "0.4s",
           }}
         >
           <img
@@ -75,7 +76,7 @@ export default function Home() {
 
         {/* Layout content */}
         <div className="absolute inset-0 flex flex-col items-center pt-[80px] pb-[160px] px-[120px] gap-[20px]">
-          {/* "Parichehr" — display name (slides down from above at 0s) */}
+          {/* "Parichehr" — display name (slides down at 0s for 0.4s) */}
           <p
             className="anim-fade-down font-normal text-[#1F2753] text-center shrink-0"
             style={{
@@ -85,38 +86,51 @@ export default function Home() {
               minWidth: "100%",
               width: "min-content",
               animationDelay: "0s",
+              animationDuration: "0.4s",
             }}
           >
             Parichehr
           </p>
 
-          {/* "Talebzadeh" — "Product Designer" — fills middle space.
-              Part of the "other texts" group, slides down at 0.5s. */}
+          {/* "Talebzadeh" / "Product Designer" — top row of the "other texts"
+              cohort. Each child animates independently (TL → TR), so the
+              container itself has no animation. */}
           <div
-            className="anim-fade-down w-full flex items-start justify-center text-[#1F2753] flex-1 min-h-px"
+            className="w-full flex items-start justify-center text-[#1F2753] flex-1 min-h-px"
             style={{
               fontWeight: 300,
               fontSize: 24,
               lineHeight: "36px",
               letterSpacing: "5px",
-              animationDelay: "0.5s",
             }}
           >
-            <p className="flex-1 min-w-0">Talebzadeh</p>
-            <p className="whitespace-nowrap shrink-0">Product Designer</p>
+            <p
+              className="anim-fade-down flex-1 min-w-0"
+              style={{ animationDelay: "0.4s", animationDuration: "0.3s" }}
+            >
+              Talebzadeh
+            </p>
+            <p
+              className="anim-fade-down whitespace-nowrap shrink-0"
+              style={{ animationDelay: "0.7s", animationDuration: "0.3s" }}
+            >
+              Product Designer
+            </p>
           </div>
 
-          {/* Bio + 2026 — also part of the "other texts" group, 0.5s */}
+          {/* bio + 2026 — bottom row of the "other texts" cohort (BL → BR). */}
           <div
-            className="anim-fade-down w-full flex items-end justify-center text-[#1F2753] shrink-0"
-            style={{ fontWeight: 300, animationDelay: "0.5s" }}
+            className="w-full flex items-end justify-center text-[#1F2753] shrink-0"
+            style={{ fontWeight: 300 }}
           >
             <p
-              className="shrink-0"
+              className="anim-fade-down shrink-0"
               style={{
                 fontSize: 16,
                 lineHeight: "28px",
                 width: 316,
+                animationDelay: "1.0s",
+                animationDuration: "0.3s",
               }}
             >
               designing digital products, containing interaction, experience,
@@ -124,11 +138,13 @@ export default function Home() {
               team for modern businesses.
             </p>
             <p
-              className="flex-1 min-w-0 text-right"
+              className="anim-fade-down flex-1 min-w-0 text-right"
               style={{
                 fontSize: 20,
                 lineHeight: "36px",
                 letterSpacing: "5px",
+                animationDelay: "1.3s",
+                animationDuration: "0.3s",
               }}
             >
               2026
