@@ -1,6 +1,8 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import Link from "next/link";
+import { useRouter } from "next/navigation";
 
 /* === FIGMA DESIGN TOKENS (AboutMe, node 302:2532) ===
    Rendered inside ScaledShell (which handles the 1512 × 982 scale).
@@ -276,6 +278,23 @@ function CustomScrollbar({
 
 export default function About() {
   const scrollRef = useRef<HTMLDivElement | null>(null);
+  const router = useRouter();
+
+  // Same view-transition handler the FloatingNav and home CTA use, so the
+  // hero-illustration morph fires when the user navigates via this CTA too.
+  const handleWorkClick = (e: React.MouseEvent<HTMLAnchorElement>) => {
+    if (typeof window === "undefined") return;
+    const startVT = (
+      document as unknown as {
+        startViewTransition?: (cb: () => void) => unknown;
+      }
+    ).startViewTransition;
+    if (typeof startVT !== "function") return;
+    e.preventDefault();
+    startVT.call(document, () => {
+      router.push("/work");
+    });
+  };
 
   return (
     <>
@@ -415,10 +434,13 @@ export default function About() {
             </div>
 
             {/* MY WORK EXPERIENCES? CTA — bottom of the scrollable area.
-                /work doesn't exist yet, so render as a non-clickable span
-                until that page lands. */}
-            <p
-              className="w-full text-[#1F2753] shrink-0"
+                Links to /work via the same document.startViewTransition
+                path so the hero-illustration morphs from About's face crop
+                to Work's profile portrait on click. */}
+            <Link
+              href="/work"
+              onClick={handleWorkClick}
+              className="w-full text-[#1F2753] shrink-0 block"
               style={{
                 fontWeight: 300,
                 fontSize: 16,
@@ -428,7 +450,7 @@ export default function About() {
               }}
             >
               MY WORK EXPERIENCES?
-            </p>
+            </Link>
           </div>
 
           <CustomScrollbar scrollRef={scrollRef} trackHeight={505} />

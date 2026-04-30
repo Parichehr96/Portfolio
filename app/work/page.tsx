@@ -1,5 +1,8 @@
 "use client";
 
+import Link from "next/link";
+import { useRouter } from "next/navigation";
+
 /* === FIGMA DESIGN TOKENS (Work, node 300:2201) ===
    Rendered inside ScaledShell (which handles the 1512 × 982 scale).
    Outer flex-col gap-80, pt-80 pb-40 px-120 items-center.
@@ -109,6 +112,24 @@ function ExperienceRow({ item }: { item: Experience }) {
 }
 
 export default function Work() {
+  const router = useRouter();
+
+  // Same view-transition handler the FloatingNav and home CTA use, so the
+  // hero-illustration morph fires when the user navigates via this CTA too.
+  const handleContactClick = (e: React.MouseEvent<HTMLAnchorElement>) => {
+    if (typeof window === "undefined") return;
+    const startVT = (
+      document as unknown as {
+        startViewTransition?: (cb: () => void) => unknown;
+      }
+    ).startViewTransition;
+    if (typeof startVT !== "function") return;
+    e.preventDefault();
+    startVT.call(document, () => {
+      router.push("/contact");
+    });
+  };
+
   return (
     <>
       {/* Page layout — flex-col gap-80, padding matches Figma exactly */}
@@ -178,10 +199,14 @@ export default function Work() {
               ))}
             </div>
 
-            {/* GET IN TOUCH? CTA — /contact not implemented yet, so render
-                as a non-clickable span until that page lands. */}
-            <p
-              className="w-full text-[#1F2753] shrink-0"
+            {/* GET IN TOUCH? CTA — links to /contact via the same
+                document.startViewTransition path so the hero-illustration
+                morphs from Work's profile portrait to Contact's face crop
+                on click. */}
+            <Link
+              href="/contact"
+              onClick={handleContactClick}
+              className="w-full text-[#1F2753] shrink-0 block"
               style={{
                 fontFamily: SOLWAY,
                 fontWeight: 300,
@@ -192,7 +217,7 @@ export default function Work() {
               }}
             >
               GET IN TOUCH?
-            </p>
+            </Link>
           </div>
         </div>
       </div>
