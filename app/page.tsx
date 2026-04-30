@@ -22,7 +22,7 @@ export default function Home() {
 
   return (
     <>
-      {/* Background illustration — slides down from top at 1.6 s on home's
+      {/* Background illustration — slides down from top at 1.1 s on home's
           load sequence. `viewTransitionName` makes this image the source
           for the cross-page morph when navigating to /about (and back). */}
       <div
@@ -38,7 +38,7 @@ export default function Home() {
           height: 868,
           viewTransitionName: "hero-illustration",
           ...(shouldAnimate
-            ? { animationDelay: "1.6s", animationDuration: "0.4s" }
+            ? { animationDelay: "1.1s", animationDuration: "0.4s" }
             : {}),
         }}
       >
@@ -51,7 +51,7 @@ export default function Home() {
 
       {/* Layout content — fills the 1512 × 982 design canvas */}
       <div className="absolute inset-0 flex flex-col items-center pt-[80px] pb-[160px] px-[120px] gap-[20px]">
-        {/* "Parichehr" — display name (slides down at 0s for 0.4s) */}
+        {/* "Parichehr" — display name (slides down at 0s for 0.3s) */}
         <p
           className={
             "font-normal text-[#1F2753] text-center shrink-0 " +
@@ -64,7 +64,7 @@ export default function Home() {
             minWidth: "100%",
             width: "min-content",
             ...(shouldAnimate
-              ? { animationDelay: "0s", animationDuration: "0.4s" }
+              ? { animationDelay: "0s", animationDuration: "0.3s" }
               : {}),
           }}
         >
@@ -72,7 +72,7 @@ export default function Home() {
         </p>
 
         {/* "Talebzadeh" / "Product Designer" — top row of the "other texts"
-            cohort. Each child animates independently (TL → TR). */}
+            cohort. Each child animates independently (TL → TR), 0.2s each. */}
         <div
           className="w-full flex items-start justify-center text-[#1F2753] flex-1 min-h-px"
           style={{
@@ -88,7 +88,7 @@ export default function Home() {
             }
             style={
               shouldAnimate
-                ? { animationDelay: "0.4s", animationDuration: "0.3s" }
+                ? { animationDelay: "0.3s", animationDuration: "0.2s" }
                 : undefined
             }
           >
@@ -101,7 +101,7 @@ export default function Home() {
             }
             style={
               shouldAnimate
-                ? { animationDelay: "0.7s", animationDuration: "0.3s" }
+                ? { animationDelay: "0.5s", animationDuration: "0.2s" }
                 : undefined
             }
           >
@@ -121,7 +121,7 @@ export default function Home() {
               lineHeight: "28px",
               width: 316,
               ...(shouldAnimate
-                ? { animationDelay: "1.0s", animationDuration: "0.3s" }
+                ? { animationDelay: "0.7s", animationDuration: "0.2s" }
                 : {}),
             }}
           >
@@ -139,7 +139,7 @@ export default function Home() {
               lineHeight: "36px",
               letterSpacing: "5px",
               ...(shouldAnimate
-                ? { animationDelay: "1.3s", animationDuration: "0.3s" }
+                ? { animationDelay: "0.9s", animationDuration: "0.2s" }
                 : {}),
             }}
           >

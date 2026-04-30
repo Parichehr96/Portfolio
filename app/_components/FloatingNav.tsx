@@ -63,17 +63,22 @@ const ICON_TRANSITION = "opacity 500ms ease-out";
 
 type FloatingNavProps = {
   /** Animation delay in seconds for the very first session render.
-   *  Backdrop fades in at this offset (0.5 s), items pop in starting
-   *  +0.5 s later, every 0.3 s. After first render, soft navigations
-   *  are silent (only the bubbly active-pill slide + icon cross-fade). */
+   *  Backdrop fades in at this offset (0.3 s), items pop in starting
+   *  +0.3 s later, every 0.2 s, each 0.2 s long. After first render,
+   *  soft navigations are silent (only the bubbly active-pill slide
+   *  + icon cross-fade). */
   startDelay?: number;
 };
 
-export default function FloatingNav({ startDelay = 2.0 }: FloatingNavProps) {
+const NAV_BACKDROP_DURATION = 0.3;
+const NAV_ITEM_DURATION = 0.2;
+const NAV_ITEM_STAGGER = 0.2;
+
+export default function FloatingNav({ startDelay = 1.5 }: FloatingNavProps) {
   const pathname = usePathname();
   const router = useRouter();
   const shouldAnimate = useShouldAnimate();
-  const itemBase = startDelay + 0.5;
+  const itemBase = startDelay + NAV_BACKDROP_DURATION;
 
   const activeIdx = ITEMS.findIndex((it) => it.href === pathname);
   const activeLeft = activeIdx >= 0 ? ITEMS[activeIdx].left : ITEMS[0].left;
@@ -95,16 +100,19 @@ export default function FloatingNav({ startDelay = 2.0 }: FloatingNavProps) {
     });
   };
 
-  const popDelay = (i: number) => `${itemBase + i * 0.3}s`;
+  const popDelay = (i: number) => `${itemBase + i * NAV_ITEM_STAGGER}s`;
   const popClass = shouldAnimate ? "anim-pop-up" : "";
   const popStyle = (i: number): React.CSSProperties =>
     shouldAnimate
-      ? { animationDelay: popDelay(i), animationDuration: "0.3s" }
+      ? {
+          animationDelay: popDelay(i),
+          animationDuration: `${NAV_ITEM_DURATION}s`,
+        }
       : {};
 
   return (
     <nav className="relative w-[382px] h-[88px] shrink-0">
-      {/* Union backdrop — fades in once on first session render */}
+      {/* Union backdrop — fades in once on first session render (0.3 s) */}
       <img
         src="/assets/nav-pill.svg"
         alt=""
@@ -114,7 +122,12 @@ export default function FloatingNav({ startDelay = 2.0 }: FloatingNavProps) {
           (shouldAnimate ? "anim-fade" : "")
         }
         style={
-          shouldAnimate ? { animationDelay: `${startDelay}s` } : undefined
+          shouldAnimate
+            ? {
+                animationDelay: `${startDelay}s`,
+                animationDuration: `${NAV_BACKDROP_DURATION}s`,
+              }
+            : undefined
         }
       />
 
@@ -161,7 +174,7 @@ export default function FloatingNav({ startDelay = 2.0 }: FloatingNavProps) {
           ...(shouldAnimate
             ? {
                 animationDelay: popDelay(Math.max(0, activeIdx)),
-                animationDuration: "0.3s",
+                animationDuration: `${NAV_ITEM_DURATION}s`,
               }
             : {}),
         }}
