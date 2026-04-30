@@ -52,6 +52,7 @@ const ITEMS: Item[] = [
     inactiveIcon: "/assets/icon-nav-about-inactive.svg",
   },
   {
+    href: "/contact",
     label: "Contact",
     left: 288,
     activeIcon: "/assets/icon-nav-contact-active.svg",
