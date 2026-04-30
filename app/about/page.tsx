@@ -118,7 +118,7 @@ function EducationRow({ item }: { item: Item }) {
           style={{ fontSize: 16, lineHeight: "24px", letterSpacing: "0.15px" }}
           aria-hidden
         >
-          {".".repeat(120)}
+          {".".repeat(500)}
         </span>
       </div>
       <p

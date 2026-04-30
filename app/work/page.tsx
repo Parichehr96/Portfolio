@@ -84,7 +84,9 @@ function ExperienceRow({
 
   return (
     <div className="w-full flex items-center gap-[8px]">
-      <div className="flex-1 min-w-0 flex items-center gap-[8px]">
+      {/* Name + short + icon cluster — shrink-0 so it stays at its
+          natural width regardless of viewport. */}
+      <div className="flex items-center gap-[8px] shrink-0">
         <p
           className="whitespace-nowrap shrink-0"
           style={{
@@ -115,21 +117,24 @@ function ExperienceRow({
         </p>
         <LinkExternalIcon light={selected} />
       </div>
+      {/* Dotted leader — flex-1 so it fills any width between the cluster
+          and the date. We render plenty of dots (more than fit at any
+          reasonable desktop width) and clip the overflow, so the visible
+          dots always extend exactly from the cluster edge to the date. */}
       <span
-        className="overflow-hidden whitespace-nowrap shrink min-w-0"
+        className="flex-1 min-w-0 overflow-hidden whitespace-nowrap"
         style={{
           fontFamily: SOLWAY,
           fontWeight: 400,
           fontSize: 16,
           lineHeight: "24px",
           letterSpacing: "0.15px",
-          maxWidth: 360,
           color: dotsColor,
           transition: COLOR_TRANSITION,
         }}
         aria-hidden
       >
-        {".".repeat(80)}
+        {".".repeat(500)}
       </span>
       <p
         className="whitespace-nowrap shrink-0"

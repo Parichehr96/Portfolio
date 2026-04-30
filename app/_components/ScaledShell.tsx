@@ -7,6 +7,12 @@ import FloatingNav from "./FloatingNav";
 const DESIGN_W = 1512;
 const DESIGN_H = 982;
 
+// Viewports at or below this width are treated as tablets and scaled an
+// extra 0.9× on top of the natural fit, so the layout has a touch more
+// breathing room on iPad-class devices.
+const TABLET_BREAKPOINT = 1024;
+const TABLET_SCALE_MULTIPLIER = 0.9;
+
 // useLayoutEffect runs synchronously after DOM mutations and before the
 // browser paints, so the very first frame the user sees is already at the
 // correct scale — no "scale=1" flash on slow machines. On the server we
@@ -42,7 +48,10 @@ export default function ScaledShell({
       // Guard against transient zero-dimension states (e.g. window
       // restored from minimized) which would collapse content to scale 0.
       if (w === 0 || h === 0) return;
-      setScale(Math.min(w / DESIGN_W, h / DESIGN_H));
+      const baseFit = Math.min(w / DESIGN_W, h / DESIGN_H);
+      const tabletAdjust =
+        w <= TABLET_BREAKPOINT ? TABLET_SCALE_MULTIPLIER : 1;
+      setScale(baseFit * tabletAdjust);
     };
     apply();
     window.addEventListener("resize", apply);
