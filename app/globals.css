@@ -62,14 +62,22 @@
   animation: anim-pop-up 0.4s ease-out both;
 }
 
-/* === Cross-page shared element transition for the hero illustration ===
-   Both the home and about pages mark their illustration with
-   `viewTransitionName: "hero-illustration"`. When a Link is wrapped in
-   `document.startViewTransition`, the browser snapshots the old
-   element + the new element and animates between them — interpolating
-   position and size while crossfading their pixels. As the centered
-   home image with the hand morphs into the corner-anchored about face
-   crop, the hand naturally drops down out of the frame. */
+/* === Cross-page transition tuning ===
+   `document.startViewTransition` (called inside FloatingNav and the
+   home CTA) hands navigation to the browser's View Transitions API.
+   The hero illustration on both pages shares a `viewTransitionName`
+   so it morphs position + size while crossfading its pixels — as the
+   centered home image with the hand morphs into the corner-anchored
+   about face crop, the hand naturally drops down out of the frame.
+   Everything else uses the default `root` group, which we slow down
+   slightly so the rest of the page eases in/out alongside the picture
+   instead of snapping. */
+::view-transition-old(root),
+::view-transition-new(root) {
+  animation-duration: 600ms;
+  animation-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+}
+
 ::view-transition-old(hero-illustration),
 ::view-transition-new(hero-illustration) {
   animation-duration: 800ms;

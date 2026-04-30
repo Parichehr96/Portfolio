@@ -4,104 +4,166 @@ import { useEffect, useRef, useState } from "react";
 
 /* === FIGMA DESIGN TOKENS (AboutMe, node 302:2532) ===
    Rendered inside ScaledShell (which handles the 1512 × 982 scale).
-   Bio Section (top, x=120 y=80, w=1272):
-     - "You can call me Pari," Solway Regular  60/66  tracking-2
-     - "Nice to meet you!"     Solway Regular  32/40  tracking-2
-     - "Product Designer"      Solway Light    20/24  tracking-5
-   Illustration (face crop): 816 × 816 absolute, x=-33, top=167.
-     `viewTransitionName: "hero-illustration"` lets the browser morph
-     this picture from home's centered position when you navigate.
-   Bio Container (x=120, y=314, 1272 × 665, pl-634):
-     - Bio Text Container (596w, h=505, scrollable) on the right
-     - Custom 2 px scrollbar at far right
-   Floating nav: rendered by ScaledShell.
+   Outer flex-col gap-80, pt-80 pb-40 px-120 items-center.
+   Bio Section (top, w=1272):
+     - "You can call me Pari," Solway Regular 60/66  tracking-2
+     - "Nice to meet you!"     Solway Regular 32/40  tracking-2
+   Illustration: 816 × 816 absolute, x=-33, top=167.
+     `viewTransitionName: "hero-illustration"` → cross-page morph.
+   Bio Container (w-full, h=665, pl=634, gap=40, pb=160, overflow-clip):
+     - Bio Text Container (flex-1) — vertically scrollable, gap-40
+         · bio paragraphs with Solway Medium emphasis spans
+         · "My Academic Background" + 2 items
+         · "My Certificates" + 4 items
+         · "My Skills" — 2-column (Methodes | Soft Skills + Tools)
+         · "My Hobbies" — 10 icons in a row, w-596 justify-between
+         · "MY WORK EXPERIENCES?" CTA (underlined, links to /work)
+     - 2px scrollbar track + 4px navy thumb (custom)
+   Floating nav: rendered by ScaledShell (About active).
 ============================================================= */
 
-type ListItem = { name: string; short: string; date: string };
+type Item = { name: string; short: string; date: string };
 
-const ACADEMIC: ListItem[] = [
+const ACADEMIC: Item[] = [
   { name: "Master Interaction Design", short: "HVA", date: "2025 - Present" },
   { name: "Bachelor Industrial Design", short: "AUI", date: "2017 - 2022" },
 ];
 
-const CERTIFICATES: ListItem[] = [
+const CERTIFICATES: Item[] = [
+  { name: "Typography", short: "Uxcel", date: "2025" },
+  { name: "GenAI for UX Designers", short: "Coursera", date: "2025" },
   { name: "Google UX Design", short: "Coursera", date: "2024" },
-  { name: "Master Interaction Design", short: "HVA", date: "2023" },
+  { name: "Agile Project", short: "Coursera", date: "2022" },
 ];
 
-const SKILLS: ListItem[] = [
-  { name: "Google UX Design", short: "Coursera", date: "2024" },
+const METHODES = [
+  "Product Design",
+  "Design Thinking",
+  "Interaction Design",
+  "Information Architecture",
+  "User Research",
+  "Usability testing",
+  "Journey Mapping",
+  "Prototyping",
+  "Design Systems",
+  "Agile / Scrum",
 ];
 
-const HOBBIES: ListItem[] = [
-  { name: "Master Interaction Design", short: "HVA", date: "2023" },
+const SOFT_SKILLS = [
+  "Cross-Functional Collaboration",
+  "Stakeholder Management",
+  "Design Leadership",
+  "Time Management",
+  "Crisis Management",
 ];
 
-function ListSection({ title, items }: { title: string; items: ListItem[] }) {
+const TOOLS = ["Figma", "Miro", "Analytical softwares"];
+
+const HOBBY_ICONS = [
+  "/assets/icon-hobby-fire-exit.svg",
+  "/assets/icon-hobby-boat.svg",
+  "/assets/icon-hobby-luggage.svg",
+  "/assets/icon-hobby-vinyl.svg",
+  "/assets/icon-hobby-puzzle.svg",
+  "/assets/icon-hobby-video-player.svg",
+  "/assets/icon-hobby-camera.svg",
+  "/assets/icon-hobby-chess.svg",
+  "/assets/icon-hobby-cheers.svg",
+  "/assets/icon-hobby-microphone.svg",
+];
+
+function LinkExternalIcon() {
   return (
-    <div className="w-full flex flex-col items-start gap-[20px] shrink-0">
-      <p
-        className="w-full text-[#5A5D70]"
-        style={{
-          fontWeight: 500,
-          fontSize: 20,
-          lineHeight: "26px",
-          letterSpacing: "0.5px",
-        }}
-      >
-        {title}
-      </p>
-      <div className="w-full flex flex-col items-start gap-[16px]">
-        {items.map((item, i) => (
-          <div
-            key={`${item.name}-${i}`}
-            className="w-full flex items-center gap-[8px]"
+    <span className="relative shrink-0 inline-block w-[24px] h-[24px]">
+      <img
+        src="/assets/icon-link-external.svg"
+        alt=""
+        className="absolute inset-0 w-full h-full block"
+      />
+    </span>
+  );
+}
+
+function EducationRow({ item }: { item: Item }) {
+  return (
+    <div className="w-full flex items-end justify-center gap-[8px]">
+      <div className="flex-1 min-w-0 flex items-center gap-[8px]">
+        <p
+          className="text-[#1B2249] whitespace-nowrap shrink-0"
+          style={{
+            fontSize: 16,
+            lineHeight: "24px",
+            letterSpacing: "0.15px",
+          }}
+        >
+          {item.name}
+        </p>
+        <div className="flex items-center shrink-0">
+          <p
+            className="text-[#7E7F85] whitespace-nowrap shrink-0"
+            style={{
+              fontSize: 16,
+              lineHeight: "24px",
+              letterSpacing: "0.15px",
+            }}
           >
-            <p
-              className="text-[#1B2249] whitespace-nowrap shrink-0"
-              style={{
-                fontSize: 16,
-                lineHeight: "24px",
-                letterSpacing: "0.15px",
-              }}
-            >
-              {item.name}
-            </p>
-            <p
-              className="text-[#7E7F85] whitespace-nowrap shrink-0"
-              style={{
-                fontSize: 16,
-                lineHeight: "24px",
-                letterSpacing: "0.15px",
-              }}
-            >
-              {item.short}
-            </p>
-            <span
-              className="flex-1 min-w-0 overflow-hidden whitespace-nowrap text-[#7E7F85]"
-              style={{
-                fontSize: 16,
-                lineHeight: "24px",
-                letterSpacing: "0.15px",
-              }}
-              aria-hidden
-            >
-              {".".repeat(120)}
-            </span>
-            <p
-              className="text-[#1B2249] whitespace-nowrap shrink-0"
-              style={{
-                fontSize: 16,
-                lineHeight: "24px",
-                letterSpacing: "0.15px",
-              }}
-            >
-              {item.date}
-            </p>
-          </div>
-        ))}
+            {item.short}
+          </p>
+          <LinkExternalIcon />
+        </div>
+        <span
+          className="flex-1 min-w-0 overflow-hidden whitespace-nowrap text-[#7E7F85]"
+          style={{ fontSize: 16, lineHeight: "24px", letterSpacing: "0.15px" }}
+          aria-hidden
+        >
+          {".".repeat(120)}
+        </span>
       </div>
+      <p
+        className="text-[#1B2249] whitespace-nowrap shrink-0"
+        style={{ fontSize: 16, lineHeight: "24px", letterSpacing: "0.15px" }}
+      >
+        {item.date}
+      </p>
     </div>
+  );
+}
+
+function SectionTitle({ children }: { children: React.ReactNode }) {
+  return (
+    <p
+      className="w-full text-[#5A5D70]"
+      style={{
+        fontWeight: 500,
+        fontSize: 20,
+        lineHeight: "26px",
+        letterSpacing: "0.5px",
+      }}
+    >
+      {children}
+    </p>
+  );
+}
+
+function SkillsColumnHeader({ children }: { children: React.ReactNode }) {
+  return (
+    <p
+      className="text-[#7E7F85] shrink-0"
+      style={{ fontSize: 16, lineHeight: "24px", letterSpacing: "0.15px" }}
+    >
+      {children}
+    </p>
+  );
+}
+
+function SkillBullet({ children }: { children: React.ReactNode }) {
+  return (
+    <p
+      className="text-[#1B2249] shrink-0"
+      style={{ fontSize: 16, lineHeight: "24px", letterSpacing: "0.15px" }}
+    >
+      · {children}
+    </p>
   );
 }
 
@@ -217,9 +279,8 @@ export default function About() {
 
   return (
     <>
-      {/* Illustration (face crop). Same `viewTransitionName` as the home
-          illustration, so the browser auto-morphs the picture between
-          their positions/sizes during navigation. */}
+      {/* Illustration (face crop) — `viewTransitionName` matches home, so the
+          browser auto-morphs the picture between the two pages on navigation. */}
       <div
         className="absolute pointer-events-none"
         style={{
@@ -237,61 +298,141 @@ export default function About() {
         />
       </div>
 
-      {/* Bio Section header */}
-      <div
-        className="absolute left-[120px] top-[80px] flex flex-col items-start gap-[12px]"
-        style={{ width: 1272 }}
-      >
-        <p
-          className="w-full text-[#1F2753]"
-          style={{ fontSize: 60, lineHeight: "66px", letterSpacing: "2px" }}
-        >
-          You can call me Pari,
-        </p>
-        <p
-          className="w-full text-[#1F2753]"
-          style={{ fontSize: 32, lineHeight: "40px", letterSpacing: "2px" }}
-        >
-          Nice to meet you!
-        </p>
-        <p
-          className="w-full text-[#1F2753]"
-          style={{
-            fontWeight: 300,
-            fontSize: 20,
-            lineHeight: "24px",
-            letterSpacing: "5px",
-          }}
-        >
-          Product Designer
-        </p>
-      </div>
-
-      {/* Bio Container — illustration overlaps left, content scrolls right */}
-      <div
-        className="absolute flex items-start"
-        style={{
-          left: 120,
-          top: 314,
-          width: 1272,
-          height: 665,
-          paddingLeft: 634,
-          paddingBottom: 160,
-          gap: 40,
-        }}
-      >
+      {/* Page layout — flex-col with gap-80 between Bio Section and Bio Container */}
+      <div className="absolute inset-0 flex flex-col items-center pt-[80px] pb-[40px] px-[120px] gap-[80px]">
+        {/* Bio Section header — gap-12 between the two greeting lines */}
         <div
-          ref={scrollRef}
-          className="no-scrollbar flex-1 min-w-0 h-full overflow-y-auto flex flex-col items-start gap-[40px]"
+          className="w-full flex flex-col items-start gap-[12px] text-[#1F2753]"
+          style={{ letterSpacing: "2px" }}
         >
-          <BioText />
-          <ListSection title="My Academic Background" items={ACADEMIC} />
-          <ListSection title="My Certificates" items={CERTIFICATES} />
-          <ListSection title="My Skills" items={SKILLS} />
-          <ListSection title="My Hobbies" items={HOBBIES} />
+          <p
+            className="w-full"
+            style={{ fontSize: 60, lineHeight: "66px" }}
+          >
+            You can call me Pari,
+          </p>
+          <p
+            className="w-full"
+            style={{ fontSize: 32, lineHeight: "40px" }}
+          >
+            Nice to meet you!
+          </p>
         </div>
 
-        <CustomScrollbar scrollRef={scrollRef} trackHeight={505} />
+        {/* Bio Container — illustration overlaps left, content scrolls right.
+            pl-634 reserves space for the illustration; pb-160 keeps the last
+            sections clear of the floating nav above. */}
+        <div
+          className="w-full flex items-start"
+          style={{
+            height: 665,
+            paddingLeft: 634,
+            paddingBottom: 160,
+            gap: 40,
+          }}
+        >
+          <div
+            ref={scrollRef}
+            className="no-scrollbar flex-1 min-w-0 h-full overflow-y-auto flex flex-col items-center gap-[40px]"
+          >
+            <BioText />
+
+            {/* My Academic Background */}
+            <div className="w-full flex flex-col items-start gap-[20px] shrink-0">
+              <SectionTitle>My Academic Background</SectionTitle>
+              <div className="w-full flex flex-col items-start gap-[16px] rounded-[24px]">
+                {ACADEMIC.map((item, i) => (
+                  <EducationRow key={`acad-${i}`} item={item} />
+                ))}
+              </div>
+            </div>
+
+            {/* My Certificates */}
+            <div className="w-full flex flex-col items-start gap-[20px] shrink-0">
+              <SectionTitle>My Certificates</SectionTitle>
+              <div className="w-full flex flex-col items-start gap-[16px] rounded-[24px]">
+                {CERTIFICATES.map((item, i) => (
+                  <EducationRow key={`cert-${i}`} item={item} />
+                ))}
+              </div>
+            </div>
+
+            {/* My Skills — Methodes | (Soft Skills + Tools) */}
+            <div className="w-full flex flex-col items-start gap-[20px] shrink-0">
+              <SectionTitle>My Skills</SectionTitle>
+              <div className="w-full flex items-start rounded-[24px] whitespace-nowrap">
+                <div className="flex-1 min-w-0 flex flex-col items-start justify-center gap-[8px]">
+                  <SkillsColumnHeader>Methodes</SkillsColumnHeader>
+                  <div className="flex flex-col items-start justify-center gap-[4px]">
+                    {METHODES.map((item) => (
+                      <SkillBullet key={item}>{item}</SkillBullet>
+                    ))}
+                  </div>
+                </div>
+                <div className="flex-1 min-w-0 flex flex-col items-start justify-center gap-[24px]">
+                  <div className="w-full flex flex-col items-start justify-center gap-[8px]">
+                    <SkillsColumnHeader>Soft Skills</SkillsColumnHeader>
+                    <div className="flex flex-col items-start justify-center gap-[4px]">
+                      {SOFT_SKILLS.map((item) => (
+                        <SkillBullet key={item}>{item}</SkillBullet>
+                      ))}
+                    </div>
+                  </div>
+                  <div className="w-full flex flex-col items-start justify-center gap-[8px]">
+                    <SkillsColumnHeader>Tools</SkillsColumnHeader>
+                    <div className="flex flex-col items-start justify-center gap-[4px]">
+                      {TOOLS.map((item) => (
+                        <SkillBullet key={item}>{item}</SkillBullet>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* My Hobbies — 10 icons in a row, justify-between, w-596 */}
+            <div className="w-full flex flex-col items-start gap-[20px] shrink-0">
+              <SectionTitle>My Hobbies</SectionTitle>
+              <div
+                className="flex items-center justify-between"
+                style={{ width: 596 }}
+              >
+                {HOBBY_ICONS.map((src, i) => (
+                  <span
+                    key={src}
+                    className="relative shrink-0 inline-block"
+                    style={{ width: 32, height: 32 }}
+                    aria-hidden
+                  >
+                    <img
+                      src={src}
+                      alt=""
+                      className="absolute inset-0 w-full h-full block"
+                    />
+                  </span>
+                ))}
+              </div>
+            </div>
+
+            {/* MY WORK EXPERIENCES? CTA — bottom of the scrollable area.
+                /work doesn't exist yet, so render as a non-clickable span
+                until that page lands. */}
+            <p
+              className="w-full text-[#1F2753] shrink-0"
+              style={{
+                fontWeight: 300,
+                fontSize: 16,
+                lineHeight: "28px",
+                textDecoration: "underline",
+                textDecorationStyle: "solid",
+              }}
+            >
+              MY WORK EXPERIENCES?
+            </p>
+          </div>
+
+          <CustomScrollbar scrollRef={scrollRef} trackHeight={505} />
+        </div>
       </div>
     </>
   );
