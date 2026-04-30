@@ -29,11 +29,11 @@ export default function ScaledShell({
   const [scale, setScale] = useState(1);
   const pathname = usePathname();
 
-  // Frozen at first mount: home gets a 1.5 s prelude that lets its load
-  // sequence (Parichehr + 4 texts + illustration) finish before the nav
+  // Frozen at first mount: home gets a 1.7 s prelude that lets its load
+  // sequence (Parichehr + 5 texts + illustration) finish before the nav
   // pops in; any other initial route gets a snappy 0.6 s entry. Subsequent
   // navigations keep this delay (it's already past at that point).
-  const [navStartDelay] = useState(() => (pathname === "/" ? 1.5 : 0.6));
+  const [navStartDelay] = useState(() => (pathname === "/" ? 1.7 : 0.6));
 
   useIsomorphicLayoutEffect(() => {
     const apply = () => {

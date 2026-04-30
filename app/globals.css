@@ -2,18 +2,19 @@
 
 /* === Sequenced home-page load animation ===
    Plays only on the very first visit / hard refresh of `/`.
-   Timeline (no gaps between segments, total 2.6 s):
+   Timeline (no gaps between segments, total 2.8 s):
      0.0s  → Parichehr name fades down from above (0.3s)
-     0.3s  → Talebzadeh         fades down (0.2s)  ┐
-     0.5s  → Product Designer   fades down (0.2s)  │  TL → TR → BL → BR
-     0.7s  → bio                fades down (0.2s)  │  reading order
-     0.9s  → 2026               fades down (0.2s)  ┘
-     1.1s  → illustration fades down from top (0.4s)
-     1.5s  → nav Union backdrop fades in (0.3s)
-     1.8s  → Home    item pops in (0.2s)
-     2.0s  → Work    item pops in
-     2.2s  → About   item pops in
-     2.4s  → Contact item pops in
+     0.3s  → Talebzadeh           fades down (0.2s)  ┐
+     0.5s  → Product Designer     fades down (0.2s)  │  Talebzadeh →
+     0.7s  → bio                  fades down (0.2s)  │  Product Designer →
+     0.9s  → KNOW ME MORE? CTA    fades down (0.2s)  │  bio → CTA →
+     1.1s  → Complexity tagline   fades down (0.2s)  ┘  Complexity
+     1.3s  → illustration fades down from top (0.4s)
+     1.7s  → nav Union backdrop fades in (0.3s)
+     2.0s  → Home    item pops in (0.2s)
+     2.2s  → Work    item pops in
+     2.4s  → About   item pops in
+     2.6s  → Contact item pops in
    Each animated element uses fill-mode: both, so it stays hidden until
    its delay elapses, then plays. Per-element duration overrides are
    applied via inline `animationDuration`. */
