@@ -323,9 +323,14 @@ export default function Contact() {
             </div>
           </div>
 
-          {/* BOOK A TIME SLOT? CTA — no destination yet, render as a span */}
-          <p
-            className="w-full text-[#1F2753] shrink-0"
+          {/* BOOK A TIME SLOT? CTA — opens the Google Calendar appointment
+              page in a new tab so users can grab a slot directly. */}
+          <a
+            href="https://calendar.app.google/jcChbEUgp776dBD4A"
+            target="_blank"
+            rel="noopener noreferrer"
+            aria-label="Book a time slot"
+            className="w-full text-[#1F2753] shrink-0 block cursor-pointer hover:opacity-70 transition-opacity duration-200"
             style={{
               fontFamily: SOLWAY,
               fontWeight: 300,
@@ -336,7 +341,7 @@ export default function Contact() {
             }}
           >
             BOOK A TIME SLOT?
-          </p>
+          </a>
         </div>
       </div>
     </>
