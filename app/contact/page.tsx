@@ -16,8 +16,11 @@
      - Text block: phone block (Text me / +31-...) sits next to two
        inline action chips for WhatsApp and Telegram (gap-32)
      - Social Links Container: "Stay with me" + 5 oval pill buttons
-       (flex-1 h-88 rounded-100 border-2 #EDEAE4) for LinkedIn /
-       Instagram / Dribbble / Behance / Medium with 40 × 40 icons
+       (flex-1 h-88 rounded-100 border-2 #EDEAE4) — each social SVG
+       is rendered at its intrinsic viewBox dimensions inside a
+       40 × 40 wrapper, so it lands pixel-perfect on the design
+       (LinkedIn 35.7 × 34.1, IG/Dribbble 35.7 × 35.7, Behance 40 × 40,
+       Medium 33.3 × 29.7).
      - "BOOK A TIME SLOT?" CTA (underlined Solway Light 16/28 navy)
    Floating nav: rendered by ScaledShell (Contact active).
 ============================================================= */
@@ -37,6 +40,11 @@ type Social = {
   href?: string;
   src: string;
   alt: string;
+  /** SVG's intrinsic viewBox dimensions, taken from the asset itself.
+   *  Rendering at these natural sizes inside the 40 × 40 wrapper
+   *  reproduces Figma's nested-inset framing without hand-tuned CSS. */
+  iconWidth: number;
+  iconHeight: number;
 };
 
 const SOCIALS: Social[] = [
@@ -44,35 +52,47 @@ const SOCIALS: Social[] = [
     href: "https://www.linkedin.com/in/parichehr-talebzadeh/",
     src: "/assets/icon-social-linkedin.svg",
     alt: "LinkedIn",
+    iconWidth: 35.7333,
+    iconHeight: 34.0667,
   },
   {
     src: "/assets/icon-social-instagram.svg",
     alt: "Instagram",
+    iconWidth: 35.7333,
+    iconHeight: 35.7333,
   },
   {
     href: "https://dribbble.com/PariUXD",
     src: "/assets/icon-social-dribbble.svg",
     alt: "Dribbble",
+    iconWidth: 35.7333,
+    iconHeight: 35.7333,
   },
   {
     href: "https://www.behance.net/pariuxd",
     src: "/assets/icon-social-behance.svg",
     alt: "Behance",
+    iconWidth: 40,
+    iconHeight: 40,
   },
   {
     href: "https://medium.com/@pariuxd",
     src: "/assets/icon-social-medium.svg",
     alt: "Medium",
+    iconWidth: 33.3333,
+    iconHeight: 29.69,
   },
 ];
 
 function ExternalChevronIcon() {
   return (
-    <span className="relative shrink-0 inline-block w-[24px] h-[24px]">
+    <span className="relative shrink-0 inline-flex items-center justify-center w-[24px] h-[24px]">
       <img
         src="/assets/icon-link-external.svg"
         alt=""
-        className="absolute inset-0 w-full h-full block"
+        width={24}
+        height={24}
+        className="block"
       />
     </span>
   );
@@ -82,15 +102,20 @@ function SocialPill({ social }: { social: Social }) {
   const baseClass =
     "flex-1 min-w-0 flex items-center justify-center rounded-[100px] border-2 border-solid border-[#EDEAE4] bg-white transition-colors duration-200";
   const interactive = "hover:bg-[#F9F5EB]";
+  // 40 × 40 inner wrapper, with the SVG rendered at its intrinsic
+  // viewBox size and centered. Result matches Figma's nested-inset
+  // composition pixel-for-pixel without hand-tuned per-icon CSS.
   const inner = (
     <span
-      className="relative shrink-0 inline-block"
+      className="relative shrink-0 inline-flex items-center justify-center"
       style={{ width: 40, height: 40 }}
     >
       <img
         src={social.src}
         alt=""
-        className="absolute inset-0 w-full h-full block"
+        width={social.iconWidth}
+        height={social.iconHeight}
+        className="block"
       />
     </span>
   );
@@ -100,7 +125,13 @@ function SocialPill({ social }: { social: Social }) {
       <span
         aria-label={social.alt}
         className={baseClass}
-        style={{ height: 88, paddingLeft: 2, paddingRight: 2, paddingTop: 12, paddingBottom: 12 }}
+        style={{
+          height: 88,
+          paddingLeft: 2,
+          paddingRight: 2,
+          paddingTop: 12,
+          paddingBottom: 12,
+        }}
       >
         {inner}
       </span>
@@ -114,7 +145,13 @@ function SocialPill({ social }: { social: Social }) {
       rel="noopener noreferrer"
       aria-label={social.alt}
       className={`${baseClass} ${interactive}`}
-      style={{ height: 88, paddingLeft: 2, paddingRight: 2, paddingTop: 12, paddingBottom: 12 }}
+      style={{
+        height: 88,
+        paddingLeft: 2,
+        paddingRight: 2,
+        paddingTop: 12,
+        paddingBottom: 12,
+      }}
     >
       {inner}
     </a>
@@ -175,7 +212,10 @@ export default function Contact() {
             gap: 40,
           }}
         >
-          {/* Mail block — clickable mailto: link */}
+          {/* Mail block — clickable mailto: link.
+              Inline `<span>` (not `<p>`) inside the `<a>` so the cursor
+              stays a pointer over the entire row and there are no
+              block-level interruptions to click handling. */}
           <div className="w-full flex flex-col items-start gap-[8px] rounded-[24px]">
             <p
               className="text-[#5A5D70] whitespace-nowrap"
@@ -190,14 +230,14 @@ export default function Contact() {
             <a
               href={`mailto:${EMAIL}`}
               aria-label={`Email ${EMAIL}`}
-              className="flex items-center"
+              className="inline-flex items-center cursor-pointer hover:opacity-70 transition-opacity duration-200"
             >
-              <p
+              <span
                 className="text-[#1F2753] whitespace-nowrap"
                 style={{ fontSize: 20, lineHeight: "28px" }}
               >
                 {EMAIL}
-              </p>
+              </span>
               <ExternalChevronIcon />
             </a>
           </div>
@@ -228,9 +268,9 @@ export default function Contact() {
                 target="_blank"
                 rel="noopener noreferrer"
                 aria-label={`WhatsApp ${PHONE_DISPLAY}`}
-                className="flex items-center"
+                className="inline-flex items-center cursor-pointer hover:opacity-70 transition-opacity duration-200"
               >
-                <p
+                <span
                   className="text-[#1F2753] whitespace-nowrap"
                   style={{
                     fontSize: 16,
@@ -239,7 +279,7 @@ export default function Contact() {
                   }}
                 >
                   WhatsApp
-                </p>
+                </span>
                 <ExternalChevronIcon />
               </a>
               <a
@@ -247,9 +287,9 @@ export default function Contact() {
                 target="_blank"
                 rel="noopener noreferrer"
                 aria-label={`Telegram ${PHONE_DISPLAY}`}
-                className="flex items-center"
+                className="inline-flex items-center cursor-pointer hover:opacity-70 transition-opacity duration-200"
               >
-                <p
+                <span
                   className="text-[#1F2753] whitespace-nowrap"
                   style={{
                     fontSize: 16,
@@ -258,7 +298,7 @@ export default function Contact() {
                   }}
                 >
                   Telegram
-                </p>
+                </span>
                 <ExternalChevronIcon />
               </a>
             </div>
