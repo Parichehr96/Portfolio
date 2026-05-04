@@ -12,7 +12,7 @@ const solway = Solway({
 
 const spaceGrotesk = Space_Grotesk({
   subsets: ["latin"],
-  weight: ["400", "500"],
+  weight: ["400"],
   variable: "--font-space-grotesk",
   display: "swap",
 });

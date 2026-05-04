@@ -1163,16 +1163,19 @@ function ReflectionBlock({
   title: string;
   children: React.ReactNode;
 }) {
+  // Sub-title: Solway Regular 22/28 (Title/large per design tokens),
+  // colour #1B2249. Updated from Space Grotesk Medium 28/38 to match
+  // the latest Figma spec (313:2981 / 313:3176).
   return (
     <div className="w-full flex flex-col items-start" style={{ gap: 8 }}>
       <p
         className="w-full"
         style={{
           color: NAVY_DARK,
-          fontFamily: "var(--font-space-grotesk), sans-serif",
-          fontWeight: 500,
-          fontSize: 28,
-          lineHeight: "38px",
+          fontFamily: SOLWAY,
+          fontWeight: 400,
+          fontSize: 22,
+          lineHeight: "28px",
         }}
       >
         {title}

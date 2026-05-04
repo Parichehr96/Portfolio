@@ -132,16 +132,19 @@ function ReflectionBlock({
   title: string;
   children: React.ReactNode;
 }) {
+  // Sub-title: Solway Regular 22/28 (Title/large per design tokens),
+  // colour #1B2249. Updated from Space Grotesk Medium 28/38 to match
+  // the latest Figma spec (313:3176 / 313:3179 / 313:3182).
   return (
     <div className="w-full flex flex-col items-start" style={{ gap: 8 }}>
       <p
         className="w-full"
         style={{
           color: NAVY_DARK,
-          fontFamily: "var(--font-space-grotesk), sans-serif",
-          fontWeight: 500,
-          fontSize: 28,
-          lineHeight: "38px",
+          fontFamily: SOLWAY,
+          fontWeight: 400,
+          fontSize: 22,
+          lineHeight: "28px",
         }}
       >
         {title}
@@ -674,9 +677,10 @@ export default function ChallenquizCaseStudy() {
             The navigation restructure and the game initiation redesign
             were the right calls. They addressed the two clearest user
             problems — not knowing what the app offers, and not being
-            able to start playing — and the change in completion rates
-            confirmed it. Everything else (onboarding, profile, in-game
-            colour system) supported those two anchors.
+            able to start playing — with straightforward, evidence-based
+            solutions. Sometimes the most impactful design work
+            isn&rsquo;t innovative; it&rsquo;s making the obvious thing
+            actually work.
           </ReflectionBlock>
           <ReflectionBlock title="What I'd do differently">
             <span style={{ display: "block", marginBottom: 24 }}>
@@ -684,22 +688,26 @@ export default function ChallenquizCaseStudy() {
               The product had real user engagement but no sustainable
               revenue path, which is ultimately why it didn&rsquo;t
               survive. As a designer, I&rsquo;ve learned to ask harder
-              questions earlier about how the work I&rsquo;m doing
-              translates into something the company can keep funding.
+              questions about business viability early — not because
+              it&rsquo;s my responsibility alone, but because designing
+              features for a product that can&rsquo;t sustain itself is
+              time I&rsquo;d rather spend differently.
             </span>
             I&rsquo;d also build in more structured measurement. We could
             see the growth data, but we didn&rsquo;t have proper
             before/after metrics on specific flows (like drop-off rates
-            at game initiation) that would have let us prove the design
-            impact more cleanly.
+            at game initiation) that would have let us quantify the
+            design impact precisely.
           </ReflectionBlock>
           <ReflectionBlock title="What I took forward">
             This project sharpened my ability to diagnose invisible UX
             failures — problems that don&rsquo;t look like bugs but
             silently drive users away. The game initiation issue
-            wasn&rsquo;t a technical error; it was a communication gap.
-            Spotting that kind of failure quickly is something I now lean
-            on in every project.
+            wasn&rsquo;t a technical error; it was a communication
+            failure. The app worked correctly; it just never told users
+            what was happening. That distinction — between something
+            being broken and something being unexplained — is one I now
+            look for in every product I touch.
           </ReflectionBlock>
         </section>
       </div>
