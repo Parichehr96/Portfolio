@@ -92,56 +92,73 @@ const BULLET_GROUPS: Bullets[] = [
   },
 ];
 
-// Per-arrow geometry mirroring Figma's wrapper structure: the outer
-// div is `flex items-center justify-center` with a fixed bounding box,
-// the inner div applies the rotation, and the SVG image fills its own
-// natural rect inside.
+// Per-arrow geometry mirroring Figma's wrapper structure: outer flex
+// box with a fixed bounding rect, inner block carries the rotation,
+// and the inset div extends the SVG to match its viewBox so the
+// arrowhead/stroke sit at the right pixel offsets. Insets are stored
+// as raw CSS strings ("-6.08px", "-1.29%") because some are pixel
+// values and some are percentages of the inner rect.
 type Arrow = {
   src: string;
-  // Outer wrapper bounding box
   left: number;
   top: number;
-  w: number; // outer width (often 0 for "rotate-90" arrows so the rotation pivots correctly)
-  h: number; // outer height
-  // Rotation in degrees applied to the inner block
+  w: number;
+  h: number;
   rotate: number;
-  // Inner rect dimensions (the arrow's natural width/height before rotation)
   innerW: number;
   innerH: number;
-  // Inset offsets that some arrows carry to align stroke+arrowhead.
-  insetTop?: number;
-  insetRight?: number;
-  insetBottom?: number;
-  insetLeft?: number;
+  insetTop: string;
+  insetRight: string;
+  insetBottom: string;
+  insetLeft: string;
 };
 
 const ARROWS: Arrow[] = [
-  // Vertical arrow Menu→Categories
-  { src: `${A}/arrow-4.svg`,  left: 864.05, top: 52.2,   w: 0,       h: 101.85, rotate: 90,    innerW: 101.85, innerH: 0, insetTop: -6.08, insetBottom: -6.08, insetLeft: 0, insetRight: -0.81 },
+  // Vertical arrow Menu → Categories
+  { src: `${A}/arrow-4.svg`,  left: 864.05, top: 52.2,   w: 0,       h: 101.85,  rotate: 90,    innerW: 101.85,  innerH: 0,
+    insetTop: "-6.08px", insetRight: "-0.81%", insetBottom: "-6.08px", insetLeft: "0" },
   // Vertical arrow into "Selects a game"
-  { src: `${A}/arrow-19.svg`, left: 1005,   top: 265,    w: 0,       h: 35,     rotate: 90,    innerW: 35,     innerH: 0, insetTop: -6.08, insetBottom: -6.08, insetLeft: 0, insetRight: -2.36 },
+  { src: `${A}/arrow-19.svg`, left: 1005,   top: 265,    w: 0,       h: 35,      rotate: 90,    innerW: 35,      innerH: 0,
+    insetTop: "-6.08px", insetRight: "-2.36%", insetBottom: "-6.08px", insetLeft: "0" },
   // Horizontal back-arrow from screenshot toolbar to "Game begins"
-  { src: `${A}/arrow-21.svg`, left: 571,    top: 374,    w: 170,     h: 0,      rotate: 180,   innerW: 170,    innerH: 0, insetTop: -6.08, insetBottom: -6.08, insetLeft: 0, insetRight: -0.49 },
-  // Horizontal arrows under the phone screenshots row
-  { src: `${A}/arrow-22.svg`, left: 580,    top: 621,    w: 161,     h: 0,      rotate: 180,   innerW: 161,    innerH: 0, insetTop: -6.08, insetBottom: -6.08, insetLeft: 0, insetRight: -0.51 },
-  { src: `${A}/arrow-23.svg`, left: 918,    top: 621,    w: 85,      h: 0,      rotate: 180,   innerW: 85,     innerH: 0, insetTop: -6.08, insetBottom: -6.08, insetLeft: 0, insetRight: -0.97 },
+  { src: `${A}/arrow-21.svg`, left: 571,    top: 374,    w: 170,     h: 0,       rotate: 180,   innerW: 170,     innerH: 0,
+    insetTop: "-6.08px", insetRight: "-0.49%", insetBottom: "-6.08px", insetLeft: "0" },
+  { src: `${A}/arrow-22.svg`, left: 580,    top: 621,    w: 161,     h: 0,       rotate: 180,   innerW: 161,     innerH: 0,
+    insetTop: "-6.08px", insetRight: "-0.51%", insetBottom: "-6.08px", insetLeft: "0" },
+  { src: `${A}/arrow-23.svg`, left: 918,    top: 621,    w: 85,      h: 0,       rotate: 180,   innerW: 85,      innerH: 0,
+    insetTop: "-6.08px", insetRight: "-0.97%", insetBottom: "-6.08px", insetLeft: "0" },
   // Tiny vertical arrow into History
-  { src: `${A}/arrow-16.svg`, left: 1159,   top: 194,    w: 0,       h: 20,     rotate: 90,    innerW: 20,     innerH: 0, insetTop: -6.08, insetBottom: -6.08, insetLeft: 0, insetRight: -4.13 },
-  // Diagonal hierarchy arrows (rotate ~32deg) — Menu → top row
-  { src: `${A}/arrow-5.svg`,  left: 841.78, top: 14.63,  w: 207.892, h: 174.845, rotate: 32.16, innerW: 191.357, innerH: 86.223 },
-  { src: `${A}/arrow-6.svg`,  left: 841.78, top: -45.19, w: 339.932, h: 294.032, rotate: 32.16, innerW: 302.903, innerH: 156.879 },
-  { src: `${A}/arrow-7.svg`,  left: 701.29, top: 1.56,   w: 175.166, h: 189.218, rotate: 32.16, innerW: 109.782, innerH: 154.487 },
-  { src: `${A}/arrow-8.svg`,  left: 556.31, top: -64,    w: 320.152, h: 319.521, rotate: 32.16, innerW: 232.965, innerH: 230.957 },
-  { src: `${A}/arrow-9.svg`,  left: 206.84, top: 24.17,  w: 386.921, h: 355.058, rotate: 32.16, innerW: 319.743, innerH: 218.377 },
-  { src: `${A}/arrow-14.svg`, left: 85.03,  top: 215.78, w: 100.558, h: 97.464,  rotate: 32.16, innerW: 76.729, innerH: 66.886 },
-  { src: `${A}/arrow-15.svg`, left: 176.58, top: 233.21, w: 71.311,  h: 61.912,  rotate: 32.16, innerW: 63.261, innerH: 33.358 },
-  { src: `${A}/arrow-10.svg`, left: 383.91, top: 105.08, w: 209.401, h: 195.389, rotate: 32.16, innerW: 169.074, innerH: 124.499 },
-  { src: `${A}/arrow-17.svg`, left: 586.08, top: 193.5,  w: 9.464,   h: 10.501,  rotate: 32.16, innerW: 5.589,  innerH: 8.89 },
-  { src: `${A}/arrow-11.svg`, left: 510.36, top: 214.04, w: 90.13,   h: 90.799,  rotate: 32.16, innerW: 64.545, innerH: 66.673 },
-  { src: `${A}/arrow-20.svg`, left: 865,    top: 293.8,  w: 138.318, h: 134.225, rotate: 32.16, innerW: 105.341, innerH: 92.32 },
-  { src: `${A}/arrow-12.svg`, left: 587.09, top: 220.45, w: 90.198,  h: 77.503,  rotate: 32.16, innerW: 81.007, innerH: 40.617 },
-  { src: `${A}/arrow-13.svg`, left: 587.09, top: 158.1,  w: 228.347, h: 202.062, rotate: 32.16, innerW: 197.887, innerH: 114.266 },
-  { src: `${A}/arrow-18.svg`, left: 784,    top: 108,    w: 228.347, h: 202.062, rotate: 32.16, innerW: 197.887, innerH: 114.266 },
+  { src: `${A}/arrow-16.svg`, left: 1159,   top: 194,    w: 0,       h: 20,      rotate: 90,    innerW: 20,      innerH: 0,
+    insetTop: "-6.08px", insetRight: "-4.13%", insetBottom: "-6.08px", insetLeft: "0" },
+  // Diagonal hierarchy arrows (rotate ~32deg)
+  { src: `${A}/arrow-5.svg`,  left: 841.78, top: 14.63,  w: 207.892, h: 174.845, rotate: 32.16, innerW: 191.357, innerH: 86.223,
+    insetTop: "2.56%",  insetRight: "-1.29%", insetBottom: "2.56%",  insetLeft: "-0.36%" },
+  { src: `${A}/arrow-6.svg`,  left: 841.78, top: -45.19, w: 339.932, h: 294.032, rotate: 32.16, innerW: 302.903, innerH: 156.879,
+    insetTop: "1.41%",  insetRight: "-0.82%", insetBottom: "1.41%",  insetLeft: "-0.23%" },
+  { src: `${A}/arrow-7.svg`,  left: 701.29, top: 1.56,   w: 175.166, h: 189.218, rotate: 32.16, innerW: 109.782, innerH: 154.487,
+    insetTop: "-0.28%", insetRight: "2.01%",  insetBottom: "-0.53%", insetLeft: "2.01%" },
+  { src: `${A}/arrow-8.svg`,  left: 556.31, top: -64,    w: 320.152, h: 319.521, rotate: 32.16, innerW: 232.965, innerH: 230.957,
+    insetTop: "-0.19%", insetRight: "0.95%",  insetBottom: "-0.36%", insetLeft: "0.95%" },
+  { src: `${A}/arrow-9.svg`,  left: 206.84, top: 24.17,  w: 386.921, h: 355.058, rotate: 32.16, innerW: 319.743, innerH: 218.377,
+    insetTop: "-0.2%",  insetRight: "0.52%",  insetBottom: "-0.38%", insetLeft: "-0.2%" },
+  { src: `${A}/arrow-14.svg`, left: 85.03,  top: 215.78, w: 100.558, h: 97.464,  rotate: 32.16, innerW: 76.729,  innerH: 66.886,
+    insetTop: "-0.66%", insetRight: "2.87%",  insetBottom: "-1.23%", insetLeft: "-2.86%" },
+  { src: `${A}/arrow-15.svg`, left: 176.58, top: 233.21, w: 71.311,  h: 61.912,  rotate: 32.16, innerW: 63.261,  innerH: 33.358,
+    insetTop: "1.64%",  insetRight: "-3.91%", insetBottom: "6.61%",  insetLeft: "-1.1%" },
+  { src: `${A}/arrow-10.svg`, left: 383.91, top: 105.08, w: 209.401, h: 195.389, rotate: 32.16, innerW: 169.074, innerH: 124.499,
+    insetTop: "-0.35%", insetRight: "0.76%",  insetBottom: "-0.66%", insetLeft: "0.25%" },
+  { src: `${A}/arrow-17.svg`, left: 586.08, top: 193.5,  w: 9.464,   h: 10.501,  rotate: 32.16, innerW: 5.589,   innerH: 8.89,
+    insetTop: "-4.94%", insetRight: "-44.25%", insetBottom: "-9.28%", insetLeft: "-44.29%" },
+  { src: `${A}/arrow-11.svg`, left: 510.36, top: 214.04, w: 90.13,   h: 90.799,  rotate: 32.16, innerW: 64.545,  innerH: 66.673,
+    insetTop: "-0.66%", insetRight: "3.42%",  insetBottom: "-1.24%", insetLeft: "0.66%" },
+  { src: `${A}/arrow-20.svg`, left: 865,    top: 293.8,  w: 138.318, h: 134.225, rotate: 32.16, innerW: 105.341, innerH: 92.32,
+    insetTop: "-0.48%", insetRight: "2.21%",  insetBottom: "-2.68%", insetLeft: "-0.78%" },
+  { src: `${A}/arrow-12.svg`, left: 587.09, top: 220.45, w: 90.198,  h: 77.503,  rotate: 32.16, innerW: 81.007,  innerH: 40.617,
+    insetTop: "5.43%",  insetRight: "-3.06%", insetBottom: "5.43%",  insetLeft: "-0.86%" },
+  { src: `${A}/arrow-13.svg`, left: 587.09, top: 158.1,  w: 228.347, h: 202.062, rotate: 32.16, innerW: 197.887, innerH: 114.266,
+    insetTop: "1.93%",  insetRight: "-1.25%", insetBottom: "1.93%",  insetLeft: "-0.35%" },
+  { src: `${A}/arrow-18.svg`, left: 784,    top: 108,    w: 228.347, h: 202.062, rotate: 32.16, innerW: 197.887, innerH: 114.266,
+    insetTop: "2.04%",  insetRight: "-1.25%", insetBottom: "2.04%",  insetLeft: "-0.35%" },
 ];
 
 const SCREENSHOTS = [
@@ -346,10 +363,10 @@ export default function ResearchDiagram() {
                 <div
                   style={{
                     position: "absolute",
-                    top: a.insetTop ?? 0,
-                    right: a.insetRight ?? 0,
-                    bottom: a.insetBottom ?? 0,
-                    left: a.insetLeft ?? 0,
+                    top: a.insetTop,
+                    right: a.insetRight,
+                    bottom: a.insetBottom,
+                    left: a.insetLeft,
                   }}
                 >
                   <img
