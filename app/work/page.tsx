@@ -32,13 +32,23 @@ type Experience = {
   /** Optional per-project preview image. Falls back to profile-image
    *  while the user hasn't supplied real previews yet. */
   preview?: string;
+  /** When set, the experience name links to a case-study route. The
+   *  whole row stays a hover target for the highlight; only the name
+   *  cluster is clickable so the surrounding date/dashed leader don't
+   *  steal the click. */
+  caseStudy?: string;
 };
 
 const EXPERIENCES: Experience[] = [
   { name: "ONTON", short: "PomeGroup", date: "May 2024 - June 2025" },
   { name: "Challenquiz", short: "PomeGroup", date: "Nov 2023 - May 2024" },
   { name: "Ezam Part", short: "Ezam", date: "Nov 2022 - June 2023" },
-  { name: "WOW Global Solution", short: "RDSysCo", date: "May 2021 - Sep 2022" },
+  {
+    name: "WOW Global Solution",
+    short: "RDSysCo",
+    date: "May 2021 - Sep 2022",
+    caseStudy: "/work/wow-global-solutions",
+  },
   { name: "Golestan", short: "-", date: "Jan 2021 - June 2022" },
   { name: "Filala", short: "Poytek", date: "Apr 2021 - Nov 2021" },
   { name: "IOT", short: "Poytek", date: "Apr 2021 - Nov 2021" },
@@ -155,6 +165,55 @@ function ExperienceRow({
       >
         {item.date}
       </p>
+    </div>
+  );
+}
+
+/* Wrapper for a single experience row. When the experience has a
+   case-study destination, the row is rendered as a real <a> anchor —
+   native HTML navigation is the most robust path: it works without
+   React event handlers, survives any pointer-events / transform / event-
+   delegation oddity in the scaled shell, and falls back to a plain
+   page load if the JS bundle fails to hydrate. */
+function ExperienceRowItem({
+  itemRef,
+  item,
+  selected,
+  onSelect,
+}: {
+  itemRef: (el: HTMLDivElement | null) => void;
+  item: Experience;
+  selected: boolean;
+  onSelect: () => void;
+}) {
+  const inner = <ExperienceRow item={item} selected={selected} />;
+  const baseClass = "relative block w-full p-[8px] no-underline";
+  if (item.caseStudy) {
+    return (
+      <a
+        ref={(el: HTMLAnchorElement | null) =>
+          itemRef(el as unknown as HTMLDivElement)
+        }
+        href={item.caseStudy}
+        className={baseClass}
+        style={{ cursor: "pointer", color: "inherit" }}
+        onMouseEnter={onSelect}
+        onFocus={onSelect}
+        aria-label={`${item.name} — open case study`}
+      >
+        {inner}
+      </a>
+    );
+  }
+  return (
+    <div
+      ref={itemRef}
+      className={baseClass}
+      style={{ cursor: "default" }}
+      onMouseEnter={onSelect}
+      onFocus={onSelect}
+    >
+      {inner}
     </div>
   );
 }
@@ -365,17 +424,15 @@ export default function Work() {
               )}
 
               {EXPERIENCES.map((item, i) => (
-                <div
+                <ExperienceRowItem
                   key={`${item.name}-${i}`}
-                  ref={(el) => {
+                  itemRef={(el) => {
                     itemRefs.current[i] = el;
                   }}
-                  className="relative w-full p-[8px] cursor-default"
-                  onMouseEnter={() => setSelectedIdx(i)}
-                  onFocus={() => setSelectedIdx(i)}
-                >
-                  <ExperienceRow item={item} selected={selectedIdx === i} />
-                </div>
+                  item={item}
+                  selected={selectedIdx === i}
+                  onSelect={() => setSelectedIdx(i)}
+                />
               ))}
             </div>
 

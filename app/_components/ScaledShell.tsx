@@ -35,6 +35,22 @@ export default function ScaledShell({
   const [scale, setScale] = useState(1);
   const pathname = usePathname();
 
+  // Case-study routes (e.g. /work/wow-global-solutions) are long-form
+  // scrollable documents that intentionally break out of the 1512×982
+  // canvas. Pass them through unscaled, with no FloatingNav — the back
+  // button on the case-study page handles return navigation.
+  const isCaseStudy = /^\/work\/[^/]+/.test(pathname);
+  if (isCaseStudy) {
+    return (
+      <div
+        className="bg-white"
+        style={{ fontFamily: "var(--font-solway), serif" }}
+      >
+        {children}
+      </div>
+    );
+  }
+
   // Frozen at first mount: home gets a 1.7 s prelude that lets its load
   // sequence (Parichehr + 5 texts + illustration) finish before the nav
   // pops in; any other initial route gets a snappy 0.6 s entry. Subsequent
