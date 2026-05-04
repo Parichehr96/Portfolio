@@ -27,8 +27,15 @@ import { useEffect, useLayoutEffect, useRef, useState } from "react";
 
 type Experience = {
   name: string;
+  /** Company / context tag shown next to the name (Solway Light grey). */
   short: string;
   date: string;
+  /** Industry tag rendered under the preview frame (e.g. "Web3"). Used
+   *  for the description block beneath the project image. */
+  industry?: string;
+  /** One-sentence project description shown under the preview frame
+   *  when the row is selected. */
+  description?: string;
   /** Optional per-project preview image. Falls back to profile-image
    *  while the user hasn't supplied real previews yet. */
   preview?: string;
@@ -40,24 +47,80 @@ type Experience = {
 };
 
 const EXPERIENCES: Experience[] = [
-  { name: "ONTON", short: "PomeGroup", date: "May 2024 - June 2025" },
+  {
+    name: "ViaVia",
+    short: "Master’s Project",
+    date: "Jan 2026 - May 2026",
+    industry: "Mobility",
+    description:
+      "Project description coming soon — placeholder until copy is finalised.",
+  },
+  {
+    name: "Mindful Meet",
+    short: "Master’s Project",
+    date: "Oct 2025 - Dec 2022",
+    industry: "Sustainability",
+    description:
+      "A Google Calendar integration that makes the digital carbon cost and mental load of online meetings visible — without using guilt.",
+  },
+  {
+    name: "ONTON",
+    short: "PomeGroup",
+    date: "May 2024 - June 2025",
+    industry: "Web3",
+    description:
+      "A Telegram Mini App connecting crypto communities to on-chain event verification, letting organisers issue and participants collect proof-of-attendance badges in-chat.",
+  },
   {
     name: "Challenquiz",
     short: "PomeGroup",
     date: "Nov 2023 - May 2024",
+    industry: "Consumer",
+    description:
+      "A redesigned Telegram quiz app where users compete in real-time trivia challenges, earn tokens, and climb leaderboards.",
     caseStudy: "/work/challenquiz",
   },
-  { name: "Ezam Part", short: "Ezam", date: "Nov 2022 - June 2023" },
+  {
+    name: "Ezam Part",
+    short: "Ezam",
+    date: "Nov 2022 - June 2023",
+    industry: "B2B E-commerce",
+    description:
+      "A unified digital ecosystem (consumer site, agent dashboard, repairman app) for one of Iran’s largest auto parts manufacturers.",
+  },
   {
     name: "WOW Global Solution",
     short: "RDSysCo",
     date: "May 2021 - Sep 2022",
+    industry: "Enterprise SaaS",
+    description:
+      "A comprehensive ERP platform centralising HR, scheduling, documents, profiles, and inter-company connections for North American oil and gas companies.",
     caseStudy: "/work/wow-global-solutions",
   },
-  { name: "Golestan", short: "-", date: "Jan 2021 - June 2022" },
-  { name: "Filala", short: "Poytek", date: "Apr 2021 - Nov 2021" },
-  { name: "IOT", short: "Poytek", date: "Apr 2021 - Nov 2021" },
-  { name: "Living Maples", short: "Golearn", date: "Oct 2020 - Apr 2021" },
+  {
+    name: "Golestan",
+    short: "Bachelor’s Thesis",
+    date: "Jan 2021 - June 2022",
+    industry: "Education",
+    description:
+      "Project description coming soon — placeholder until copy is finalised.",
+  },
+  {
+    name: "Filala",
+    short: "Poytek",
+    date: "Apr 2021 - Nov 2021",
+    industry: "Consumer",
+    description:
+      "Project description coming soon — placeholder until copy is finalised.",
+  },
+  {
+    name: "Living Maples",
+    short: "Golearn",
+    date: "Oct 2020 - Apr 2021",
+    industry: "EdTech",
+    description:
+      "Project description coming soon — placeholder until copy is finalised.",
+  },
 ];
 
 const SPACE_GROTESK = "var(--font-space-grotesk), sans-serif";
@@ -356,7 +419,8 @@ export default function Work() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [selectedIdx]);
 
-  const currentPreview = EXPERIENCES[selectedIdx]?.preview ?? FALLBACK_PREVIEW;
+  const currentExperience = EXPERIENCES[selectedIdx];
+  const currentPreview = currentExperience?.preview ?? FALLBACK_PREVIEW;
 
   return (
     <>
@@ -400,21 +464,119 @@ export default function Work() {
             gap: 40,
           }}
         >
-          {/* Project preview frame — its own view-transition name so it
-              fades in/out rather than cross-morphing with the person
-              illustrations on /home, /about, /contact (those would
-              cross-fade visually-incompatible content). */}
-          <div
-            className="h-full aspect-square shrink-0 relative overflow-hidden"
-            style={{ viewTransitionName: "work-preview" }}
-          >
-            <img
-              key={selectedIdx}
-              src={currentPreview}
-              alt=""
-              className="absolute inset-0 w-full h-full object-cover block anim-fade"
-              style={{ animationDuration: "400ms" }}
-            />
+          {/* Project preview column — image on top + name/company/industry
+              line + description (Figma 302:2375). The frame's
+              `viewTransitionName: work-preview` fades cleanly between
+              /work and the other main pages. The metadata + description
+              swap with the currently-hovered experience via React state. */}
+          <div className="h-full aspect-square shrink-0 flex flex-col gap-[12px] py-[8px] overflow-hidden">
+            <div
+              className="relative w-full overflow-hidden"
+              style={{
+                viewTransitionName: "work-preview",
+                aspectRatio: "1 / 1",
+                flex: "0 1 auto",
+                minHeight: 0,
+              }}
+            >
+              <img
+                key={selectedIdx}
+                src={currentPreview}
+                alt=""
+                className="absolute inset-0 w-full h-full object-cover block anim-fade"
+                style={{ animationDuration: "400ms" }}
+              />
+            </div>
+            {currentExperience && (
+              <>
+                {/* Name · Company · Industry line — anim-fade swaps with
+                    selectedIdx so it cross-fades when hovering rows. */}
+                <div
+                  key={`meta-${selectedIdx}`}
+                  className="flex items-start gap-[12px] anim-fade whitespace-nowrap"
+                  style={{
+                    fontSize: 16,
+                    lineHeight: "24px",
+                    letterSpacing: "0.15px",
+                    animationDuration: "400ms",
+                  }}
+                >
+                  <p
+                    className="shrink-0"
+                    style={{
+                      fontFamily: SPACE_GROTESK,
+                      fontWeight: 400,
+                      color: "#111323",
+                    }}
+                  >
+                    {currentExperience.name}
+                  </p>
+                  <p
+                    className="shrink-0"
+                    style={{
+                      fontFamily: SOLWAY,
+                      fontWeight: 400,
+                      color: "#1B2249",
+                    }}
+                  >
+                    ·
+                  </p>
+                  <p
+                    className="shrink-0"
+                    style={{
+                      fontFamily: SOLWAY,
+                      fontWeight: 300,
+                      color: "#7E7F85",
+                    }}
+                  >
+                    {currentExperience.short}
+                  </p>
+                  {currentExperience.industry && (
+                    <>
+                      <p
+                        className="shrink-0"
+                        style={{
+                          fontFamily: SOLWAY,
+                          fontWeight: 400,
+                          color: "#1B2249",
+                        }}
+                      >
+                        ·
+                      </p>
+                      <p
+                        className="shrink-0"
+                        style={{
+                          fontFamily: SOLWAY,
+                          fontWeight: 300,
+                          color: "#7E7F85",
+                        }}
+                      >
+                        {currentExperience.industry}
+                      </p>
+                    </>
+                  )}
+                </div>
+                {/* Description — Solway Medium 12/16, also anim-fade keyed
+                    by selectedIdx so it follows the hover. */}
+                {currentExperience.description && (
+                  <p
+                    key={`desc-${selectedIdx}`}
+                    className="w-full anim-fade"
+                    style={{
+                      fontFamily: SOLWAY,
+                      fontWeight: 500,
+                      fontSize: 12,
+                      lineHeight: "16px",
+                      letterSpacing: "0.5px",
+                      color: "#1F2753",
+                      animationDuration: "400ms",
+                    }}
+                  >
+                    {currentExperience.description}
+                  </p>
+                )}
+              </>
+            )}
           </div>
 
           {/* Text and Experiences Container */}
