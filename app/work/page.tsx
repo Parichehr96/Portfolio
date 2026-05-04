@@ -185,14 +185,26 @@ function ExperienceRowItem({
   item,
   selected,
   onSelect,
+  stage,
 }: {
   itemRef: (el: HTMLDivElement | null) => void;
   item: Experience;
   selected: boolean;
   onSelect: () => void;
+  stage: number;
 }) {
   const inner = <ExperienceRow item={item} selected={selected} />;
-  const baseClass = "relative block w-full p-[8px] no-underline";
+  // anim-bubbly-grow goes on the same element that itemRef points at
+  // so the navy highlight pill (which reads item.offsetTop /
+  // offsetHeight) sees the right layout position. Wrapping this in an
+  // extra div with `transform` would reset offsetParent to that
+  // wrapper and break the highlight slide.
+  const baseClass =
+    "relative block w-full p-[8px] no-underline anim-bubbly-grow";
+  const stageStyle: React.CSSProperties = {
+    transformOrigin: "left center",
+    ["--stage" as string]: stage,
+  };
   if (item.caseStudy) {
     return (
       <a
@@ -201,7 +213,7 @@ function ExperienceRowItem({
         }
         href={item.caseStudy}
         className={baseClass}
-        style={{ cursor: "pointer", color: "inherit" }}
+        style={{ cursor: "pointer", color: "inherit", ...stageStyle }}
         onMouseEnter={onSelect}
         onFocus={onSelect}
         aria-label={`${item.name} — open case study`}
@@ -214,7 +226,7 @@ function ExperienceRowItem({
     <div
       ref={itemRef}
       className={baseClass}
-      style={{ cursor: "default" }}
+      style={{ cursor: "default", ...stageStyle }}
       onMouseEnter={onSelect}
       onFocus={onSelect}
     >
@@ -349,26 +361,37 @@ export default function Work() {
   return (
     <>
       <div className="absolute inset-0 flex flex-col items-center pt-[80px] pb-[40px] px-[120px] gap-[80px]">
-        {/* Bio Section header */}
+        {/* Bio Section header — stage 0 + 1 (top-left) */}
         <div
           className="w-full flex flex-col items-start gap-[12px] text-[#1F2753]"
           style={{ letterSpacing: "2px" }}
         >
           <p
-            className="w-full"
-            style={{ fontSize: 44, lineHeight: "52px" }}
+            className="w-full anim-bubbly-grow"
+            style={{
+              fontSize: 44,
+              lineHeight: "52px",
+              transformOrigin: "left center",
+              ["--stage" as string]: 0,
+            }}
           >
             I&rsquo;ve worked in multiple industries...
           </p>
           <p
-            className="w-full"
-            style={{ fontSize: 20, lineHeight: "24px" }}
+            className="w-full anim-bubbly-grow"
+            style={{
+              fontSize: 20,
+              lineHeight: "24px",
+              transformOrigin: "left center",
+              ["--stage" as string]: 1,
+            }}
           >
             Saas, B2B, ERP, Startup, Crypto, etc.
           </p>
         </div>
 
-        {/* Bio Container — preview frame on the left, experience list on the right */}
+        {/* Bio Container — preview frame on the left is the matching
+            layer; right column staggers individually. */}
         <div
           className="w-full flex items-start"
           style={{
@@ -377,9 +400,7 @@ export default function Work() {
             gap: 40,
           }}
         >
-          {/* Project preview frame. The currently-selected experience drives
-              which preview is shown; image swap fades in with a 400 ms
-              opacity transition keyed by selectedIdx. */}
+          {/* Project preview frame (matching layer — no bubbly). */}
           <div
             className="h-full aspect-square shrink-0 relative overflow-hidden"
             style={{ viewTransitionName: "hero-illustration" }}
@@ -395,23 +416,23 @@ export default function Work() {
 
           {/* Text and Experiences Container */}
           <div className="flex-1 min-w-0 flex flex-col items-start gap-[32px]">
+            {/* "My Experiences" label — stage 2 */}
             <p
-              className="w-full text-[#5A5D70]"
+              className="w-full text-[#5A5D70] anim-bubbly-grow"
               style={{
                 fontWeight: 500,
                 fontSize: 20,
                 lineHeight: "26px",
                 letterSpacing: "0.5px",
+                transformOrigin: "left center",
+                ["--stage" as string]: 2,
               }}
             >
               My Experiences
             </p>
 
-            {/* Experience list with bubbly animated highlight.
-                All rows have p-[8px] always (consistent layout). The
-                selected row's navy pill is rendered as a single absolute
-                element that animates top + height with spring easing as
-                the user hovers between rows. */}
+            {/* Experience list — each row sub-stages 3.0..3.7 so the
+                eight rows pop in one-by-one, top to bottom. */}
             <div
               ref={containerRef}
               className="relative w-full flex flex-col items-start gap-[16px] rounded-[24px]"
@@ -437,25 +458,35 @@ export default function Work() {
                   item={item}
                   selected={selectedIdx === i}
                   onSelect={() => setSelectedIdx(i)}
+                  stage={3 + i * 0.5}
                 />
               ))}
             </div>
 
-            {/* CTAs — Primary "GET IN TOUCH" → /contact, Secondary "MY CV"
-                (no destination yet, renders as a non-clickable span). */}
+            {/* CTAs — each button stages individually as the last two. */}
             <div className="w-full flex items-start gap-[20px] shrink-0">
-              <CTAButton
-                href="/contact"
-                iconSrc="/assets/icon-cta-chat.svg"
-                label="Get in touch"
+              <span
+                className="anim-bubbly-grow flex-1 flex"
+                style={{ ["--stage" as string]: 8 }}
+              >
+                <CTAButton
+                  href="/contact"
+                  iconSrc="/assets/icon-cta-chat.svg"
+                  label="Get in touch"
                 variant="primary"
-                uppercase
-              />
-              <CTAButton
-                iconSrc="/assets/icon-cta-cv.svg"
-                label="MY CV"
-                variant="secondary"
-              />
+                  uppercase
+                />
+              </span>
+              <span
+                className="anim-bubbly-grow flex-1 flex"
+                style={{ ["--stage" as string]: 9 }}
+              >
+                <CTAButton
+                  iconSrc="/assets/icon-cta-cv.svg"
+                  label="MY CV"
+                  variant="secondary"
+                />
+              </span>
             </div>
           </div>
         </div>

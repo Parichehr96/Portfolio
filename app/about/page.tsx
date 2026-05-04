@@ -176,11 +176,17 @@ function SkillBullet({ children }: { children: React.ReactNode }) {
   );
 }
 
-function BioText() {
+function BioText({ stage }: { stage: number }) {
   return (
     <div
-      className="w-full text-[#5A5D70] flex flex-col gap-[24px] shrink-0"
-      style={{ fontSize: 16, lineHeight: "24px", letterSpacing: "0.5px" }}
+      className="w-full text-[#5A5D70] flex flex-col gap-[24px] shrink-0 anim-bubbly-grow"
+      style={{
+        fontSize: 16,
+        lineHeight: "24px",
+        letterSpacing: "0.5px",
+        transformOrigin: "left top",
+        ["--stage" as string]: stage,
+      }}
     >
       <p>
         I&rsquo;m a product designer with{" "}
@@ -388,26 +394,40 @@ export default function About() {
         />
       </div>
 
-      {/* Bio Section header */}
+      {/* Bio Section header — stage 0 (TL) + stage 1 */}
       <div
         className="absolute left-[120px] top-[80px] flex flex-col items-start gap-[12px]"
         style={{ width: 1272 }}
       >
         <p
-          className="w-full text-[#1F2753]"
-          style={{ fontSize: 60, lineHeight: "66px", letterSpacing: "2px" }}
+          className="w-full text-[#1F2753] anim-bubbly-grow"
+          style={{
+            fontSize: 60,
+            lineHeight: "66px",
+            letterSpacing: "2px",
+            transformOrigin: "left center",
+            ["--stage" as string]: 0,
+          }}
         >
           You can call me Pari,
         </p>
         <p
-          className="w-full text-[#1F2753]"
-          style={{ fontSize: 32, lineHeight: "40px", letterSpacing: "2px" }}
+          className="w-full text-[#1F2753] anim-bubbly-grow"
+          style={{
+            fontSize: 32,
+            lineHeight: "40px",
+            letterSpacing: "2px",
+            transformOrigin: "left center",
+            ["--stage" as string]: 1,
+          }}
         >
           Nice to meet you!
         </p>
       </div>
 
-      {/* Bio Container — illustration overlaps left, content scrolls right */}
+      {/* Bio Container — illustration on the left is the matching layer
+          (no bubbly); each child of the scrollable bio bubbles in
+          individually, staged 2..8 to flow top → bottom. */}
       <div
         className="absolute flex items-start"
         style={{
@@ -428,12 +448,26 @@ export default function About() {
             overscrollBehavior: "contain",
           }}
         >
-          <BioText />
-          <ListSection title="My Academic Background" items={ACADEMIC} />
-          <ListSection title="My Certificates" items={CERTIFICATES} />
+          <BioText stage={2} />
+          <ListSection
+            title="My Academic Background"
+            items={ACADEMIC}
+            stage={3}
+          />
+          <ListSection
+            title="My Certificates"
+            items={CERTIFICATES}
+            stage={4}
+          />
 
-          {/* My Skills — Methodes | (Soft Skills + Tools) */}
-          <div className="w-full flex flex-col items-start gap-[20px] shrink-0">
+          {/* My Skills — Methodes | (Soft Skills + Tools) — stage 5 */}
+          <div
+            className="w-full flex flex-col items-start gap-[20px] shrink-0 anim-bubbly-grow"
+            style={{
+              transformOrigin: "left top",
+              ["--stage" as string]: 5,
+            }}
+          >
             <SectionTitle>My Skills</SectionTitle>
             <div className="w-full flex items-start rounded-[24px] whitespace-nowrap">
               <div className="flex-1 min-w-0 flex flex-col items-start justify-center gap-[8px]">
@@ -465,18 +499,29 @@ export default function About() {
             </div>
           </div>
 
-          {/* My Hobbies — 10 icons in a row, justify-between, w-596 */}
-          <div className="w-full flex flex-col items-start gap-[20px] shrink-0">
+          {/* My Hobbies — 10 icons in a row. Section header is stage 6;
+              each icon sub-stages 6.0..6.9 so they pop one-by-one. */}
+          <div
+            className="w-full flex flex-col items-start gap-[20px] shrink-0 anim-bubbly-grow"
+            style={{
+              transformOrigin: "left top",
+              ["--stage" as string]: 6,
+            }}
+          >
             <SectionTitle>My Hobbies</SectionTitle>
             <div
               className="flex items-center justify-between"
               style={{ width: 596 }}
             >
-              {HOBBY_ICONS.map((src) => (
+              {HOBBY_ICONS.map((src, i) => (
                 <span
                   key={src}
-                  className="relative shrink-0 inline-block"
-                  style={{ width: 32, height: 32 }}
+                  className="relative shrink-0 inline-block anim-bubbly-grow"
+                  style={{
+                    width: 32,
+                    height: 32,
+                    ["--stage" as string]: 6 + i * 0.25,
+                  }}
                   aria-hidden
                 >
                   <img
@@ -489,23 +534,32 @@ export default function About() {
             </div>
           </div>
 
-          {/* CTAs — Primary "Get in touch" → /contact, Secondary
-              "MY EXPERIENCES" → /work. Both go through the same
-              document.startViewTransition path so the picture morph fires. */}
+          {/* CTAs — Each button bubbles individually as the last two
+              stages (8 and 9). */}
           <div className="w-full flex items-start gap-[20px] shrink-0">
-            <CTAButton
-              href="/contact"
-              iconSrc="/assets/icon-cta-chat.svg"
-              label="Get in touch"
-              variant="primary"
-              uppercase
-            />
-            <CTAButton
-              href="/work"
-              iconSrc="/assets/icon-cta-work.svg"
-              label="MY EXPERIENCES"
-              variant="secondary"
-            />
+            <span
+              className="anim-bubbly-grow flex-1 flex"
+              style={{ ["--stage" as string]: 8 }}
+            >
+              <CTAButton
+                href="/contact"
+                iconSrc="/assets/icon-cta-chat.svg"
+                label="Get in touch"
+                variant="primary"
+                uppercase
+              />
+            </span>
+            <span
+              className="anim-bubbly-grow flex-1 flex"
+              style={{ ["--stage" as string]: 9 }}
+            >
+              <CTAButton
+                href="/work"
+                iconSrc="/assets/icon-cta-work.svg"
+                label="MY EXPERIENCES"
+                variant="secondary"
+              />
+            </span>
           </div>
         </div>
 
@@ -515,9 +569,23 @@ export default function About() {
   );
 }
 
-function ListSection({ title, items }: { title: string; items: Item[] }) {
+function ListSection({
+  title,
+  items,
+  stage,
+}: {
+  title: string;
+  items: Item[];
+  stage: number;
+}) {
   return (
-    <div className="w-full flex flex-col items-start gap-[20px] shrink-0">
+    <div
+      className="w-full flex flex-col items-start gap-[20px] shrink-0 anim-bubbly-grow"
+      style={{
+        transformOrigin: "left top",
+        ["--stage" as string]: stage,
+      }}
+    >
       <SectionTitle>{title}</SectionTitle>
       <div className="w-full flex flex-col items-start gap-[16px] rounded-[24px]">
         {items.map((item, i) => (

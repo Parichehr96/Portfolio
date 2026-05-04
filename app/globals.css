@@ -50,6 +50,29 @@
   }
 }
 
+/* Bubbly grow used for every page-mount transition (first visit AND
+   navigation between Home/About/Work/Contact). Gentle: each element
+   starts at 0.88× + invisible and rises to 1.02× before settling at
+   1.0 — a subtle, restrained overshoot rather than a big pop.
+
+   Pages set `--stage: <number>` per element to stagger from top-left
+   to bottom-right. With 160 ms stagger and 600 ms run, ~10 individual
+   elements complete in 9×160 + 600 = 2040 ms ≈ the 2 s envelope. */
+@keyframes anim-bubbly-grow {
+  0% {
+    opacity: 0;
+    transform: scale(0.88);
+  }
+  65% {
+    opacity: 1;
+    transform: scale(1.02);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
 .anim-fade {
   animation: anim-fade 0.5s ease-out both;
 }
@@ -62,63 +85,41 @@
   animation: anim-pop-up 0.4s ease-out both;
 }
 
+.anim-bubbly-grow {
+  animation: anim-bubbly-grow 600ms cubic-bezier(0.22, 1.15, 0.4, 1) both;
+  animation-delay: calc(var(--stage, 0) * 160ms);
+  transform-origin: center center;
+}
+
 /* === Cross-page transition tuning ===
-   `document.startViewTransition` (called inside FloatingNav and the
-   home CTA) hands navigation to the browser's View Transitions API.
+   Two concurrent tracks during a route change between Home / About /
+   Work / Contact:
 
-   The hero illustration on each of the four main pages shares a
-   `viewTransitionName: "hero-illustration"` so it physically morphs
-   position + size between routes — the picture is the matching layer
-   that smoothly transforms across the boundary.
+     1. MATCHING LAYER — hero illustration
+        Each page's illustration shares `viewTransitionName:
+        "hero-illustration"`. Where the View Transitions API is
+        supported (Chrome, Edge, Safari 18+) the illustration
+        physically moves + scales between its start and end positions
+        over 1500 ms. In browsers without VTA support it just snaps;
+        the per-element bubbly grow on the new page still runs.
 
-   Everything else (titles, body copy, CTAs, etc.) belongs to the
-   default `root` group. Instead of the browser's default crossfade we
-   override it with a fade + slight zoom: the outgoing page recedes
-   (fades to 0 + scales down to 0.96), the incoming page emerges
-   (fades from 0 + scales from 1.04 → 1). The result is a telescoping
-   feel that pairs naturally with the morphing illustration. */
-@keyframes vt-page-out {
-  from {
-    opacity: 1;
-    transform: scale(1);
-  }
-  to {
-    opacity: 0;
-    transform: scale(0.96);
-  }
-}
+     2. NON-MATCHING ELEMENTS — per-element bubbly grow
+        Every other element on the new page (titles, body copy, CTAs)
+        plays the `anim-bubbly-grow` keyframe on mount, with a stagger
+        of 250 ms per `--stage` slot. With up to 6 stages the last
+        element finishes at 6×250 + 500 = 2000 ms — exactly the 2 s
+        envelope.
 
-@keyframes vt-page-in {
-  from {
-    opacity: 0;
-    transform: scale(1.04);
-  }
-  to {
-    opacity: 1;
-    transform: scale(1);
-  }
-}
-
-::view-transition-group(root) {
-  animation-duration: 700ms;
-  animation-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
-}
-
-::view-transition-old(root) {
-  animation: 700ms cubic-bezier(0.4, 0, 0.2, 1) both vt-page-out;
-  /* Center the scale on the viewport so the page zooms about its own
-     middle, not the top-left corner. */
-  transform-origin: center center;
-}
-
+   The root pseudo-elements have `animation: none` so the browser's
+   default cross-fade doesn't overlap with our mount-time animations. */
+::view-transition-old(root),
 ::view-transition-new(root) {
-  animation: 700ms cubic-bezier(0.4, 0, 0.2, 1) both vt-page-in;
-  transform-origin: center center;
+  animation: none;
 }
 
 ::view-transition-old(hero-illustration),
 ::view-transition-new(hero-illustration) {
-  animation-duration: 900ms;
+  animation-duration: 1500ms;
   animation-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
 }
 

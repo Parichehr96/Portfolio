@@ -183,26 +183,38 @@ export default function Contact() {
 
       {/* Page layout */}
       <div className="absolute inset-0 flex flex-col items-center pt-[80px] pb-[40px] px-[120px] gap-[80px]">
-        {/* Bio Section header */}
+        {/* Bio Section header — stage 0 + 1 (top-left) */}
         <div
           className="w-full flex flex-col items-start gap-[12px] text-[#1F2753]"
           style={{ letterSpacing: "2px" }}
         >
           <p
-            className="w-full"
-            style={{ fontSize: 60, lineHeight: "66px" }}
+            className="w-full anim-bubbly-grow"
+            style={{
+              fontSize: 60,
+              lineHeight: "66px",
+              transformOrigin: "left center",
+              ["--stage" as string]: 0,
+            }}
           >
             Have something in mind?
           </p>
           <p
-            className="w-full"
-            style={{ fontSize: 32, lineHeight: "40px" }}
+            className="w-full anim-bubbly-grow"
+            style={{
+              fontSize: 32,
+              lineHeight: "40px",
+              transformOrigin: "left center",
+              ["--stage" as string]: 1,
+            }}
           >
             Let&rsquo;s talk about it.
           </p>
         </div>
 
-        {/* Bio Container — content left, illustration overlaps right */}
+        {/* Bio Container — stage 2 (mail/phone/social/CTA all bubble in
+            together below the title). Illustration on the right is the
+            matching layer. */}
         <div
           className="w-full flex flex-col items-start"
           style={{
@@ -212,11 +224,17 @@ export default function Contact() {
             gap: 40,
           }}
         >
-          {/* Mail block — clickable mailto: link.
+          {/* Mail block — stage 2. Clickable mailto: link.
               Inline `<span>` (not `<p>`) inside the `<a>` so the cursor
               stays a pointer over the entire row and there are no
               block-level interruptions to click handling. */}
-          <div className="w-full flex flex-col items-start gap-[8px] rounded-[24px]">
+          <div
+            className="w-full flex flex-col items-start gap-[8px] rounded-[24px] anim-bubbly-grow"
+            style={{
+              transformOrigin: "left top",
+              ["--stage" as string]: 2,
+            }}
+          >
             <p
               className="text-[#5A5D70] whitespace-nowrap"
               style={{
@@ -242,8 +260,14 @@ export default function Contact() {
             </a>
           </div>
 
-          {/* Phone block + WhatsApp / Telegram chips */}
-          <div className="w-full flex items-end gap-[32px] rounded-[24px]">
+          {/* Phone block + WhatsApp / Telegram chips — stage 3 */}
+          <div
+            className="w-full flex items-end gap-[32px] rounded-[24px] anim-bubbly-grow"
+            style={{
+              transformOrigin: "left top",
+              ["--stage" as string]: 3,
+            }}
+          >
             <div className="shrink-0 flex flex-col items-start gap-[8px] whitespace-nowrap">
               <p
                 className="text-[#5A5D70]"
@@ -304,8 +328,15 @@ export default function Contact() {
             </div>
           </div>
 
-          {/* Social Links Container */}
-          <div className="w-full flex flex-col items-start gap-[16px]">
+          {/* Social Links Container — header stage 4, each pill icon
+              sub-stages 4.0..4.4 so they pop one-by-one. */}
+          <div
+            className="w-full flex flex-col items-start gap-[16px] anim-bubbly-grow"
+            style={{
+              transformOrigin: "left top",
+              ["--stage" as string]: 4,
+            }}
+          >
             <p
               className="w-full text-[#5A5D70]"
               style={{
@@ -317,20 +348,26 @@ export default function Contact() {
               Stay with me
             </p>
             <div className="w-full flex items-start gap-[32px]">
-              {SOCIALS.map((s) => (
-                <SocialPill key={s.alt} social={s} />
+              {SOCIALS.map((s, i) => (
+                <span
+                  key={s.alt}
+                  className="anim-bubbly-grow flex-1 flex"
+                  style={{ ["--stage" as string]: 4 + (i + 1) * 0.3 }}
+                >
+                  <SocialPill social={s} />
+                </span>
               ))}
             </div>
           </div>
 
-          {/* BOOK A TIME SLOT? CTA — opens the Google Calendar appointment
-              page in a new tab so users can grab a slot directly. */}
+          {/* BOOK A TIME SLOT? CTA — stage 7 (last). Opens the Google
+              Calendar appointment page in a new tab. */}
           <a
             href="https://calendar.app.google/jcChbEUgp776dBD4A"
             target="_blank"
             rel="noopener noreferrer"
             aria-label="Book a time slot"
-            className="w-full text-[#1F2753] shrink-0 block cursor-pointer hover:opacity-70 transition-opacity duration-200"
+            className="w-full text-[#1F2753] shrink-0 block cursor-pointer hover:opacity-70 transition-opacity duration-200 anim-bubbly-grow"
             style={{
               fontFamily: SOLWAY,
               fontWeight: 300,
@@ -338,6 +375,8 @@ export default function Contact() {
               lineHeight: "28px",
               textDecoration: "underline",
               textDecorationStyle: "solid",
+              transformOrigin: "left center",
+              ["--stage" as string]: 7,
             }}
           >
             BOOK A TIME SLOT?
