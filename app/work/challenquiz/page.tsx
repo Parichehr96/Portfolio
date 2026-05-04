@@ -12,7 +12,7 @@ import CaseStudyHeader, {
 const SOLWAY = "var(--font-solway), serif";
 const NAVY = "#1F2753";
 const NAVY_DARK = "#1B2249";
-const CREAM_LIGHTER = "#FEFBF5";
+const CREAM = "#F9F5EB";
 
 const TELEGRAM_URL = "https://t.me/Challenquiz";
 const FIGMA_FILE_URL =
@@ -83,44 +83,41 @@ function BodyBlock({ children }: { children: React.ReactNode }) {
 function ImageFrame({
   src,
   alt,
-  height,
-  bg = CREAM_LIGHTER,
+  bg = CREAM,
   rounded = 20,
-  imgFit = "contain",
 }: {
   src: string;
   alt: string;
-  height: number;
   bg?: string;
   rounded?: number;
-  imgFit?: "contain" | "cover";
 }) {
+  // Cream-framed image. Width fills the container; height follows the
+  // image's natural aspect ratio so the frame matches the visual exactly
+  // — no inner letterboxing, no extra darker frame.
   return (
     <div
-      className="relative w-full overflow-hidden"
-      style={{ backgroundColor: bg, height, borderRadius: rounded }}
+      className="w-full overflow-hidden"
+      style={{ backgroundColor: bg, borderRadius: rounded }}
     >
-      <img
-        src={src}
-        alt={alt}
-        className="block w-full h-full"
-        style={{ objectFit: imgFit }}
-      />
+      <img src={src} alt={alt} className="block w-full h-auto" />
     </div>
   );
 }
 
 function ImageCaption({ children }: { children: React.ReactNode }) {
+  // Left-aligned, Body/medium per design tokens (Solway Regular 14/20,
+  // letterSpacing 0.25px) — the description sits below each image.
   return (
     <p
-      className="w-full text-center"
+      className="w-full"
       style={{
-        color: "#5A5D70",
+        color: NAVY,
         fontFamily: SOLWAY,
         fontWeight: 400,
-        fontStyle: "italic",
         fontSize: 14,
         lineHeight: "20px",
+        letterSpacing: "0.25px",
+        textAlign: "left",
       }}
     >
       {children}
@@ -266,7 +263,6 @@ export default function ChallenquizCaseStudy() {
             <ImageFrame
               src="/assets/challenquiz/section-comparison-generic.png"
               alt="Old system list-based menu vs. new structured tab navigation"
-              height={620}
             />
             <ImageCaption>
               Old system: list-based menu, no visual hierarchy vs. New
@@ -323,7 +319,6 @@ export default function ChallenquizCaseStudy() {
             <ImageFrame
               src="/assets/challenquiz/section-screenshots.png"
               alt="User journey map highlighting drop-off points at game selection and initiation"
-              height={760}
             />
             <ImageCaption>
               User journey map: drop-off points highlighted at game
@@ -364,7 +359,6 @@ export default function ChallenquizCaseStudy() {
             <ImageFrame
               src="/assets/challenquiz/section-competitor.png"
               alt="Competitor reference: navigation patterns and colour usage in gamified apps"
-              height={620}
             />
             <ImageCaption>
               Competitor reference: navigation patterns and colour usage
@@ -416,7 +410,6 @@ export default function ChallenquizCaseStudy() {
             <ImageFrame
               src="/assets/challenquiz/section-nav-comparison.png"
               alt="Before: vertical list menu vs. After: bottom tab bar with grouped features"
-              height={620}
             />
             <ImageCaption>
               Before: vertical list menu → After: bottom tab bar with
@@ -462,7 +455,6 @@ export default function ChallenquizCaseStudy() {
             <ImageFrame
               src="/assets/challenquiz/section-game-flow-comparison.png"
               alt="Game initiation: old silent flow vs. new flow with player count, join state, and active feedback"
-              height={620}
             />
             <ImageCaption>
               Game initiation: old silent flow vs. new flow with player
@@ -499,7 +491,6 @@ export default function ChallenquizCaseStudy() {
             <ImageFrame
               src="/assets/challenquiz/section-onboarding-comparison.png"
               alt="Old onboarding form fields vs. new illustrated step-through"
-              height={620}
             />
             <ImageCaption>
               Old onboarding: form fields only → New onboarding:
@@ -535,7 +526,6 @@ export default function ChallenquizCaseStudy() {
             <ImageFrame
               src="/assets/challenquiz/section-ingame-comparison.png"
               alt="In-game: old static question layout vs. new colour-coded real-time interface"
-              height={620}
             />
             <ImageCaption>
               In-game: old static question layout vs. new colour-coded
@@ -568,7 +558,6 @@ export default function ChallenquizCaseStudy() {
             <ImageFrame
               src="/assets/challenquiz/section-profile-comparison.png"
               alt="Profile section: game history, scoreboard, avatar, preferences"
-              height={620}
             />
             <ImageCaption>
               Profile section: game history, scoreboard, avatar,
@@ -592,7 +581,7 @@ export default function ChallenquizCaseStudy() {
           <div
             className="w-full flex flex-col"
             style={{
-              backgroundColor: CREAM_LIGHTER,
+              backgroundColor: CREAM,
               borderRadius: 20,
               padding: "32px 40px",
               gap: 12,
