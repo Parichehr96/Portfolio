@@ -327,44 +327,59 @@ export default function ChallenquizCaseStudy() {
           </div>
         </section>
 
-        {/* Competitor Analysis */}
+        {/* Competitor Analysis — text left + images stacked right (Figma
+            layout 353:2806). Two image-only exports avoid the duplicated
+            text the previous full-section screenshot included. */}
         <section
           className="w-full flex flex-col items-start"
           style={{ gap: 40 }}
         >
-          <BodyBlock>
-            <SectionTitle text="Competitor Analysis" size="lg" />
-            <BodyText>
-              We studied existing quiz and gamification apps — including
-              QuizBot and tap-to-earn games popular in the Telegram
-              ecosystem — to understand navigation patterns and engagement
-              mechanics.
-            </BodyText>
-            <BodyText>Two key takeaways shaped our direction:</BodyText>
-            <BodyText>
-              Most successful gamification apps keep all core features
-              visible on a single screen or within a persistent navigation
-              bar — sometimes with as many as seven tabs. Immediate access
-              matters. Users need to see what they can do without digging.
-            </BodyText>
-            <BodyText>
-              Colour coding and high-contrast visual feedback are powerful
-              engagement tools in gamified contexts. The legacy
-              Challenquiz used minimal colour differentiation, which made
-              state changes (correct answer, wrong answer, time running
-              out) feel unclear and unrewarding.
-            </BodyText>
-          </BodyBlock>
-          <div className="w-full flex flex-col items-center" style={{ gap: 16 }}>
-            <ImageFrame
-              src="/assets/challenquiz/section-competitor.png"
-              alt="Competitor reference: navigation patterns and colour usage in gamified apps"
-            />
-            <ImageCaption>
-              Competitor reference: navigation patterns and colour usage
-              in gamified apps
-            </ImageCaption>
+          <div className="w-full flex items-start" style={{ gap: 40 }}>
+            <BodyBlock>
+              <SectionTitle text="Competitor Analysis" size="lg" />
+              <BodyText>
+                We studied existing quiz and gamification apps — including
+                QuizBot and tap-to-earn games popular in the Telegram
+                ecosystem — to understand navigation patterns and engagement
+                mechanics.
+              </BodyText>
+              <BodyText>Two key takeaways shaped our direction:</BodyText>
+              <BodyText>
+                Most successful gamification apps keep all core features
+                visible on a single screen or within a persistent navigation
+                bar — sometimes with as many as seven tabs. Immediate access
+                matters. Users need to see what they can do without digging.
+              </BodyText>
+              <BodyText>
+                Colour coding and high-contrast visual feedback are powerful
+                engagement tools in gamified contexts. The legacy
+                Challenquiz used minimal colour differentiation, which made
+                state changes (correct answer, wrong answer, time running
+                out) feel unclear and unrewarding.
+              </BodyText>
+            </BodyBlock>
+            <div
+              className="shrink-0 flex flex-col"
+              style={{ width: 645, gap: 12 }}
+            >
+              <img
+                src="/assets/challenquiz/competitor-quizbot.png"
+                alt="QuizBot — a Telegram-native quiz app reference"
+                className="block w-full h-auto"
+                style={{ borderRadius: 12 }}
+              />
+              <img
+                src="/assets/challenquiz/competitor-hamster.png"
+                alt="Tap-to-earn hamster game UI reference"
+                className="block w-full h-auto"
+                style={{ borderRadius: 12 }}
+              />
+            </div>
           </div>
+          <ImageCaption>
+            Competitor reference: navigation patterns and colour usage in
+            gamified apps
+          </ImageCaption>
         </section>
 
         {/* Key Design Decisions header */}
