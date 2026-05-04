@@ -1,44 +1,13 @@
 "use client";
 
-import { useEffect, useLayoutEffect, useRef, useState } from "react";
+import CaseStudyHeader, {
+  MC2_HEIGHT,
+} from "../../_components/CaseStudyHeader";
 
-/* === FIGMA DESIGN TOKENS (WOW Case Study, nodes 313:2747 + 333:3201) ===
-   This page lives outside ScaledShell (see ScaledShell.tsx — case-study
-   routes pass through unscaled) so the document is a normal-flow,
-   scrollable long read.
-
-   The header is a SINGLE morphing card (MainCard) that physically
-   transforms from MC1 (full card filling the viewport at scrollY=0) to
-   MC2 (compact bar) over the course of one viewport-height of scroll:
-
-     • cardHeight = max(MC2_HEIGHT, vh + MC2_HEIGHT - scrollY)
-       so the card always meets the top of body content with no gap.
-     • At scrollY=0 the card is `vh + MC2_HEIGHT` tall — the bottom
-       MC2_HEIGHT is below the viewport, so visually the card fills
-       exactly one viewport with overflow:hidden clipping anything
-       outside it. Nothing peeks through.
-     • At scrollY=vh the card has shrunk to MC2_HEIGHT and stays
-       sticky at the top for the rest of the page.
-
-   Inside the card:
-     • Compact bar at top (back + title-stack + right-side) is always
-       rendered. Title font-size morphs 56 → 28, subtitle 24 → 11.
-     • Right-side has a back-button mirror (MC1) and the four inline
-       links (MC2) cross-fading by progress — the four-link cluster is
-       allowed to fade per the design brief.
-     • Below the compact bar lives the expanded section: hero image,
-       role detail items, four CTA pills. As the card height shrinks,
-       this section is naturally clipped by overflow:hidden — role
-       details disappear via clipping (no fade). The image and the
-       four CTA pills fade their opacity (allowed) so the cleanup
-       reads as deliberate.
-     • The expanded section is wrapped in a transform:scale so it
-       always fits the available card height even on shorter viewports.
-
-   To restore MC1, the user can scroll back to the top OR tap any empty
-   area of the card — back button and links stopPropagation so they
-   navigate without triggering the scroll-to-top.
-=========================================================== */
+/* WOW Global Solution case study (Figma 313:2747).
+   The header is the shared CaseStudyHeader (MainCard) component — see
+   app/_components/CaseStudyHeader.tsx for the morph behaviour. Body
+   sections below are specific to WOW. */
 
 const SOLWAY = "var(--font-solway), serif";
 const NAVY = "#1F2753";
@@ -53,618 +22,6 @@ const HR_CASE_STUDY_URL =
   "https://www.behance.net/gallery/197828723/WOW-HR-module-system";
 const DS_CASE_STUDY_URL =
   "https://www.behance.net/gallery/195643297/Design-System-Case-Study-Connect2WOW";
-
-function ChevronLeft({ size = 33.6 }: { size?: number }) {
-  // Native chevron-left, navy stroke. Matches Figma's icon glyph at the
-  // sizes used by both header states (33.6 in full, 33.6 in compact).
-  return (
-    <svg
-      width={size}
-      height={size}
-      viewBox="0 0 24 24"
-      fill="none"
-      xmlns="http://www.w3.org/2000/svg"
-      className="block"
-      aria-hidden="true"
-    >
-      <path
-        d="M15 6L9 12L15 18"
-        stroke={NAVY}
-        strokeWidth="2"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-      />
-    </svg>
-  );
-}
-
-/* ---------- Header — morphing MainCard ---------- */
-
-// Approximate natural height of MC1's content (Figma 313:2747 — header
-// + image+details + CTA row + paddings). Used as the "design" reference
-// when scaling expanded content to fit shorter viewports.
-const DESIGN_VH = 877;
-// Compact bar (MC2) total height — px-120 py-32 + ~52px of content.
-// Compact bar (MC2 — Figma 333:3203) total height: border-4 + py-32 +
-// content(title 32 + subtitle 16 = 48) + py-32 + border-4 = 120.
-const MC2_HEIGHT = 120;
-
-function lerp(from: number, to: number, t: number) {
-  return from + (to - from) * t;
-}
-function clamp01(t: number) {
-  return Math.min(1, Math.max(0, t));
-}
-
-// Hero image fixed dimensions from Figma 313:2774 (latest design):
-// width 596 × height 409. Whole image is visible (no cropping); image
-// fills its container at natural aspect, sits flush right next to the
-// flex-1 detail items column.
-const IMAGE_WIDTH = 596;
-const IMAGE_HEIGHT = 409;
-
-// Padding interpolation between MC1 (Figma 313:2759 — main content
-// p-40) and MC2 (Figma 333:3203 — px-120 py-32). The card's outer
-// padding morphs alongside the inner layout.
-const MC1_PADDING_X = 40;
-const MC2_PADDING_X = 120;
-const MC1_PADDING_Y = 40;
-const MC2_PADDING_Y = 32;
-
-// Back button is size-28 in both Figma variants (313:2762 and 333:3206).
-const BACK_BUTTON_SIZE = 28;
-const BACK_GAP = 12;
-
-function MainCard() {
-  // Tracks scrollY and viewport height to drive the morph. SSR uses
-  // sane defaults so the first paint is reasonable; useLayoutEffect
-  // syncs to the real values before paint on the client.
-  const [scrollY, setScrollY] = useState(0);
-  const [vh, setVh] = useState(900);
-  // Card width and the natural widths of the title-stack (at MC1
-  // sizes) and the four-inline-link cluster (at MC2 sizes), used to
-  // position the title between centered (MC1) and left-aligned (MC2)
-  // pixel-perfectly. Hardcoded fallbacks render a sensible first frame
-  // before the layout-effect measure runs.
-  const [cardWidth, setCardWidth] = useState(1512);
-  const [stackWidth, setStackWidth] = useState(600);
-
-  const cardRef = useRef<HTMLDivElement>(null);
-  const stackMeasureRef = useRef<HTMLDivElement>(null);
-
-  const useIsoLayoutEffect =
-    typeof window !== "undefined" ? useLayoutEffect : useEffect;
-  useIsoLayoutEffect(() => {
-    const measure = () => {
-      if (cardRef.current) setCardWidth(cardRef.current.clientWidth);
-      if (stackMeasureRef.current)
-        setStackWidth(stackMeasureRef.current.scrollWidth);
-    };
-    const onScroll = () => setScrollY(window.scrollY);
-    const onResize = () => {
-      setVh(window.innerHeight);
-      setScrollY(window.scrollY);
-      measure();
-    };
-    measure();
-    onResize();
-    window.addEventListener("scroll", onScroll, { passive: true });
-    window.addEventListener("resize", onResize);
-    return () => {
-      window.removeEventListener("scroll", onScroll);
-      window.removeEventListener("resize", onResize);
-    };
-  }, []);
-
-  const progress = clamp01(scrollY / vh);
-  const cardHeight = Math.max(MC2_HEIGHT, vh + MC2_HEIGHT - scrollY);
-
-  // Scale for the expanded section so MC1's content fits the available
-  // card height. Cap at 1 so we never enlarge the design.
-  const expandedScale = Math.min(
-    1,
-    (vh - MC2_HEIGHT) / (DESIGN_VH - MC2_HEIGHT)
-  );
-
-  // Title / subtitle morph (no fade — physical font-size + position
-  // interpolation as required by the brief). Sizes per latest Figma:
-  //   MC1 (313:2747): title 44/64 (Display medium), subtitle 22/28
-  //                   (Title large), both Solway Regular Navy.
-  //   MC2 (333:3201): title 24/32 (Headline small) Solway Regular Navy,
-  //                   subtitle 11/16 Solway Medium Gray-Navy.
-  const titleSize = lerp(44, 24, progress);
-  const titleLineHeight = lerp(64, 32, progress);
-  const subtitleSize = lerp(22, 11, progress);
-  const subtitleLineHeight = lerp(28, 16, progress);
-  const subtitleColor = progress > 0.5 ? GRAY_NAVY : NAVY;
-
-  // Padding morph (MC1 p-40 → MC2 px-120 py-32).
-  const paddingX = lerp(MC1_PADDING_X, MC2_PADDING_X, progress);
-  const paddingTop = lerp(MC1_PADDING_Y, MC2_PADDING_Y, progress);
-
-  // Title-stack absolute position. At MC1 the stack is centered
-  // horizontally inside the card with text-align center; at MC2 it
-  // sits flush-left immediately after the back button (paddingX +
-  // back-button-28 + gap-12 = 160). Top sits at paddingTop in both
-  // states so the title is aligned to the inner edge of the cream
-  // padding, matching Figma's items-start in 333:3481.
-  const stackLeftMC1 = (cardWidth - stackWidth) / 2;
-  const stackLeftMC2 = MC2_PADDING_X + BACK_BUTTON_SIZE + BACK_GAP;
-  const stackLeft = lerp(stackLeftMC1, stackLeftMC2, progress);
-  const stackTop = paddingTop;
-  // Gap between title and subtitle: MC1 = 8 (Figma 313:2760 gap-8),
-  // MC2 = 0 (stack is justify-center, no inter-line gap).
-  const stackGap = lerp(8, 0, progress);
-  const stackTextAlign = progress < 0.5 ? "center" : "left";
-
-  // Back button vertical centring: at MC1 it centres on the title row
-  // alone (subtitle is on a separate row below in Figma 313:2761); at
-  // MC2 it centres on the full title+subtitle stack (Figma 333:3204
-  // items-center). Lerp by progress so it slides into place.
-  const backButtonTop =
-    stackTop +
-    (titleLineHeight + subtitleLineHeight * progress) / 2 -
-    BACK_BUTTON_SIZE / 2;
-
-  // Cross-fade allowance: the four-link cluster + hero image + CTA
-  // pills are explicitly allowed to fade per the brief. Other elements
-  // (title, subtitle, back button, role details) reform via position +
-  // size interpolation, never via opacity.
-  const expandedOpacity = clamp01(1 - progress * 1.6);
-  const imageOpacity = clamp01(1 - progress * 1.4);
-  const linksOpacity = clamp01((progress - 0.3) / 0.7);
-
-  const handleCardClick = () => {
-    if (typeof window === "undefined") return;
-    if (progress < 0.5) return;
-    window.scrollTo({ top: 0, behavior: "smooth" });
-  };
-
-  return (
-    <div
-      ref={cardRef}
-      onClick={handleCardClick}
-      style={{
-        position: "fixed",
-        top: 0,
-        left: 0,
-        right: 0,
-        height: cardHeight,
-        zIndex: 50,
-        backgroundColor: CREAM,
-        borderBottomLeftRadius: 24 * progress,
-        borderBottomRightRadius: 24 * progress,
-        overflow: "hidden",
-        cursor: progress > 0.5 ? "pointer" : "default",
-      }}
-    >
-      {/* Hidden measurers — render the title-stack at MC1 sizes and the
-          links cluster at MC2 sizes once so we can pixel-position the
-          live elements without waiting for runtime layout. */}
-      <div
-        aria-hidden
-        style={{
-          position: "absolute",
-          left: -99999,
-          top: 0,
-          visibility: "hidden",
-          pointerEvents: "none",
-        }}
-      >
-        <div ref={stackMeasureRef} style={{ display: "inline-block" }}>
-          <p
-            style={{
-              fontFamily: SOLWAY,
-              fontWeight: 400,
-              fontSize: 44,
-              lineHeight: "64px",
-              whiteSpace: "nowrap",
-              margin: 0,
-            }}
-          >
-            WOW Global Solution
-          </p>
-          <p
-            style={{
-              fontFamily: SOLWAY,
-              fontWeight: 400,
-              fontSize: 22,
-              lineHeight: "28px",
-              whiteSpace: "nowrap",
-              margin: 0,
-            }}
-          >
-            Enterprise Resource Planning for Oil &amp; Gas Projects
-          </p>
-        </div>
-      </div>
-
-      {/* Back button — vertically centred against the title row at MC1
-          and against the title+subtitle stack at MC2 (per Figma
-          313:2761 / 333:3204 items-center). */}
-      <div
-        style={{
-          position: "absolute",
-          left: paddingX,
-          top: backButtonTop,
-        }}
-      >
-        <BackButton />
-      </div>
-
-      {/* Title-stack — absolute, position morphs centered → left. Title
-          and subtitle stacked with gap-8 (MC1) → 0 (MC2). */}
-      <div
-        style={{
-          position: "absolute",
-          left: stackLeft,
-          top: stackTop,
-          width: stackWidth,
-          display: "flex",
-          flexDirection: "column",
-          gap: stackGap,
-          textAlign: stackTextAlign,
-        }}
-      >
-        <p
-          style={{
-            color: NAVY,
-            fontFamily: SOLWAY,
-            fontWeight: 400,
-            fontSize: titleSize,
-            lineHeight: `${titleLineHeight}px`,
-            whiteSpace: "nowrap",
-            margin: 0,
-          }}
-        >
-          WOW Global Solution
-        </p>
-        <p
-          style={{
-            color: subtitleColor,
-            fontFamily: SOLWAY,
-            fontWeight: progress > 0.5 ? 500 : 400,
-            fontSize: subtitleSize,
-            lineHeight: `${subtitleLineHeight}px`,
-            letterSpacing: `${lerp(0, 0.5, progress)}px`,
-            whiteSpace: "nowrap",
-            margin: 0,
-          }}
-        >
-          {progress > 0.5
-            ? "(Enterprise Resource Planning for Oil & Gas Projects)"
-            : "Enterprise Resource Planning for Oil & Gas Projects"}
-        </p>
-      </div>
-
-      {/* Right-side cluster (MC2) — four inline links separated by
-          1px-wide vertical dividers (Figma 333:3485). No flex gap; the
-          dividers and each link's px-16 padding define the spacing. */}
-      <div
-        style={{
-          position: "absolute",
-          right: paddingX,
-          top: backButtonTop,
-          height: BACK_BUTTON_SIZE,
-          display: "flex",
-          alignItems: "center",
-          gap: 0,
-          flexWrap: "nowrap",
-          opacity: linksOpacity,
-          pointerEvents: progress > 0.5 ? "auto" : "none",
-        }}
-      >
-        <CompactLink href="/contact" label="Get in touch" internal />
-        <CompactDivider />
-        <CompactLink href={HR_CASE_STUDY_URL} label="Case study (HR Module)" />
-        <CompactDivider />
-        <CompactLink
-          href={DS_CASE_STUDY_URL}
-          label="Case study (Design System)"
-        />
-        <CompactDivider />
-        <CompactLink href={LINKEDIN_URL} label="Company's Linkedin" />
-      </div>
-
-      {/* Expanded section (image + details + CTA pills). Sits below the
-          MC1 header. Wrapped in a transform:scale so it shrinks to fit
-          shorter viewports. Clipped by the card's overflow:hidden when
-          the card height shrinks toward MC2_HEIGHT. */}
-      <div
-        style={{
-          position: "absolute",
-          // Position below the MC1 header (back/title/subtitle) at MC1,
-          // and below the MC2 bar at MC2 (where it has zero opacity).
-          // MC1 header height = title 64 + gap 8 + subtitle 28 = 100,
-          // plus card padding-top 40, plus 64 gap to image+details row.
-          top: lerp(MC1_PADDING_Y + 64 + 8 + 28 + 64, MC2_HEIGHT, progress),
-          left: 0,
-          right: 0,
-          paddingLeft: paddingX,
-          paddingRight: paddingX,
-          paddingBottom: MC1_PADDING_Y,
-          transform: `scale(${expandedScale})`,
-          transformOrigin: "top center",
-          opacity: expandedOpacity,
-          pointerEvents: progress > 0.5 ? "none" : "auto",
-        }}
-      >
-        {/* Image + details row — Figma 313:2766: items-center, gap-40,
-            pl-12 only. Left column flex-1 (detail items take whatever
-            space is left). Hero image fixed 596×409, sits flush right
-            with the whole image visible (natural aspect, no cropping). */}
-        <div
-          className="w-full flex items-center"
-          style={{
-            gap: 40,
-            paddingLeft: 12,
-            marginBottom: 64,
-            height: IMAGE_HEIGHT,
-          }}
-        >
-          <div
-            className="flex-1 min-w-0 flex flex-col justify-between"
-            style={{ height: "100%" }}
-          >
-            <DetailItem label="Role" value="Product / UX Designer" />
-            <DetailItem
-              label="Timeline"
-              value={"17 months · May 2021 – September 2022"}
-            />
-            <DetailItem
-              label="Team"
-              value="3 designers, 1 lead, 11 developers, PM"
-            />
-            <DetailItem
-              label="Client"
-              value="EPFC Corp. (Canadian oil & gas company)"
-            />
-            <DetailItem label="Tools" value="Figma, Miro, FigJam" />
-            <DetailItem
-              label="Status"
-              value="Shut down before reaching end users"
-            />
-          </div>
-          <div
-            className="shrink-0 relative"
-            style={{
-              width: IMAGE_WIDTH,
-              height: IMAGE_HEIGHT,
-              opacity: imageOpacity,
-            }}
-          >
-            <img
-              src="/assets/wow/main.png"
-              alt="WOW Global Solution platform overview"
-              className="absolute inset-0 w-full h-full object-contain block pointer-events-none"
-            />
-          </div>
-        </div>
-        <div className="w-full flex items-start gap-[20px]">
-          <CTAButton
-            href="/contact"
-            iconSrc="/assets/wow/icon-cta-chat.svg"
-            label="Get in touch"
-            variant="primary"
-            internal
-            uppercase
-          />
-          <CTAButton
-            href={HR_CASE_STUDY_URL}
-            iconSrc="/assets/wow/icon-cta-briefcase.svg"
-            label="Case study (HR Module)"
-            variant="secondary"
-          />
-          <CTAButton
-            href={DS_CASE_STUDY_URL}
-            iconSrc="/assets/wow/icon-cta-browser.svg"
-            label="Case study (Design System)"
-            variant="secondary"
-          />
-          <CTAButton
-            href={LINKEDIN_URL}
-            iconSrc="/assets/wow/icon-cta-linkedin.svg"
-            label="Company's Linkedin"
-            variant="secondary"
-          />
-        </div>
-      </div>
-    </div>
-  );
-}
-
-function DetailItem({ label, value }: { label: string; value: string }) {
-  return (
-    <div className="w-full flex flex-col items-start gap-[4px]">
-      <p
-        className="w-full"
-        style={{
-          color: NAVY,
-          fontFamily: SOLWAY,
-          fontWeight: 700,
-          fontSize: 14,
-          lineHeight: "20px",
-          letterSpacing: "0.1px",
-        }}
-      >
-        {label}
-      </p>
-      <p
-        className="w-full"
-        style={{
-          color: NAVY,
-          fontFamily: SOLWAY,
-          fontWeight: 400,
-          fontSize: 16,
-          lineHeight: "24px",
-          letterSpacing: "0.15px",
-        }}
-      >
-        {value}
-      </p>
-    </div>
-  );
-}
-
-function BackButton() {
-  // Plain <a href> — native browser navigation is the most reliable
-  // path and survives any React/router edge cases. stopPropagation so
-  // tapping the back button inside the compact bar doesn't trigger the
-  // bar's "scroll-to-top" handler.
-  const stop = (e: React.MouseEvent) => {
-    e.stopPropagation();
-  };
-  return (
-    <a
-      href="/work"
-      onClick={stop}
-      aria-label="Back to work"
-      className="shrink-0 inline-flex items-center justify-center cursor-pointer hover:opacity-70 transition-opacity duration-200"
-      style={{ width: 33.6, height: 33.6 }}
-    >
-      <ChevronLeft />
-    </a>
-  );
-}
-
-function CTAButton({
-  href,
-  iconSrc,
-  label,
-  variant,
-  internal,
-  uppercase,
-}: {
-  href: string;
-  iconSrc: string;
-  label: string;
-  variant: "primary" | "secondary";
-  internal?: boolean;
-  uppercase?: boolean;
-}) {
-  // Plain <a> — internal links use a same-tab navigation, externals
-  // open in a new tab. stopPropagation so a click inside the compact
-  // bar doesn't bubble up to its scroll-to-top handler.
-  const stop = (e: React.MouseEvent) => {
-    e.stopPropagation();
-  };
-
-  const baseClass =
-    "flex-1 min-w-0 inline-flex items-center justify-center gap-[12px] p-[16px] rounded-[120px] transition-colors duration-200 cursor-pointer";
-  const variantClass =
-    variant === "primary"
-      ? "bg-white hover:bg-[#EDEAE4]"
-      : "bg-transparent border-[2.6px] border-solid border-white hover:bg-white";
-
-  const inner = (
-    <>
-      <span
-        className="relative shrink-0 inline-block"
-        style={{ width: 24, height: 24 }}
-      >
-        <img
-          src={iconSrc}
-          alt=""
-          className="absolute inset-0 w-full h-full block"
-        />
-      </span>
-      <span
-        className="whitespace-nowrap"
-        style={{
-          color: NAVY,
-          fontFamily: SOLWAY,
-          fontWeight: 400,
-          fontSize: 14,
-          lineHeight: "18px",
-          textTransform: uppercase ? "uppercase" : undefined,
-        }}
-      >
-        {label}
-      </span>
-    </>
-  );
-
-  if (internal) {
-    return (
-      <a href={href} onClick={stop} className={`${baseClass} ${variantClass}`}>
-        {inner}
-      </a>
-    );
-  }
-  return (
-    <a
-      href={href}
-      target="_blank"
-      rel="noopener noreferrer"
-      onClick={stop}
-      className={`${baseClass} ${variantClass}`}
-    >
-      {inner}
-    </a>
-  );
-}
-
-function CompactDivider() {
-  // 1px vertical line separating each pair of MC2 inline links. Spans
-  // the full bar content height (= back-button-size) per Figma 333:3488.
-  return (
-    <span
-      aria-hidden
-      className="self-stretch shrink-0"
-      style={{ width: 1, backgroundColor: NAVY }}
-    />
-  );
-}
-
-function CompactLink({
-  href,
-  label,
-  internal,
-}: {
-  href: string;
-  label: string;
-  internal?: boolean;
-}) {
-  // Plain <a> with stopPropagation so the click navigates without
-  // triggering the compact bar's "scroll-to-top" handler.
-  const stop = (e: React.MouseEvent) => {
-    e.stopPropagation();
-  };
-  const className =
-    "inline-flex items-center justify-center px-[16px] rounded-[120px] cursor-pointer hover:opacity-70 transition-opacity duration-200 whitespace-nowrap shrink-0";
-  const style: React.CSSProperties = {
-    color: NAVY,
-    fontFamily: SOLWAY,
-    fontWeight: 400,
-    fontSize: 14,
-    lineHeight: "20px",
-    letterSpacing: "0.25px",
-    textDecoration: "underline",
-    textDecorationStyle: "solid",
-    whiteSpace: "nowrap",
-  };
-  if (internal) {
-    return (
-      <a href={href} onClick={stop} className={className} style={style}>
-        {label}
-      </a>
-    );
-  }
-  return (
-    <a
-      href={href}
-      target="_blank"
-      rel="noopener noreferrer"
-      onClick={stop}
-      className={className}
-      style={style}
-    >
-      {label}
-    </a>
-  );
-}
-
-/* ---------- Body — copy + image blocks ---------- */
 
 function SectionTitle({
   text,
@@ -1327,11 +684,51 @@ function RequestImagesBlock() {
 export default function WowCaseStudy() {
   return (
     <div className="bg-white relative w-full">
-      {/* Single morphing card — fixed at the top of the viewport, height
-          shrinks from `vh + MC2_HEIGHT` to `MC2_HEIGHT` over one viewport
-          of scroll. Body content sits below by `100vh + MC2_HEIGHT` so
-          the card always meets it cleanly with no gap or overlap. */}
-      <MainCard />
+      <CaseStudyHeader
+        title="WOW Global Solution"
+        subtitle="Enterprise Resource Planning for Oil & Gas Projects"
+        detailItems={[
+          { label: "Role", value: "Product / UX Designer" },
+          { label: "Timeline", value: "17 months · May 2021 – September 2022" },
+          { label: "Team", value: "3 designers, 1 lead, 11 developers, PM" },
+          {
+            label: "Client",
+            value: "EPFC Corp. (Canadian oil & gas company)",
+          },
+          { label: "Tools", value: "Figma, Miro, FigJam" },
+          { label: "Status", value: "Shut down before reaching end users" },
+        ]}
+        heroImageSrc="/assets/wow/main.png"
+        heroImageAlt="WOW Global Solution platform overview"
+        ctas={[
+          {
+            href: "/contact",
+            iconSrc: "/assets/wow/icon-cta-chat.svg",
+            label: "Get in touch",
+            variant: "primary",
+            internal: true,
+            uppercase: true,
+          },
+          {
+            href: HR_CASE_STUDY_URL,
+            iconSrc: "/assets/wow/icon-cta-briefcase.svg",
+            label: "Case study (HR Module)",
+            variant: "secondary",
+          },
+          {
+            href: DS_CASE_STUDY_URL,
+            iconSrc: "/assets/wow/icon-cta-browser.svg",
+            label: "Case study (Design System)",
+            variant: "secondary",
+          },
+          {
+            href: LINKEDIN_URL,
+            iconSrc: "/assets/wow/icon-cta-linkedin.svg",
+            label: "Company's Linkedin",
+            variant: "secondary",
+          },
+        ]}
+      />
 
       {/* Body — offset by 100vh + MC2_HEIGHT so the card has room to be
           MC1-sized at the top, then transition to MC2 as content rises. */}

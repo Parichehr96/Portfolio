@@ -41,7 +41,12 @@ type Experience = {
 
 const EXPERIENCES: Experience[] = [
   { name: "ONTON", short: "PomeGroup", date: "May 2024 - June 2025" },
-  { name: "Challenquiz", short: "PomeGroup", date: "Nov 2023 - May 2024" },
+  {
+    name: "Challenquiz",
+    short: "PomeGroup",
+    date: "Nov 2023 - May 2024",
+    caseStudy: "/work/challenquiz",
+  },
   { name: "Ezam Part", short: "Ezam", date: "Nov 2022 - June 2023" },
   {
     name: "WOW Global Solution",
