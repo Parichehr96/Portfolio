@@ -31,6 +31,24 @@ export default function RootLayout({
       lang="en"
       className={`${solway.variable} ${spaceGrotesk.variable}`}
     >
+      <head>
+        {/* Preload every page's hero illustration so the View Transitions
+            snapshot at navigation time is captured with the image already
+            in cache — eliminates the first-nav lag where the morph would
+            otherwise capture an unloaded `<img>`. */}
+        <link rel="preload" as="image" href="/assets/illustration.png" />
+        <link
+          rel="preload"
+          as="image"
+          href="/assets/illustration-about.png"
+        />
+        <link
+          rel="preload"
+          as="image"
+          href="/assets/illustration-contact.png"
+        />
+        <link rel="preload" as="image" href="/assets/profile-image.png" />
+      </head>
       <body className="bg-white text-[#1F2753] antialiased font-[family-name:var(--font-solway)]">
         <ScaledShell>{children}</ScaledShell>
       </body>

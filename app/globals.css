@@ -129,15 +129,29 @@
   opacity: 0;
 }
 
+/* Hero illustration morph: 900 ms is long enough to read the move +
+   scale clearly but short enough that it doesn't feel laggy. The
+   GROUP animates the box position/size; OLD and NEW animate their
+   content cross-fade in sync. */
 ::view-transition-group(hero-illustration) {
-  animation-duration: 1500ms;
+  animation-duration: 900ms;
   animation-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 ::view-transition-old(hero-illustration),
 ::view-transition-new(hero-illustration) {
-  animation-duration: 1500ms;
+  animation-duration: 900ms;
   animation-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Work preview gets its own group so it fades cleanly between /work
+   and the other main pages instead of cross-morphing with the person
+   illustration. */
+::view-transition-group(work-preview),
+::view-transition-old(work-preview),
+::view-transition-new(work-preview) {
+  animation-duration: 500ms;
+  animation-timing-function: ease-out;
 }
 
 /* Hide native scrollbar entirely. The About bio area uses a custom

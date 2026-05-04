@@ -400,10 +400,13 @@ export default function Work() {
             gap: 40,
           }}
         >
-          {/* Project preview frame (matching layer — no bubbly). */}
+          {/* Project preview frame — its own view-transition name so it
+              fades in/out rather than cross-morphing with the person
+              illustrations on /home, /about, /contact (those would
+              cross-fade visually-incompatible content). */}
           <div
             className="h-full aspect-square shrink-0 relative overflow-hidden"
-            style={{ viewTransitionName: "hero-illustration" }}
+            style={{ viewTransitionName: "work-preview" }}
           >
             <img
               key={selectedIdx}
