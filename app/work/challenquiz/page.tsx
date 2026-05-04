@@ -189,12 +189,13 @@ export default function ChallenquizCaseStudy() {
             value: "2 designers (myself and Niloufar Davoudi)",
           },
           { label: "Client", value: "Pome group (Finish studio)" },
+          { label: "Tools", value: "Figma" },
           {
             label: "Status",
             value: "Redesign partially shipped · Project no longer active",
           },
         ]}
-        heroImageSrc="/assets/challenquiz/main.png"
+        heroImageSrc="/assets/challenquiz/section-multiples.png"
         heroImageAlt="Challenquiz redesigned mobile experience"
         ctas={[
           {
@@ -263,7 +264,7 @@ export default function ChallenquizCaseStudy() {
           </BodyBlock>
           <div className="w-full flex flex-col items-center" style={{ gap: 16 }}>
             <ImageFrame
-              src="/assets/challenquiz/image1.png"
+              src="/assets/challenquiz/section-comparison-generic.png"
               alt="Old system list-based menu vs. new structured tab navigation"
               height={620}
             />
@@ -320,9 +321,9 @@ export default function ChallenquizCaseStudy() {
           </BodyBlock>
           <div className="w-full flex flex-col items-center" style={{ gap: 16 }}>
             <ImageFrame
-              src="/assets/challenquiz/image2.png"
+              src="/assets/challenquiz/section-screenshots.png"
               alt="User journey map highlighting drop-off points at game selection and initiation"
-              height={620}
+              height={760}
             />
             <ImageCaption>
               User journey map: drop-off points highlighted at game
@@ -361,7 +362,7 @@ export default function ChallenquizCaseStudy() {
           </BodyBlock>
           <div className="w-full flex flex-col items-center" style={{ gap: 16 }}>
             <ImageFrame
-              src="/assets/challenquiz/competitor-2.png"
+              src="/assets/challenquiz/section-competitor.png"
               alt="Competitor reference: navigation patterns and colour usage in gamified apps"
               height={620}
             />
@@ -413,7 +414,7 @@ export default function ChallenquizCaseStudy() {
           </BodyBlock>
           <div className="w-full flex flex-col items-center" style={{ gap: 16 }}>
             <ImageFrame
-              src="/assets/challenquiz/image3.png"
+              src="/assets/challenquiz/section-nav-comparison.png"
               alt="Before: vertical list menu vs. After: bottom tab bar with grouped features"
               height={620}
             />
@@ -459,7 +460,7 @@ export default function ChallenquizCaseStudy() {
           </BodyBlock>
           <div className="w-full flex flex-col items-center" style={{ gap: 16 }}>
             <ImageFrame
-              src="/assets/challenquiz/game-flow.png"
+              src="/assets/challenquiz/section-game-flow-comparison.png"
               alt="Game initiation: old silent flow vs. new flow with player count, join state, and active feedback"
               height={620}
             />
@@ -496,7 +497,7 @@ export default function ChallenquizCaseStudy() {
           </BodyBlock>
           <div className="w-full flex flex-col items-center" style={{ gap: 16 }}>
             <ImageFrame
-              src="/assets/challenquiz/image4.png"
+              src="/assets/challenquiz/section-onboarding-comparison.png"
               alt="Old onboarding form fields vs. new illustrated step-through"
               height={620}
             />
@@ -532,7 +533,7 @@ export default function ChallenquizCaseStudy() {
           </BodyBlock>
           <div className="w-full flex flex-col items-center" style={{ gap: 16 }}>
             <ImageFrame
-              src="/assets/challenquiz/in-game.png"
+              src="/assets/challenquiz/section-ingame-comparison.png"
               alt="In-game: old static question layout vs. new colour-coded real-time interface"
               height={620}
             />
@@ -565,7 +566,7 @@ export default function ChallenquizCaseStudy() {
           </BodyBlock>
           <div className="w-full flex flex-col items-center" style={{ gap: 16 }}>
             <ImageFrame
-              src="/assets/challenquiz/profile.png"
+              src="/assets/challenquiz/section-profile-comparison.png"
               alt="Profile section: game history, scoreboard, avatar, preferences"
               height={620}
             />
