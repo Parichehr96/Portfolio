@@ -92,29 +92,46 @@
 }
 
 /* === Cross-page transition tuning ===
-   Two concurrent tracks during a route change between Home / About /
+   Three concurrent tracks during a route change between Home / About /
    Work / Contact:
 
-     1. MATCHING LAYER — hero illustration
-        Each page's illustration shares `viewTransitionName:
+     1. MATCHING LAYER — hero illustration (move + scale, 1500 ms)
+        Each page's illustration carries `viewTransitionName:
         "hero-illustration"`. Where the View Transitions API is
-        supported (Chrome, Edge, Safari 18+) the illustration
-        physically moves + scales between its start and end positions
-        over 1500 ms. In browsers without VTA support it just snaps;
-        the per-element bubbly grow on the new page still runs.
+        supported (Chrome, Edge, Safari 18+) the illustration physically
+        moves and scales between its start and end positions while its
+        OLD content fades out and the NEW content fades in inside the
+        same group — exactly the "scale and move where there are image
+        in both pages" behaviour.
 
-     2. NON-MATCHING ELEMENTS — per-element bubbly grow
-        Every other element on the new page (titles, body copy, CTAs)
-        plays the `anim-bubbly-grow` keyframe on mount, with a stagger
-        of 250 ms per `--stage` slot. With up to 6 stages the last
-        element finishes at 6×250 + 500 = 2000 ms — exactly the 2 s
-        envelope.
+     2. NON-MATCHING ELEMENTS — old fades out (400 ms)
+        Everything else on the OLD page (page-specific images, icons,
+        text, CTAs) belongs to the default `root` group and fades from
+        opacity 1 to 0 as a single layer. Images that exist on the OLD
+        page but not on the NEW one fade out together; the converse
+        (NEW-only images) fades in via the per-element bubbly grow on
+        the NEW DOM.
 
-   The root pseudo-elements have `animation: none` so the browser's
-   default cross-fade doesn't overlap with our mount-time animations. */
-::view-transition-old(root),
+     3. NON-MATCHING NEW ELEMENTS — bubbly grow on mount (≈2 s)
+        The NEW root snapshot is suppressed (opacity 0) so the actual
+        new DOM is visible underneath the fading-out old snapshot, and
+        each element plays `anim-bubbly-grow` with a stagger of
+        160 ms × --stage. */
+::view-transition-old(root) {
+  animation-duration: 400ms;
+  animation-timing-function: ease-out;
+}
+
 ::view-transition-new(root) {
+  /* Suppress the new snapshot — the actual new DOM shows beneath the
+     fading old snapshot and animates via per-element bubbly grow. */
   animation: none;
+  opacity: 0;
+}
+
+::view-transition-group(hero-illustration) {
+  animation-duration: 1500ms;
+  animation-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 ::view-transition-old(hero-illustration),
