@@ -3,6 +3,7 @@
 import CaseStudyHeader, {
   MC2_HEIGHT,
 } from "../../_components/CaseStudyHeader";
+import ResearchDiagram from "./_research-diagram";
 
 /* Challenquiz case study (Figma 313:3079).
    Header is the shared CaseStudyHeader; body sections below are
@@ -318,11 +319,8 @@ export default function ChallenquizCaseStudy() {
               section.
             </BodyText>
           </BodyBlock>
-          <div className="w-full flex flex-col items-center" style={{ gap: 16 }}>
-            <ImageFrame
-              src="/assets/challenquiz/section-screenshots.png"
-              alt="User journey map highlighting drop-off points at game selection and initiation"
-            />
+          <div className="w-full flex flex-col items-start" style={{ gap: 16 }}>
+            <ResearchDiagram />
             <ImageCaption>
               User journey map: drop-off points highlighted at game
               selection and initiation
