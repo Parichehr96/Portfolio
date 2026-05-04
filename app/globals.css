@@ -65,22 +65,60 @@
 /* === Cross-page transition tuning ===
    `document.startViewTransition` (called inside FloatingNav and the
    home CTA) hands navigation to the browser's View Transitions API.
-   The hero illustration on both pages shares a `viewTransitionName`
-   so it morphs position + size while crossfading its pixels — as the
-   centered home image with the hand morphs into the corner-anchored
-   about face crop, the hand naturally drops down out of the frame.
-   Everything else uses the default `root` group, which we slow down
-   slightly so the rest of the page eases in/out alongside the picture
-   instead of snapping. */
-::view-transition-old(root),
-::view-transition-new(root) {
-  animation-duration: 600ms;
+
+   The hero illustration on each of the four main pages shares a
+   `viewTransitionName: "hero-illustration"` so it physically morphs
+   position + size between routes — the picture is the matching layer
+   that smoothly transforms across the boundary.
+
+   Everything else (titles, body copy, CTAs, etc.) belongs to the
+   default `root` group. Instead of the browser's default crossfade we
+   override it with a fade + slight zoom: the outgoing page recedes
+   (fades to 0 + scales down to 0.96), the incoming page emerges
+   (fades from 0 + scales from 1.04 → 1). The result is a telescoping
+   feel that pairs naturally with the morphing illustration. */
+@keyframes vt-page-out {
+  from {
+    opacity: 1;
+    transform: scale(1);
+  }
+  to {
+    opacity: 0;
+    transform: scale(0.96);
+  }
+}
+
+@keyframes vt-page-in {
+  from {
+    opacity: 0;
+    transform: scale(1.04);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+::view-transition-group(root) {
+  animation-duration: 700ms;
   animation-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+::view-transition-old(root) {
+  animation: 700ms cubic-bezier(0.4, 0, 0.2, 1) both vt-page-out;
+  /* Center the scale on the viewport so the page zooms about its own
+     middle, not the top-left corner. */
+  transform-origin: center center;
+}
+
+::view-transition-new(root) {
+  animation: 700ms cubic-bezier(0.4, 0, 0.2, 1) both vt-page-in;
+  transform-origin: center center;
 }
 
 ::view-transition-old(hero-illustration),
 ::view-transition-new(hero-illustration) {
-  animation-duration: 800ms;
+  animation-duration: 900ms;
   animation-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
 }
 
