@@ -455,12 +455,15 @@ export default function Work() {
         </div>
 
         {/* Bio Container — preview frame on the left is the matching
-            layer; right column staggers individually. */}
+            layer; right column staggers individually. Height + pb match
+            Figma 300:2208 so the CTAs at the bottom of the right column
+            land just above the FloatingNav (top:854) and never get
+            covered by it. */}
         <div
-          className="w-full flex items-start"
+          className="w-full flex items-start justify-center overflow-hidden"
           style={{
-            height: 665,
-            paddingBottom: 80,
+            height: 606,
+            paddingBottom: 16,
             gap: 40,
           }}
         >
@@ -579,11 +582,14 @@ export default function Work() {
             )}
           </div>
 
-          {/* Text and Experiences Container */}
-          <div className="flex-1 min-w-0 flex flex-col items-start gap-[32px]">
+          {/* Text and Experiences Container — h-full so the inner
+              experience-list flexes (justify-between) and pushes the
+              CTAs to the bottom of the 606-tall bio container, sitting
+              just above the FloatingNav. */}
+          <div className="flex-1 min-w-0 h-full flex flex-col items-start gap-[32px]">
             {/* "My Experiences" label — stage 2 */}
             <p
-              className="w-full text-[#5A5D70] anim-bubbly-grow"
+              className="w-full text-[#5A5D70] anim-bubbly-grow shrink-0"
               style={{
                 fontWeight: 500,
                 fontSize: 20,
@@ -596,11 +602,13 @@ export default function Work() {
               My Experiences
             </p>
 
-            {/* Experience list — each row sub-stages 3.0..3.7 so the
-                eight rows pop in one-by-one, top to bottom. */}
+            {/* Experience list — flex-1 + justify-between (Figma
+                302:2360): the 9 rows distribute evenly between header
+                and CTAs so the column always fills the bio container
+                regardless of row count. */}
             <div
               ref={containerRef}
-              className="relative w-full flex flex-col items-start gap-[16px] rounded-[24px]"
+              className="relative w-full flex flex-col items-start justify-between flex-1 min-h-0 rounded-[24px]"
             >
               {/* Animated highlight */}
               {highlight && (
