@@ -118,14 +118,14 @@ const ARROWS: Arrow[] = [
   { src: `${A}/arrow-4.svg`,  left: 864.05, top: 52.2,   w: 0,       h: 101.85,  rotate: 90,    innerW: 101.85,  innerH: 0,
     insetTop: "-6.08px", insetRight: "-0.81%", insetBottom: "-6.08px", insetLeft: "0" },
   // Vertical arrow into "Selects a game"
-  { src: `${A}/arrow-19.svg`, left: 1005,   top: 265,    w: 0,       h: 35,      rotate: 90,    innerW: 35,      innerH: 0,
+  { src: `${A}/arrow-19.png`, left: 1005,   top: 265,    w: 0,       h: 35,      rotate: 90,    innerW: 35,      innerH: 0,
     insetTop: "-6.08px", insetRight: "-2.36%", insetBottom: "-6.08px", insetLeft: "0" },
   // Horizontal back-arrow from screenshot toolbar to "Game begins"
-  { src: `${A}/arrow-21.svg`, left: 571,    top: 374,    w: 170,     h: 0,       rotate: 180,   innerW: 170,     innerH: 0,
+  { src: `${A}/arrow-21.png`, left: 571,    top: 374,    w: 170,     h: 0,       rotate: 180,   innerW: 170,     innerH: 0,
     insetTop: "-6.08px", insetRight: "-0.49%", insetBottom: "-6.08px", insetLeft: "0" },
-  { src: `${A}/arrow-22.svg`, left: 580,    top: 621,    w: 161,     h: 0,       rotate: 180,   innerW: 161,     innerH: 0,
+  { src: `${A}/arrow-22.png`, left: 580,    top: 621,    w: 161,     h: 0,       rotate: 180,   innerW: 161,     innerH: 0,
     insetTop: "-6.08px", insetRight: "-0.51%", insetBottom: "-6.08px", insetLeft: "0" },
-  { src: `${A}/arrow-23.svg`, left: 918,    top: 621,    w: 85,      h: 0,       rotate: 180,   innerW: 85,      innerH: 0,
+  { src: `${A}/arrow-23.png`, left: 918,    top: 621,    w: 85,      h: 0,       rotate: 180,   innerW: 85,      innerH: 0,
     insetTop: "-6.08px", insetRight: "-0.97%", insetBottom: "-6.08px", insetLeft: "0" },
   // Tiny vertical arrow into History
   { src: `${A}/arrow-16.svg`, left: 1159,   top: 194,    w: 0,       h: 20,      rotate: 90,    innerW: 20,      innerH: 0,
@@ -151,13 +151,13 @@ const ARROWS: Arrow[] = [
     insetTop: "-4.94%", insetRight: "-44.25%", insetBottom: "-9.28%", insetLeft: "-44.29%" },
   { src: `${A}/arrow-11.svg`, left: 510.36, top: 214.04, w: 90.13,   h: 90.799,  rotate: 32.16, innerW: 64.545,  innerH: 66.673,
     insetTop: "-0.66%", insetRight: "3.42%",  insetBottom: "-1.24%", insetLeft: "0.66%" },
-  { src: `${A}/arrow-20.svg`, left: 865,    top: 293.8,  w: 138.318, h: 134.225, rotate: 32.16, innerW: 105.341, innerH: 92.32,
+  { src: `${A}/arrow-20.png`, left: 865,    top: 293.8,  w: 138.318, h: 134.225, rotate: 32.16, innerW: 105.341, innerH: 92.32,
     insetTop: "-0.48%", insetRight: "2.21%",  insetBottom: "-2.68%", insetLeft: "-0.78%" },
   { src: `${A}/arrow-12.svg`, left: 587.09, top: 220.45, w: 90.198,  h: 77.503,  rotate: 32.16, innerW: 81.007,  innerH: 40.617,
     insetTop: "5.43%",  insetRight: "-3.06%", insetBottom: "5.43%",  insetLeft: "-0.86%" },
   { src: `${A}/arrow-13.svg`, left: 587.09, top: 158.1,  w: 228.347, h: 202.062, rotate: 32.16, innerW: 197.887, innerH: 114.266,
     insetTop: "1.93%",  insetRight: "-1.25%", insetBottom: "1.93%",  insetLeft: "-0.35%" },
-  { src: `${A}/arrow-18.svg`, left: 784,    top: 108,    w: 228.347, h: 202.062, rotate: 32.16, innerW: 197.887, innerH: 114.266,
+  { src: `${A}/arrow-18.png`, left: 784,    top: 108,    w: 228.347, h: 202.062, rotate: 32.16, innerW: 197.887, innerH: 114.266,
     insetTop: "2.04%",  insetRight: "-1.25%", insetBottom: "2.04%",  insetLeft: "-0.35%" },
 ];
 
