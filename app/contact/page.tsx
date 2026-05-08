@@ -1,5 +1,16 @@
 "use client";
 
+import { useIsMobile } from "../_components/useIsMobile";
+import {
+  CALENDAR_URL,
+  EMAIL,
+  PHONE_DISPLAY,
+  SOCIALS,
+  TELEGRAM_URL,
+  WHATSAPP_URL,
+  type Social,
+} from "../_data/contact";
+
 /* === FIGMA DESIGN TOKENS (Contact, node 300:2277) ===
    Rendered inside ScaledShell (which handles the 1512 × 982 scale).
    Outer flex-col gap-80, pt-80 pb-40 px-120 items-center.
@@ -26,63 +37,6 @@
 ============================================================= */
 
 const SOLWAY = "var(--font-solway), serif";
-
-const EMAIL = "parichehr.t96@gmail.com";
-const PHONE_DISPLAY = "+31-657248971";
-// WhatsApp wants international digits with no `+` or punctuation; Telegram
-// accepts the `+` form. Phone number is +31 6 5724 8971.
-const WHATSAPP_URL = "https://wa.me/31657248971";
-const TELEGRAM_URL = "https://t.me/+31657248971";
-
-type Social = {
-  /** Optional href — when omitted the button renders as a non-clickable
-   *  visual placeholder (currently used for Instagram per request). */
-  href?: string;
-  src: string;
-  alt: string;
-  /** SVG's intrinsic viewBox dimensions, taken from the asset itself.
-   *  Rendering at these natural sizes inside the 40 × 40 wrapper
-   *  reproduces Figma's nested-inset framing without hand-tuned CSS. */
-  iconWidth: number;
-  iconHeight: number;
-};
-
-const SOCIALS: Social[] = [
-  {
-    href: "https://www.linkedin.com/in/parichehr-talebzadeh/",
-    src: "/assets/icon-social-linkedin.svg",
-    alt: "LinkedIn",
-    iconWidth: 35.7333,
-    iconHeight: 34.0667,
-  },
-  {
-    src: "/assets/icon-social-instagram.svg",
-    alt: "Instagram",
-    iconWidth: 35.7333,
-    iconHeight: 35.7333,
-  },
-  {
-    href: "https://dribbble.com/PariUXD",
-    src: "/assets/icon-social-dribbble.svg",
-    alt: "Dribbble",
-    iconWidth: 35.7333,
-    iconHeight: 35.7333,
-  },
-  {
-    href: "https://www.behance.net/pariuxd",
-    src: "/assets/icon-social-behance.svg",
-    alt: "Behance",
-    iconWidth: 40,
-    iconHeight: 40,
-  },
-  {
-    href: "https://medium.com/@pariuxd",
-    src: "/assets/icon-social-medium.svg",
-    alt: "Medium",
-    iconWidth: 33.3333,
-    iconHeight: 29.69,
-  },
-];
 
 function ExternalChevronIcon() {
   return (
@@ -158,7 +112,7 @@ function SocialPill({ social }: { social: Social }) {
   );
 }
 
-export default function Contact() {
+function ContactDesktop() {
   return (
     <>
       {/* Illustration (face crop, mirror of About) — same `viewTransitionName`
@@ -363,7 +317,7 @@ export default function Contact() {
           {/* BOOK A TIME SLOT? CTA — stage 7 (last). Opens the Google
               Calendar appointment page in a new tab. */}
           <a
-            href="https://calendar.app.google/jcChbEUgp776dBD4A"
+            href={CALENDAR_URL}
             target="_blank"
             rel="noopener noreferrer"
             aria-label="Book a time slot"
@@ -385,4 +339,217 @@ export default function Contact() {
       </div>
     </>
   );
+}
+
+/* === Mobile (Figma 312:2580) ===
+   Stacked layout, no illustration. Mail block, phone block, social
+   pills (62 × 62 each, wrap to 2 rows on narrow viewports), then
+   "BOOK A TIME SLOT?" as a single underline link.
+   Type scales:
+     - Title       Solway Regular 32/40 navy
+     - Sub         Solway Regular 16/20 navy
+     - Field label Solway Regular 14/24 grey-navy
+     - Field value Solway Regular 18/28 navy
+     - CTA         Solway Light 16/28 navy underline */
+function MobileSocialPill({ social }: { social: Social }) {
+  const baseClass =
+    "shrink-0 flex items-center justify-center bg-white border-[#EDEAE4] border border-solid transition-colors duration-200";
+  const inner = (
+    <span
+      className="relative shrink-0 inline-flex items-center justify-center"
+      style={{ width: 24, height: 24 }}
+    >
+      <img
+        src={social.src}
+        alt=""
+        width={social.iconWidth * (24 / 40)}
+        height={social.iconHeight * (24 / 40)}
+        className="block"
+      />
+    </span>
+  );
+  const sizeStyle = {
+    width: 62,
+    height: 62,
+    borderRadius: 17.28,
+    padding: 17.28,
+  } as const;
+  if (!social.href) {
+    return (
+      <span aria-label={social.alt} className={baseClass} style={sizeStyle}>
+        {inner}
+      </span>
+    );
+  }
+  return (
+    <a
+      href={social.href}
+      target="_blank"
+      rel="noopener noreferrer"
+      aria-label={social.alt}
+      className={`${baseClass} hover:bg-[#F9F5EB]`}
+      style={sizeStyle}
+    >
+      {inner}
+    </a>
+  );
+}
+
+function ContactMobile() {
+  return (
+    <div className="absolute inset-0 flex flex-col items-center pt-[64px] pb-[120px] px-[16px] gap-[40px]">
+      {/* Title section */}
+      <div className="w-full flex flex-col items-start gap-[8px] shrink-0 text-[#1F2753]">
+        <p
+          className="w-full anim-bubbly-grow"
+          style={{
+            fontSize: 32,
+            lineHeight: "40px",
+            transformOrigin: "left center",
+            ["--stage" as string]: 0,
+          }}
+        >
+          Have something in mind?
+        </p>
+        <p
+          className="w-full anim-bubbly-grow"
+          style={{
+            fontSize: 16,
+            lineHeight: "20px",
+            transformOrigin: "left center",
+            ["--stage" as string]: 1,
+          }}
+        >
+          Let&rsquo;s talk about it.
+        </p>
+      </div>
+
+      {/* Bio Container */}
+      <div className="w-full flex-1 min-h-0 flex flex-col items-center gap-[40px] overflow-hidden">
+        {/* Mail block */}
+        <div
+          className="w-full flex flex-col items-start gap-[4px] anim-bubbly-grow"
+          style={{
+            transformOrigin: "left top",
+            ["--stage" as string]: 2,
+          }}
+        >
+          <p
+            className="w-full text-[#5A5D70]"
+            style={{
+              fontSize: 14,
+              lineHeight: "24px",
+              letterSpacing: "0.15px",
+            }}
+          >
+            Mail me
+          </p>
+          <a
+            href={`mailto:${EMAIL}`}
+            aria-label={`Email ${EMAIL}`}
+            className="w-full text-[#1F2753] hover:opacity-70 transition-opacity duration-200"
+            style={{
+              fontSize: 18,
+              lineHeight: "28px",
+            }}
+          >
+            {EMAIL}
+          </a>
+        </div>
+
+        {/* Phone block */}
+        <div
+          className="w-full flex flex-col items-start gap-[4px] anim-bubbly-grow"
+          style={{
+            transformOrigin: "left top",
+            ["--stage" as string]: 3,
+          }}
+        >
+          <p
+            className="w-full text-[#5A5D70]"
+            style={{
+              fontSize: 14,
+              lineHeight: "24px",
+              letterSpacing: "0.15px",
+            }}
+          >
+            Text me (WhatsApp, Telegram)
+          </p>
+          <a
+            href={WHATSAPP_URL}
+            target="_blank"
+            rel="noopener noreferrer"
+            aria-label={`WhatsApp ${PHONE_DISPLAY}`}
+            className="w-full text-[#1F2753] hover:opacity-70 transition-opacity duration-200"
+            style={{
+              fontSize: 18,
+              lineHeight: "28px",
+            }}
+          >
+            {PHONE_DISPLAY}
+          </a>
+        </div>
+
+        {/* Social Links */}
+        <div
+          className="w-full flex flex-col items-start gap-[16px] anim-bubbly-grow"
+          style={{
+            transformOrigin: "left top",
+            ["--stage" as string]: 4,
+          }}
+        >
+          <p
+            className="w-full text-[#5A5D70]"
+            style={{
+              fontSize: 14,
+              lineHeight: "24px",
+              letterSpacing: "0.15px",
+            }}
+          >
+            Stay with me
+          </p>
+          <div
+            className="w-full flex flex-wrap items-start"
+            style={{ rowGap: 12, columnGap: 12 }}
+          >
+            {SOCIALS.map((s, i) => (
+              <span
+                key={s.alt}
+                className="anim-bubbly-grow"
+                style={{ ["--stage" as string]: 4 + (i + 1) * 0.3 }}
+              >
+                <MobileSocialPill social={s} />
+              </span>
+            ))}
+          </div>
+        </div>
+
+        {/* BOOK A TIME SLOT? */}
+        <a
+          href={CALENDAR_URL}
+          target="_blank"
+          rel="noopener noreferrer"
+          aria-label="Book a time slot"
+          className="w-full text-[#1F2753] cursor-pointer hover:opacity-70 transition-opacity duration-200 anim-bubbly-grow"
+          style={{
+            fontFamily: SOLWAY,
+            fontWeight: 300,
+            fontSize: 16,
+            lineHeight: "28px",
+            textDecoration: "underline",
+            textDecorationStyle: "solid",
+            transformOrigin: "left center",
+            ["--stage" as string]: 7,
+          }}
+        >
+          BOOK A TIME SLOT?
+        </a>
+      </div>
+    </div>
+  );
+}
+
+export default function Contact() {
+  const isMobile = useIsMobile();
+  return isMobile ? <ContactMobile /> : <ContactDesktop />;
 }

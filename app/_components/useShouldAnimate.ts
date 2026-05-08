@@ -15,7 +15,7 @@ let homeHasRendered = false;
    soft Link navigation to / correctly skips the home loading sequence.
    On SSR the value stays null; the SSR branch of useShouldAnimateHome
    short-circuits anyway (SSR for home only happens on the / route). */
-let initialPathname: string | null =
+const initialPathname: string | null =
   typeof window !== "undefined" ? window.location.pathname : null;
 
 /** True on the first call of this session, false on every subsequent call.

@@ -1,7 +1,8 @@
 "use client";
 
 import Link from "next/link";
-import { usePathname, useRouter } from "next/navigation";
+import { usePathname } from "next/navigation";
+import { useViewTransitionRouter } from "../_lib/useViewTransitionRouter";
 import { useShouldAnimate } from "./useShouldAnimate";
 
 /* === FIGMA DESIGN TOKENS (Nav, instance 288:1727) ===
@@ -78,29 +79,12 @@ const NAV_ITEM_STAGGER = 0.2;
 
 export default function FloatingNav({ startDelay = 1.5 }: FloatingNavProps) {
   const pathname = usePathname();
-  const router = useRouter();
+  const { handleClick } = useViewTransitionRouter();
   const shouldAnimate = useShouldAnimate();
   const itemBase = startDelay + NAV_BACKDROP_DURATION;
 
   const activeIdx = ITEMS.findIndex((it) => it.href === pathname);
   const activeLeft = activeIdx >= 0 ? ITEMS[activeIdx].left : ITEMS[0].left;
-
-  // Navigate inside a View Transition so the shared
-  // `viewTransitionName: "hero-illustration"` element morphs from
-  // home position → about corner (and back) automatically.
-  const handleNav = (href: string) => (e: React.MouseEvent) => {
-    if (typeof window === "undefined") return;
-    const startVT = (
-      document as unknown as {
-        startViewTransition?: (cb: () => void) => unknown;
-      }
-    ).startViewTransition;
-    if (typeof startVT !== "function") return;
-    e.preventDefault();
-    startVT.call(document, () => {
-      router.push(href);
-    });
-  };
 
   const popDelay = (i: number) => `${itemBase + i * NAV_ITEM_STAGGER}s`;
   const popClass = shouldAnimate ? "anim-pop-up" : "";
@@ -147,7 +131,7 @@ export default function FloatingNav({ startDelay = 1.5 }: FloatingNavProps) {
             aria-label={item.label}
             className={className}
             style={style}
-            onClick={handleNav(item.href)}
+            onClick={handleClick(item.href)}
           >
             {inner}
           </Link>

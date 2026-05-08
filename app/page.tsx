@@ -1,14 +1,17 @@
 "use client";
 
 import Link from "next/link";
-import { useRouter } from "next/navigation";
+import { useIsMobile } from "./_components/useIsMobile";
+import { useViewTransitionRouter } from "./_lib/useViewTransitionRouter";
 
-/* === FIGMA DESIGN TOKENS (Home, node 288:1718) ===
-   Frame: 1512 × 982 — content rendered inside ScaledShell which
-   handles the scale-to-fit transform.
-   Type: all Solway, Navy #1F2753
+/* === FIGMA DESIGN TOKENS (Home) ===
+   Desktop (node 288:1718): rendered inside ScaledShell which scales the
+   1512 × 982 design canvas. All Solway, Navy #1F2753.
+   Mobile  (node 312:1661): rendered unscaled inside the mobile shell —
+   pt-64 pb-32 px-16, gap-24, illustration absolute behind content at
+   bottom-centre, FloatingNav above it (managed by ScaledShell).
 
-   Mount-time animation: every element below carries
+   Mount-time animation: every visible text/CTA carries
    `className="anim-bubbly-grow"` with an inline `--stage` (0 → N) so
    they pop in top-left → bottom-right with a 250 ms stagger,
    completing in ~2 s total. The illustration uses `viewTransitionName`
@@ -19,22 +22,9 @@ import { useRouter } from "next/navigation";
 const STAGE = (n: number) =>
   ({ "--stage": n }) as React.CSSProperties;
 
-export default function Home() {
-  const router = useRouter();
-
-  const handleAboutClick = (e: React.MouseEvent<HTMLAnchorElement>) => {
-    if (typeof window === "undefined") return;
-    const startVT = (
-      document as unknown as {
-        startViewTransition?: (cb: () => void) => unknown;
-      }
-    ).startViewTransition;
-    if (typeof startVT !== "function") return;
-    e.preventDefault();
-    startVT.call(document, () => {
-      router.push("/about");
-    });
-  };
+function HomeDesktop() {
+  const { handleClick } = useViewTransitionRouter();
+  const handleAboutClick = handleClick("/about");
 
   return (
     <>
@@ -168,4 +158,156 @@ export default function Home() {
       </div>
     </>
   );
+}
+
+/* === Mobile layout (Figma 312:1661) ===
+   Width: 100% of viewport, content padded 16 px. Vertical stack with
+   24 px gap. Illustration absolutely positioned at bottom-centre as
+   background; foreground text/CTAs sit above it. The FloatingNav is
+   rendered by ScaledShell at fixed bottom-centre.
+
+   Type scales:
+     - "Parichehr"            Solway Regular 60/64 tracking-8
+     - "Talebzadeh" + role    Solway Light 14/24 tracking-2
+     - Bio paragraph          Solway Light 14/20 (Regular for emphasis)
+     - "Remember;" + tagline  Solway Light 14/18
+     - KNOW ME MORE?          Solway Light 16/28 underline */
+function HomeMobile() {
+  const { handleClick } = useViewTransitionRouter();
+  const handleAboutClick = handleClick("/about");
+
+  return (
+    <>
+      {/* Illustration — bottom-centred. z-10 puts it in front of the
+          page text where they overlap (per request) while still
+          letting the FloatingNav (rendered by ScaledShell at z-20)
+          sit above it. Same `viewTransitionName` as desktop so it
+          cross-page morphs. Fades in as stage 6, after the 6 text
+          elements (stages 0–5) finish their bubbly entrance. */}
+      <div
+        className="absolute pointer-events-none anim-fade-stage"
+        style={{
+          left: "50%",
+          bottom: 0,
+          width: 541,
+          height: 541,
+          transform: "translateX(-50%)",
+          viewTransitionName: "hero-illustration",
+          zIndex: 10,
+          ...STAGE(6),
+        }}
+      >
+        <img
+          src="/assets/illustration.png"
+          alt=""
+          className="w-full h-full object-cover block"
+        />
+      </div>
+
+      <div
+        className="absolute inset-0 flex flex-col items-stretch pt-[64px] pb-[120px] px-[16px] gap-[24px]"
+        style={{ zIndex: 0 }}
+      >
+        {/* Bio Section header (Parichehr + name/role row) — shrink-0
+            so it sits at the top, the bio container below grows. */}
+        <div className="w-full flex flex-col items-start gap-[16px] text-[#1F2753] shrink-0">
+          <p
+            className="w-full font-normal anim-bubbly-grow"
+            style={{
+              fontSize: 60,
+              lineHeight: "64px",
+              letterSpacing: "8px",
+              transformOrigin: "left center",
+              ...STAGE(0),
+            }}
+          >
+            Parichehr
+          </p>
+          <div
+            className="w-full flex items-start"
+            style={{
+              fontWeight: 300,
+              fontSize: 14,
+              lineHeight: "24px",
+              letterSpacing: "2px",
+            }}
+          >
+            <p
+              className="flex-1 min-w-0 anim-bubbly-grow"
+              style={{ transformOrigin: "left center", ...STAGE(1) }}
+            >
+              Talebzadeh
+            </p>
+            <p
+              className="whitespace-nowrap shrink-0 anim-bubbly-grow"
+              style={{ transformOrigin: "right center", ...STAGE(2) }}
+            >
+              Product Designer
+            </p>
+          </div>
+        </div>
+
+        {/* Bio Container — fills remaining vertical space, top-aligned
+            so the bio text + quote + CTA sit just under the title and
+            never collide with the illustration below. */}
+        <div
+          className="w-full flex flex-col items-start gap-[24px] text-[#1F2753] shrink-0"
+          style={{ fontWeight: 300 }}
+        >
+          <p
+            className="w-full anim-bubbly-grow"
+            style={{
+              fontSize: 14,
+              lineHeight: "20px",
+              transformOrigin: "left center",
+              ...STAGE(3),
+            }}
+          >
+            designing digital products, containing{" "}
+            <span style={{ fontWeight: 400 }}>interaction</span>,{" "}
+            <span style={{ fontWeight: 400 }}>experience</span>,{" "}
+            <span style={{ fontWeight: 400 }}>interface</span>,{" "}
+            <span style={{ fontWeight: 400 }}>design system</span>, and{" "}
+            <span style={{ fontWeight: 400 }}>content</span>, within various
+            product team for modern businesses.
+          </p>
+          <div
+            className="w-full flex flex-col items-start gap-[4px] anim-bubbly-grow"
+            style={{
+              fontSize: 14,
+              lineHeight: "18px",
+              transformOrigin: "left center",
+              ...STAGE(4),
+            }}
+          >
+            <p className="w-full text-[#5A5D70]">Remember;</p>
+            <p className="w-full text-[#1F2753]">
+              Complexity is inevitable, Confusion is optional.
+            </p>
+          </div>
+          <Link
+            href="/about"
+            onClick={handleAboutClick}
+            className="w-full anim-bubbly-grow"
+            style={{
+              fontSize: 16,
+              lineHeight: "28px",
+              color: "#1F2753",
+              textDecoration: "underline",
+              textDecorationStyle: "solid",
+              transformOrigin: "left center",
+              ...STAGE(5),
+            }}
+          >
+            KNOW ME MORE?
+          </Link>
+        </div>
+      </div>
+    </>
+  );
+}
+
+export default function Home() {
+  const isMobile = useIsMobile();
+  return isMobile ? <HomeMobile /> : <HomeDesktop />;
 }

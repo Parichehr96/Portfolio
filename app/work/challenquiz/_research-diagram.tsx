@@ -11,7 +11,6 @@ import { useEffect, useLayoutEffect, useRef, useState } from "react";
    so the diagram is crisp at any zoom level.
 ======================================================================= */
 
-const NAVY = "#1F2753";
 const NAVY_DARK = "#1B2249";
 const NAVY_LIGHT = "#28315F";
 const GRAY_NAVY = "#5A5D70";

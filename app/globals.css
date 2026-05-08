@@ -1,5 +1,25 @@
 @import "tailwindcss";
 
+/* === Design tokens ===
+   Mirrored in app/_lib/tokens.ts. CSS variables are exposed so
+   style={{ color: "var(--color-navy)" }} stays valid alongside
+   tokens.color.navy in TS, and so the Tailwind v4 @theme block can
+   register them as utility colors. */
+@theme {
+  --color-navy: #1F2753;
+  --color-navy-dark: #1B2249;
+  --color-navy-deep: #28315F;
+  --color-gray-navy: #5A5D70;
+  --color-gray-soft: #7E7F85;
+  --color-gray-light: #DDE0F1;
+  --color-cream: #F9F5EB;
+  --color-cream-dark: #EDEAE4;
+  --color-cream-light: #FEFBF5;
+
+  --ease-bubbly: cubic-bezier(0.34, 1.56, 0.64, 1);
+  --ease-standard: cubic-bezier(0.4, 0, 0.2, 1);
+}
+
 /* === Sequenced home-page load animation ===
    Plays only on the very first visit / hard refresh of `/`.
    Timeline (no gaps between segments, total 2.8 s):
@@ -75,6 +95,15 @@
 
 .anim-fade {
   animation: anim-fade 0.5s ease-out both;
+}
+
+/* Staged fade-in: same `--stage` * 160 ms cadence as anim-bubbly-grow,
+   but fades opacity only (no scale). Used by mobile illustrations
+   that should appear in their turn of the page stagger but without
+   the scale wobble of the bubbly grow. */
+.anim-fade-stage {
+  animation: anim-fade 600ms ease-out both;
+  animation-delay: calc(var(--stage, 0) * 160ms);
 }
 
 .anim-fade-down {
@@ -163,4 +192,54 @@
 
 .no-scrollbar::-webkit-scrollbar {
   display: none;
+}
+
+/* === Case-study responsive utilities ===
+   Case-study routes (`/work/<slug>`) bypass ScaledShell and render at
+   their native canvas. These classes encapsulate the breakpoint-driven
+   padding/margin switches that show up across the case-study tree
+   (page bodies + custom layout blocks) so server components can stay
+   server-only — Tailwind's `md:` prefix would also work but many of
+   the case-study files use inline-style numeric values which can't
+   easily be Tailwind-ified.
+
+   Breakpoint: 768 px (matches MOBILE_BREAKPOINT in useIsMobile.ts). */
+.cs-body-offset {
+  /* 100vh = morphing CaseStudyHeader fills first viewport on desktop;
+     +120px = MC2 bar height once the card collapses. */
+  margin-top: calc(100vh + 120px);
+}
+
+.cs-body-padding {
+  padding: 80px 120px;
+}
+
+.cs-section-row {
+  /* Used by case-study sections that put text + image side-by-side on
+     desktop. Stacks vertically on mobile so the image can go full-
+     width. The desktop layout adds horizontal gap. */
+  display: flex;
+  flex-direction: column;
+  gap: 32px;
+  align-items: stretch;
+  width: 100%;
+}
+
+@media (min-width: 768px) {
+  .cs-section-row {
+    flex-direction: row;
+    gap: 40px;
+    align-items: flex-start;
+  }
+}
+
+@media (max-width: 767px) {
+  .cs-body-offset {
+    /* No fixed header on mobile — the simpler stacked header is in
+       normal flow, so body content sits naturally below it. */
+    margin-top: 0;
+  }
+  .cs-body-padding {
+    padding: 32px 16px;
+  }
 }

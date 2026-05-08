@@ -1,8 +1,12 @@
-"use client";
-
-import CaseStudyHeader, {
-  MC2_HEIGHT,
-} from "../../_components/CaseStudyHeader";
+import CaseStudyHeader from "../../_components/CaseStudyHeader";
+import {
+  BodyBlock,
+  BodyText,
+  ImageCaption,
+  ImageFrame,
+  ReflectionBlock,
+  SectionTitle,
+} from "../../_components/case-study/CaseStudyBody";
 import ResearchDiagram from "./_research-diagram";
 
 /* Challenquiz case study (Figma 313:3079).
@@ -12,160 +16,11 @@ import ResearchDiagram from "./_research-diagram";
 
 const SOLWAY = "var(--font-solway), serif";
 const NAVY = "#1F2753";
-const NAVY_DARK = "#1B2249";
 const CREAM = "#F9F5EB";
 
 const TELEGRAM_URL = "https://t.me/Challenquiz";
 const FIGMA_FILE_URL =
   "https://www.figma.com/design/6grX5EnZZJWMbaoVGQW4Gc/CHALLENQUIZ?node-id=1-4&t=lW9GZwwbKeTvGYma-1";
-
-/* ---------- Shared body helpers (mirrors WOW page) ---------- */
-
-function SectionTitle({
-  text,
-  size = "lg",
-}: {
-  text: string;
-  size?: "xl" | "lg" | "md";
-}) {
-  const sizeMap = {
-    xl: { fontSize: 32, lineHeight: "40px", fontWeight: 700 },
-    lg: { fontSize: 28, lineHeight: "36px", fontWeight: 700 },
-    md: { fontSize: 24, lineHeight: "32px", fontWeight: 700 },
-  } as const;
-  const s = sizeMap[size];
-  return (
-    <p
-      className="w-full"
-      style={{ color: NAVY, fontFamily: SOLWAY, ...s }}
-    >
-      {text}
-    </p>
-  );
-}
-
-function BodyText({ children }: { children: React.ReactNode }) {
-  return (
-    <p
-      className="w-full"
-      style={{
-        color: NAVY,
-        fontFamily: SOLWAY,
-        fontWeight: 400,
-        fontSize: 16,
-        lineHeight: "24px",
-        letterSpacing: "0.5px",
-      }}
-    >
-      {children}
-    </p>
-  );
-}
-
-function BodyBlock({ children }: { children: React.ReactNode }) {
-  return (
-    <div
-      className="w-full flex flex-col"
-      style={{
-        gap: 16,
-        color: NAVY,
-        fontFamily: SOLWAY,
-        fontWeight: 400,
-        fontSize: 16,
-        lineHeight: "24px",
-        letterSpacing: "0.5px",
-      }}
-    >
-      {children}
-    </div>
-  );
-}
-
-function ImageFrame({
-  src,
-  alt,
-  bg = CREAM,
-  rounded = 20,
-}: {
-  src: string;
-  alt: string;
-  bg?: string;
-  rounded?: number;
-}) {
-  // Cream-framed image. Width fills the container; height follows the
-  // image's natural aspect ratio so the frame matches the visual exactly
-  // — no inner letterboxing, no extra darker frame.
-  return (
-    <div
-      className="w-full overflow-hidden"
-      style={{ backgroundColor: bg, borderRadius: rounded }}
-    >
-      <img src={src} alt={alt} className="block w-full h-auto" />
-    </div>
-  );
-}
-
-function ImageCaption({ children }: { children: React.ReactNode }) {
-  // Left-aligned, Body/medium per design tokens (Solway Regular 14/20,
-  // letterSpacing 0.25px) — the description sits below each image.
-  return (
-    <p
-      className="w-full"
-      style={{
-        color: NAVY,
-        fontFamily: SOLWAY,
-        fontWeight: 400,
-        fontSize: 14,
-        lineHeight: "20px",
-        letterSpacing: "0.25px",
-        textAlign: "left",
-      }}
-    >
-      {children}
-    </p>
-  );
-}
-
-function ReflectionBlock({
-  title,
-  children,
-}: {
-  title: string;
-  children: React.ReactNode;
-}) {
-  // Sub-title: Solway Regular 22/28 (Title/large per design tokens),
-  // colour #1B2249. Updated from Space Grotesk Medium 28/38 to match
-  // the latest Figma spec (313:3176 / 313:3179 / 313:3182).
-  return (
-    <div className="w-full flex flex-col items-start" style={{ gap: 8 }}>
-      <p
-        className="w-full"
-        style={{
-          color: NAVY_DARK,
-          fontFamily: SOLWAY,
-          fontWeight: 400,
-          fontSize: 22,
-          lineHeight: "28px",
-        }}
-      >
-        {title}
-      </p>
-      <p
-        className="w-full"
-        style={{
-          color: NAVY,
-          fontFamily: SOLWAY,
-          fontWeight: 400,
-          fontSize: 16,
-          lineHeight: "24px",
-          letterSpacing: "0.5px",
-        }}
-      >
-        {children}
-      </p>
-    </div>
-  );
-}
 
 /* ---------- Page ---------- */
 
@@ -223,15 +78,8 @@ export default function ChallenquizCaseStudy() {
       />
 
       <div
-        className="w-full flex flex-col items-start"
-        style={{
-          marginTop: `calc(100vh + ${MC2_HEIGHT}px)`,
-          paddingLeft: 120,
-          paddingRight: 120,
-          paddingTop: 80,
-          paddingBottom: 80,
-          gap: 64,
-        }}
+        className="cs-body-offset cs-body-padding w-full flex flex-col items-start"
+        style={{ gap: 64 }}
       >
         {/* Problem */}
         <section
@@ -267,6 +115,7 @@ export default function ChallenquizCaseStudy() {
             <ImageFrame
               src="/assets/challenquiz/section-comparison-generic.png"
               alt="Old system list-based menu vs. new structured tab navigation"
+              bg={CREAM}
             />
             <ImageCaption>
               Old system: list-based menu, no visual hierarchy vs. New
@@ -335,7 +184,7 @@ export default function ChallenquizCaseStudy() {
           className="w-full flex flex-col items-start"
           style={{ gap: 40 }}
         >
-          <div className="w-full flex items-start" style={{ gap: 40 }}>
+          <div className="cs-section-row">
             <BodyBlock>
               <SectionTitle text="Competitor Analysis" size="lg" />
               <BodyText>
@@ -360,8 +209,8 @@ export default function ChallenquizCaseStudy() {
               </BodyText>
             </BodyBlock>
             <div
-              className="shrink-0 flex flex-col"
-              style={{ width: 645, gap: 12 }}
+              className="shrink-0 flex flex-col w-full md:w-[645px]"
+              style={{ gap: 12 }}
             >
               <img
                 src="/assets/challenquiz/competitor-quizbot.png"
@@ -426,6 +275,7 @@ export default function ChallenquizCaseStudy() {
             <ImageFrame
               src="/assets/challenquiz/section-nav-comparison.png"
               alt="Before: vertical list menu vs. After: bottom tab bar with grouped features"
+              bg={CREAM}
             />
             <ImageCaption>
               Before: vertical list menu → After: bottom tab bar with
@@ -471,6 +321,7 @@ export default function ChallenquizCaseStudy() {
             <ImageFrame
               src="/assets/challenquiz/section-game-flow-comparison.png"
               alt="Game initiation: old silent flow vs. new flow with player count, join state, and active feedback"
+              bg={CREAM}
             />
             <ImageCaption>
               Game initiation: old silent flow vs. new flow with player
@@ -507,6 +358,7 @@ export default function ChallenquizCaseStudy() {
             <ImageFrame
               src="/assets/challenquiz/section-onboarding-comparison.png"
               alt="Old onboarding form fields vs. new illustrated step-through"
+              bg={CREAM}
             />
             <ImageCaption>
               Old onboarding: form fields only → New onboarding:
@@ -542,6 +394,7 @@ export default function ChallenquizCaseStudy() {
             <ImageFrame
               src="/assets/challenquiz/section-ingame-comparison.png"
               alt="In-game: old static question layout vs. new colour-coded real-time interface"
+              bg={CREAM}
             />
             <ImageCaption>
               In-game: old static question layout vs. new colour-coded
@@ -574,6 +427,7 @@ export default function ChallenquizCaseStudy() {
             <ImageFrame
               src="/assets/challenquiz/section-profile-comparison.png"
               alt="Profile section: game history, scoreboard, avatar, preferences"
+              bg={CREAM}
             />
             <ImageCaption>
               Profile section: game history, scoreboard, avatar,
@@ -595,11 +449,10 @@ export default function ChallenquizCaseStudy() {
             </BodyText>
           </BodyBlock>
           <div
-            className="w-full flex flex-col"
+            className="w-full flex flex-col px-[20px] py-[24px] md:px-[40px] md:py-[32px]"
             style={{
               backgroundColor: CREAM,
               borderRadius: 20,
-              padding: "32px 40px",
               gap: 12,
               fontFamily: SOLWAY,
               color: NAVY,
@@ -616,9 +469,11 @@ export default function ChallenquizCaseStudy() {
                 borderBottom: `1px solid ${NAVY}`,
               }}
             >
-              <span style={{ flex: 1 }}>Metric</span>
-              <span style={{ width: 200, textAlign: "right" }}>March 2024</span>
-              <span style={{ width: 200, textAlign: "right" }}>
+              <span style={{ flex: 1, minWidth: 0 }}>Metric</span>
+              <span className="w-[80px] md:w-[200px] text-right shrink-0">
+                March 2024
+              </span>
+              <span className="w-[80px] md:w-[200px] text-right shrink-0">
                 September 2024
               </span>
             </div>
@@ -634,9 +489,13 @@ export default function ChallenquizCaseStudy() {
                 className="w-full flex items-center"
                 style={{ paddingTop: 8, paddingBottom: 8 }}
               >
-                <span style={{ flex: 1 }}>{metric}</span>
-                <span style={{ width: 200, textAlign: "right" }}>{before}</span>
-                <span style={{ width: 200, textAlign: "right" }}>{after}</span>
+                <span style={{ flex: 1, minWidth: 0 }}>{metric}</span>
+                <span className="w-[80px] md:w-[200px] text-right shrink-0">
+                  {before}
+                </span>
+                <span className="w-[80px] md:w-[200px] text-right shrink-0">
+                  {after}
+                </span>
               </div>
             ))}
           </div>

@@ -1,6 +1,8 @@
 "use client";
 
+import Image from "next/image";
 import { useEffect, useLayoutEffect, useRef, useState } from "react";
+import { useIsMobile } from "./useIsMobile";
 
 /* === FINALIZED CASE-STUDY HEADER (MainCard) ============================
    Single morphing card used at the top of every case-study page. The
@@ -264,7 +266,19 @@ function CompactLink({
   );
 }
 
-export default function CaseStudyHeader({
+/* Public component — picks the mobile or desktop variant. Hooks
+   inside each variant only run when that variant renders, so the
+   desktop scroll/resize handlers don't fire on phones. */
+export default function CaseStudyHeader(props: CaseStudyHeaderProps) {
+  const isMobile = useIsMobile();
+  return isMobile ? (
+    <CaseStudyHeaderMobile {...props} />
+  ) : (
+    <CaseStudyHeaderDesktop {...props} />
+  );
+}
+
+function CaseStudyHeaderDesktop({
   title,
   subtitle,
   subtitleCompact,
@@ -292,7 +306,20 @@ export default function CaseStudyHeader({
       if (stackMeasureRef.current)
         setStackWidth(stackMeasureRef.current.scrollWidth);
     };
-    const onScroll = () => setScrollY(window.scrollY);
+
+    // rAF-throttled scroll: scroll events fire on every frame at 60–
+    // 144 Hz; pushing scrollY into React state on each one triggers a
+    // re-render per frame. We coalesce to one update per animation
+    // frame so React work doesn't pile up if the browser is busy.
+    let frame = 0;
+    const onScroll = () => {
+      if (frame !== 0) return;
+      frame = requestAnimationFrame(() => {
+        frame = 0;
+        setScrollY(window.scrollY);
+      });
+    };
+
     const onResize = () => {
       setVh(window.innerHeight);
       setScrollY(window.scrollY);
@@ -303,6 +330,7 @@ export default function CaseStudyHeader({
     window.addEventListener("scroll", onScroll, { passive: true });
     window.addEventListener("resize", onResize);
     return () => {
+      if (frame !== 0) cancelAnimationFrame(frame);
       window.removeEventListener("scroll", onScroll);
       window.removeEventListener("resize", onResize);
     };
@@ -539,10 +567,13 @@ export default function CaseStudyHeader({
               opacity: imageOpacity,
             }}
           >
-            <img
+            <Image
               src={heroImageSrc}
               alt={heroImageAlt}
-              className="absolute inset-0 w-full h-full object-contain block pointer-events-none"
+              fill
+              priority
+              sizes="596px"
+              className="object-contain pointer-events-none"
             />
           </div>
         </div>
@@ -553,5 +584,261 @@ export default function CaseStudyHeader({
         </div>
       </div>
     </div>
+  );
+}
+
+/* Mobile case-study header — no desktop morph. Static stacked layout
+   (back / title / subtitle / hero / details / CTAs) in normal flow;
+   when the user scrolls past it, a sticky compact bar (back + title)
+   slides in from the top.
+
+   This intentionally diverges from the desktop morphing card because
+   the desktop card's content (six detail items + 596×409 hero + four
+   CTAs) won't fit a phone viewport without ugly clipping. The mobile
+   version is a more conventional case-study header and works on every
+   phone size.
+   ---------------------------------------------------------------- */
+
+const MOBILE_PAGE_PADDING = 16;
+const MOBILE_STICKY_HEIGHT = 56;
+
+function MobileCTAButton({
+  href,
+  iconSrc,
+  label,
+  variant,
+  internal,
+  uppercase,
+}: CaseStudyCTA) {
+  const baseClass =
+    "w-full inline-flex items-center justify-center gap-[12px] py-[14px] px-[16px] rounded-[120px] transition-colors duration-200 cursor-pointer";
+  const variantClass =
+    variant === "primary"
+      ? "bg-white hover:bg-[#EDEAE4]"
+      : "bg-transparent border-[2px] border-solid border-white hover:bg-white/30";
+  const inner = (
+    <>
+      <span
+        className="relative shrink-0 inline-block"
+        style={{ width: 20, height: 20 }}
+      >
+        <img
+          src={iconSrc}
+          alt=""
+          className="absolute inset-0 w-full h-full block"
+        />
+      </span>
+      <span
+        className="whitespace-nowrap"
+        style={{
+          color: NAVY,
+          fontFamily: SOLWAY,
+          fontWeight: 400,
+          fontSize: 14,
+          lineHeight: "18px",
+          textTransform: uppercase ? "uppercase" : undefined,
+        }}
+      >
+        {label}
+      </span>
+    </>
+  );
+  if (internal) {
+    return (
+      <a href={href} className={`${baseClass} ${variantClass}`}>
+        {inner}
+      </a>
+    );
+  }
+  return (
+    <a
+      href={href}
+      target="_blank"
+      rel="noopener noreferrer"
+      className={`${baseClass} ${variantClass}`}
+    >
+      {inner}
+    </a>
+  );
+}
+
+function CaseStudyHeaderMobile({
+  title,
+  subtitle,
+  detailItems,
+  heroImageSrc,
+  heroImageAlt,
+  ctas,
+  backHref = "/work",
+}: CaseStudyHeaderProps) {
+  const [scrolled, setScrolled] = useState(false);
+  const headerRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const headerEl = headerRef.current;
+    if (!headerEl) return;
+
+    // Reveal the sticky compact bar when the user has scrolled past
+    // ~80% of the static header. We compute the threshold once on
+    // mount and on resize; rAF-throttle the scroll handler so we
+    // don't churn React on every frame.
+    let threshold = 0;
+    let frame = 0;
+
+    const measure = () => {
+      threshold = Math.max(0, headerEl.offsetHeight * 0.8);
+    };
+
+    const onScroll = () => {
+      if (frame !== 0) return;
+      frame = requestAnimationFrame(() => {
+        frame = 0;
+        setScrolled(window.scrollY > threshold);
+      });
+    };
+
+    const onResize = () => {
+      measure();
+      onScroll();
+    };
+
+    measure();
+    onScroll();
+    window.addEventListener("scroll", onScroll, { passive: true });
+    window.addEventListener("resize", onResize);
+    return () => {
+      if (frame !== 0) cancelAnimationFrame(frame);
+      window.removeEventListener("scroll", onScroll);
+      window.removeEventListener("resize", onResize);
+    };
+  }, []);
+
+  return (
+    <>
+      {/* Sticky compact bar — slides in once the user scrolls past
+          most of the static header. */}
+      <div
+        aria-hidden={!scrolled}
+        style={{
+          position: "fixed",
+          top: 0,
+          left: 0,
+          right: 0,
+          height: MOBILE_STICKY_HEIGHT,
+          backgroundColor: CREAM,
+          borderBottomLeftRadius: 16,
+          borderBottomRightRadius: 16,
+          padding: `0 ${MOBILE_PAGE_PADDING}px`,
+          display: "flex",
+          alignItems: "center",
+          gap: 12,
+          zIndex: 50,
+          transform: scrolled ? "translateY(0)" : "translateY(-100%)",
+          transition: "transform 220ms ease-out",
+          boxShadow: scrolled ? "0 2px 8px rgba(31,39,83,0.08)" : "none",
+          pointerEvents: scrolled ? "auto" : "none",
+        }}
+      >
+        <BackButton href={backHref} />
+        <p
+          className="flex-1 min-w-0"
+          style={{
+            color: NAVY,
+            fontFamily: SOLWAY,
+            fontWeight: 500,
+            fontSize: 16,
+            lineHeight: "20px",
+            overflow: "hidden",
+            textOverflow: "ellipsis",
+            whiteSpace: "nowrap",
+          }}
+        >
+          {title}
+        </p>
+      </div>
+
+      {/* Static header — normal flow, full-width stack. */}
+      <header
+        ref={headerRef}
+        style={{
+          backgroundColor: CREAM,
+          borderBottomLeftRadius: 24,
+          borderBottomRightRadius: 24,
+          padding: `${MOBILE_PAGE_PADDING}px ${MOBILE_PAGE_PADDING}px 32px`,
+          display: "flex",
+          flexDirection: "column",
+          gap: 24,
+        }}
+      >
+        {/* Back row */}
+        <div style={{ paddingTop: 8 }}>
+          <BackButton href={backHref} />
+        </div>
+
+        {/* Title + subtitle */}
+        <div className="flex flex-col gap-[8px]">
+          <h1
+            style={{
+              color: NAVY,
+              fontFamily: SOLWAY,
+              fontWeight: 400,
+              fontSize: 28,
+              lineHeight: "36px",
+              margin: 0,
+            }}
+          >
+            {title}
+          </h1>
+          <p
+            style={{
+              color: NAVY,
+              fontFamily: SOLWAY,
+              fontWeight: 400,
+              fontSize: 16,
+              lineHeight: "22px",
+              margin: 0,
+            }}
+          >
+            {subtitle}
+          </p>
+        </div>
+
+        {/* Hero image — full-width, aspect ratio preserved. */}
+        <div
+          className="relative w-full overflow-hidden"
+          style={{
+            aspectRatio: `${IMAGE_WIDTH} / ${IMAGE_HEIGHT}`,
+            borderRadius: 16,
+          }}
+        >
+          <Image
+            src={heroImageSrc}
+            alt={heroImageAlt}
+            fill
+            priority
+            sizes="(max-width: 767px) 100vw, 596px"
+            className="object-contain pointer-events-none"
+          />
+        </div>
+
+        {/* Detail items — vertical stack */}
+        <div className="flex flex-col gap-[16px] w-full">
+          {detailItems.map((item) => (
+            <DetailItem
+              key={item.label}
+              label={item.label}
+              value={item.value}
+            />
+          ))}
+        </div>
+
+        {/* CTAs — stacked full-width pills */}
+        <div className="flex flex-col gap-[12px] w-full">
+          {ctas.map((cta) => (
+            <MobileCTAButton key={cta.label} {...cta} />
+          ))}
+        </div>
+      </header>
+    </>
   );
 }
