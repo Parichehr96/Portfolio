@@ -120,6 +120,74 @@
   transform-origin: center center;
 }
 
+/* Bouncy transform-only "pop" used on the mobile /work page when
+   the user swipes between sections or advances the selected item.
+   Pure scale (no opacity, no translate) so the transition reads as
+   a soft spring without any fade-out / fade-in drama — the old
+   content vanishes instantly and the new content scales up from
+   96 % to 100 %, with the bubbly curve overshooting briefly to
+   ~102 % before settling.
+
+   Easing matches the desktop hover (cubic-bezier(0.34, 1.7, 0.64, 1))
+   so mobile transitions and desktop hovers feel like one family.
+   400 ms is short enough to feel snappy when the user is rapidly
+   advancing items, long enough that the bounce reads. */
+@keyframes anim-bounce-pop {
+  0% {
+    transform: scale(0.96);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+.anim-bounce-pop {
+  animation: anim-bounce-pop 400ms cubic-bezier(0.34, 1.7, 0.64, 1) both;
+}
+
+/* Selected-pill name + date cross-transition for the mobile /work
+   page. When the user advances the selected item within a tier, the
+   previous item's name and date slide up + fade out while the new
+   item's slide up from below + fade in (with the same bubbly
+   overshoot as the desktop hover). Below the row the industry,
+   company, and description update in place — the cross-transition
+   only affects the title row, so the pill never feels like a full
+   fade-out / fade-in. */
+/* translateY uses 100% (the row's own height) so the outgoing layer
+   fully slides out the top of the clipping box and the incoming
+   layer fully slides in from below — i.e. the previous title
+   physically leaves the selection area as the new one takes its
+   place, rather than just nudging up a few px and fading. */
+@keyframes anim-pill-name-out {
+  0% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  100% {
+    opacity: 0;
+    transform: translateY(-100%);
+  }
+}
+
+@keyframes anim-pill-name-in {
+  0% {
+    opacity: 0;
+    transform: translateY(100%);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.anim-pill-name-out {
+  animation: anim-pill-name-out 360ms cubic-bezier(0.4, 0, 0.2, 1) both;
+}
+
+.anim-pill-name-in {
+  animation: anim-pill-name-in 460ms cubic-bezier(0.34, 1.7, 0.64, 1) both;
+}
+
 /* === Cross-page transition tuning ===
    Three concurrent tracks during a route change between Home / About /
    Work / Contact:

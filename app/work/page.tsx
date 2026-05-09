@@ -1,8 +1,13 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import Image from "next/image";
+import {
+  useEffect,
+  useLayoutEffect,
+  useRef,
+  useState,
+} from "react";
 import CTAButton from "../_components/CTAButton";
-import LinkExternalIcon from "../_components/LinkExternalIcon";
 import { useIsMobile } from "../_components/useIsMobile";
 import {
   EXPERIENCES,
@@ -492,216 +497,194 @@ function WorkDesktop() {
   );
 }
 
-/* === Mobile (Figma 319:1666) ===
-   Header (title + sub) at the top, then a fixed-height preview image
-   (h=282) showing the currently selected experience, then "My
-   Experiences" label + a vertically scrollable list with a 2 px
-   scrollbar on the right. Tapping a row promotes it to selected
-   (navy pill, larger type, full info). Below the list, the two CTAs
-   stick to the bottom; the FloatingNav is managed by ScaledShell.
+/* === Mobile (Figma 439:3667 / 439:3864) ============================
+   Section carousel — three "tiers" (Featured / Supporting / Early)
+   navigable via the chevrons next to the section title or by swiping
+   the page horizontally. Tiers wrap: → from Early Works loops back
+   to Featured.
 
-   Type scales:
-     - Title       Solway Regular 32/40 navy
-     - Sub         Solway Regular 16/20 navy
-     - Section     Solway Medium 20/26 grey-navy
-     - Other rows  Solway Regular 12.8/19.2 navy-dark, date 10.4/19.2 50% navy-dark
-     - Selected    Solway Regular 18/24 white, short 13/20 white,
-                   date 13/24 white, navy bg p-8 rounded-8 */
-function MobileExperienceRow({
-  item,
-  selected,
-  onSelect,
-}: {
-  item: Experience;
-  selected: boolean;
-  onSelect: () => void;
-}) {
-  const isCaseStudy = !!item.caseStudy;
+   Within a tier, the SELECTED experience renders as a cream pill at
+   the TOP of the list (full content: name + industry + short + date
+   + description). Below it, the remaining items render as a rotated
+   tail of the section's experience array. The user can:
+     - tap an unselected row → it becomes the selected pill (with the
+       rest of the list rotating around it),
+     - swipe vertically → advance / retreat the rotation,
+   and the rotation wraps so scrolling past the last item loops back
+   to the first.
 
-  if (selected) {
-    const innerSelected = (
-      <div className="bg-[#1F2753] flex items-center p-[8px] rounded-[8px] w-full gap-[8px]">
-        <div className="flex-1 min-w-0 flex gap-[8px] items-center">
-          <p
-            className="font-normal whitespace-nowrap shrink-0"
-            style={{
-              fontFamily: SOLWAY,
-              fontSize: 18,
-              lineHeight: "24px",
-              letterSpacing: "0.15px",
-              color: "#FFFFFF",
-            }}
-          >
-            {item.name}
-          </p>
-          <p
-            className="whitespace-nowrap shrink-0"
-            style={{
-              fontFamily: SOLWAY,
-              fontWeight: 300,
-              fontSize: 13,
-              lineHeight: "20px",
-              letterSpacing: "0.15px",
-              color: "#FFFFFF",
-            }}
-          >
-            {item.short}
-          </p>
-          <LinkExternalIcon light />
-        </div>
-        <p
-          className="whitespace-nowrap shrink-0"
-          style={{
-            fontFamily: SOLWAY,
-            fontSize: 13,
-            lineHeight: "24px",
-            letterSpacing: "0.15px",
-            color: "#FFFFFF",
-          }}
-        >
-          {item.date}
-        </p>
-      </div>
-    );
+   Scroll indicator (right edge): only appears when the section has
+   more than 3 items (1 selected + 2 unselected fit in the frame
+   without overflow). Track height matches the list height; thumb
+   height = trackHeight / N, thumb top = trackHeight × selectedIdx/N.
+==================================================================== */
 
-    if (isCaseStudy) {
-      return (
-        <a
-          href={item.caseStudy}
-          className="block w-full no-underline anim-bubbly-grow"
-          style={{ color: "inherit" }}
-          aria-label={`${item.name} — open case study`}
-        >
-          {innerSelected}
-        </a>
-      );
-    }
-    return (
-      <button
-        type="button"
-        onClick={onSelect}
-        className="block w-full text-left anim-bubbly-grow"
-      >
-        {innerSelected}
-      </button>
-    );
-  }
-
+function ChevronLeftIcon({ size = 24 }: { size?: number }) {
   return (
-    <button
-      type="button"
-      onClick={onSelect}
-      className="w-full flex items-center px-[8px] opacity-80 anim-bubbly-grow"
-      aria-label={item.name}
+    <svg
+      width={size}
+      height={size}
+      viewBox="0 0 24 24"
+      fill="none"
+      xmlns="http://www.w3.org/2000/svg"
+      aria-hidden="true"
+      className="block"
     >
-      <p
-        className="flex-1 min-w-0 text-left whitespace-nowrap"
-        style={{
-          fontFamily: SOLWAY,
-          fontSize: 12.8,
-          lineHeight: "19.2px",
-          letterSpacing: "0.12px",
-          color: "#1B2249",
-        }}
-      >
-        {item.name}
-      </p>
-      <p
-        className="whitespace-nowrap shrink-0 opacity-50"
-        style={{
-          fontFamily: SOLWAY,
-          fontSize: 10.4,
-          lineHeight: "19.2px",
-          letterSpacing: "0.12px",
-          color: "#1B2249",
-        }}
-      >
-        {item.date}
-      </p>
-    </button>
+      <path
+        d="M15 6L9 12L15 18"
+        stroke="#111323"
+        strokeWidth="1.5"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+    </svg>
   );
 }
 
-function MobileScrollbar({
-  scrollRef,
-}: {
-  scrollRef: React.RefObject<HTMLDivElement | null>;
-}) {
-  const trackRef = useRef<HTMLDivElement | null>(null);
-  const [thumb, setThumb] = useState({ height: 32, top: 0 });
-
-  useEffect(() => {
-    const el = scrollRef.current;
-    const track = trackRef.current;
-    if (!el || !track) return;
-    const update = () => {
-      const trackHeight = track.clientHeight;
-      const ratio = el.clientHeight / el.scrollHeight;
-      const height = Math.max(32, Math.round(ratio * trackHeight));
-      const maxScroll = el.scrollHeight - el.clientHeight;
-      const top =
-        maxScroll > 0
-          ? Math.round((el.scrollTop / maxScroll) * (trackHeight - height))
-          : 0;
-      setThumb({ height, top });
-    };
-    update();
-    el.addEventListener("scroll", update, { passive: true });
-    const ro = new ResizeObserver(update);
-    ro.observe(el);
-    ro.observe(track);
-    return () => {
-      el.removeEventListener("scroll", update);
-      ro.disconnect();
-    };
-  }, [scrollRef]);
-
+function ChevronRightIcon({ size = 24 }: { size?: number }) {
   return (
-    <div
-      ref={trackRef}
-      className="bg-[#EDEAE4] rounded-[4px] relative shrink-0"
-      style={{ width: 2, height: "100%" }}
+    <svg
+      width={size}
+      height={size}
+      viewBox="0 0 24 24"
+      fill="none"
+      xmlns="http://www.w3.org/2000/svg"
+      aria-hidden="true"
+      className="block"
     >
-      <div
-        className="absolute bg-[#28315F] rounded-[4px] -translate-x-1/2 left-1/2"
-        style={{
-          width: 4,
-          height: thumb.height,
-          top: thumb.top,
-          transition:
-            "top 280ms cubic-bezier(0.34, 1.56, 0.64, 1), height 280ms cubic-bezier(0.34, 1.56, 0.64, 1)",
-          willChange: "top, height",
-        }}
+      <path
+        d="M9 6L15 12L9 18"
+        stroke="#111323"
+        strokeWidth="1.5"
+        strokeLinecap="round"
+        strokeLinejoin="round"
       />
-    </div>
+    </svg>
   );
 }
 
 function WorkMobile() {
+  const [sectionIdx, setSectionIdx] = useState(0);
   const [selectedIdx, setSelectedIdx] = useState(0);
-  const scrollRef = useRef<HTMLDivElement | null>(null);
 
-  const currentExperience = EXPERIENCES[selectedIdx];
+  const sectionCount = EXPERIENCE_SECTIONS.length;
+  const section = EXPERIENCE_SECTIONS[sectionIdx];
+  // Strip the trailing " -" from the desktop-style label for the
+  // mobile section title (the chevrons replace the dash visually).
+  const sectionLabel = section.label.replace(/\s*-\s*$/, "");
+  const sectionItems = EXPERIENCES.slice(section.start, section.end);
+  const itemCount = sectionItems.length;
+  // Defensive clamp: setSelectedIdx(0) is called on every section
+  // change, but during the same render it's still possible (after
+  // hot reload etc.) for selectedIdx to be out of range — keep it
+  // valid so currentExperience never becomes undefined.
+  const safeSelectedIdx = ((selectedIdx % itemCount) + itemCount) % itemCount;
+  const currentExperience = sectionItems[safeSelectedIdx];
   const currentPreview = currentExperience?.preview ?? FALLBACK_PREVIEW;
 
-  /* Mobile layout uses absolute positions inside the fixed 390×844
-     canvas — guarantees the preview frame and CTAs land at the figma
-     locations with no flexbox-collapse surprises. The experiences
-     list fills the gap between the header and the CTAs and scrolls
-     internally. Reserved bottom space is 120 px (88 nav + 32 nav-pad)
-     so CTAs sit immediately above the FloatingNav. */
+  // Rotated list: selected first, then the rest in original order with
+  // wraparound. The visible tail is capped at 2 items so the frame
+  // always shows "1 selected + 2 unselected" — extra items (e.g. the
+  // 4th in Featured) live in DOM only after the user advances the
+  // rotation past them. The scroll indicator (only visible when the
+  // section has > 3 items) hints that more rows exist beyond the
+  // visible two.
+  const rotated = sectionItems.map(
+    (_, i) => sectionItems[(safeSelectedIdx + i) % itemCount],
+  );
+  const tail = rotated.slice(1, 3);
+
+  const goSection = (delta: number) => {
+    setSectionIdx((s) => ((s + delta) % sectionCount + sectionCount) % sectionCount);
+    setSelectedIdx(0);
+  };
+  const goItem = (delta: number) => {
+    setSelectedIdx(
+      (i) => ((i + delta) % itemCount + itemCount) % itemCount,
+    );
+  };
+
+  // Touch swipe — horizontal moves between sections, vertical moves
+  // between items. Threshold 40 px filters out incidental finger jitter;
+  // > 600 ms is treated as a slow drag and ignored. The dominant axis
+  // (max of |dx|, |dy|) wins so a near-diagonal swipe still resolves to
+  // one intent.
+  const touchStart = useRef<{ x: number; y: number; t: number } | null>(null);
+  const onTouchStart = (e: React.TouchEvent) => {
+    const t = e.touches[0];
+    touchStart.current = { x: t.clientX, y: t.clientY, t: Date.now() };
+  };
+  const onTouchEnd = (e: React.TouchEvent) => {
+    const start = touchStart.current;
+    if (!start) return;
+    touchStart.current = null;
+    const t = e.changedTouches[0];
+    const dx = t.clientX - start.x;
+    const dy = t.clientY - start.y;
+    const dt = Date.now() - start.t;
+    if (dt > 600) return;
+    const absDx = Math.abs(dx);
+    const absDy = Math.abs(dy);
+    const THRESHOLD = 40;
+    if (absDx > absDy && absDx > THRESHOLD) {
+      goSection(dx > 0 ? -1 : 1);
+    } else if (absDy > absDx && absDy > THRESHOLD) {
+      goItem(dy > 0 ? -1 : 1);
+    }
+  };
+
+  // Wheel/trackpad — same intent as touch, but fired by mouse wheel,
+  // trackpad pan, or DevTools mobile-mode (which routes wheel events
+  // even when touch isn't emulated). The lock prevents trackpad
+  // momentum scroll from over-advancing — one item per ~250 ms,
+  // one section per ~400 ms. Pinch-zoom (ctrlKey) is ignored.
+  const wheelLock = useRef(0);
+  const onWheel = (e: React.WheelEvent) => {
+    if (e.ctrlKey) return;
+    const now = Date.now();
+    if (now < wheelLock.current) return;
+    const absDx = Math.abs(e.deltaX);
+    const absDy = Math.abs(e.deltaY);
+    if (absDx < 4 && absDy < 4) return;
+    if (absDx > absDy * 1.5) {
+      wheelLock.current = now + 400;
+      goSection(e.deltaX > 0 ? 1 : -1);
+    } else if (absDy > absDx * 1.5) {
+      wheelLock.current = now + 250;
+      goItem(e.deltaY > 0 ? 1 : -1);
+    }
+  };
+
   return (
-    <>
-      {/* Title section — top, stages 0/1 */}
-      <div
-        className="absolute flex flex-col items-start text-[#1F2753]"
-        style={{ left: 16, right: 16, top: 32, gap: 8 }}
-      >
+    <div
+      className="absolute inset-0 flex flex-col items-center bg-white"
+      style={{
+        paddingLeft: 16,
+        paddingRight: 16,
+        paddingTop: 32,
+        // 128 = 32 (nav bottom margin) + 88 (nav height) + 8 (gap
+        // between MY CV CTA and the nav). Larger values push the
+        // experience list shorter and clip the second unselected row,
+        // so 8 px is the smallest readable gap that keeps the row
+        // visible.
+        paddingBottom: 128,
+        gap: 16,
+        touchAction: "pan-y",
+      }}
+      onTouchStart={onTouchStart}
+      onTouchEnd={onTouchEnd}
+      onWheel={onWheel}
+    >
+      {/* Bio Section header — title + subtitle (Figma 439:3668) */}
+      <div className="w-full flex flex-col items-start shrink-0">
         <p
           className="w-full anim-bubbly-grow"
           style={{
-            fontSize: 32,
-            lineHeight: "40px",
+            fontFamily: SOLWAY,
+            fontWeight: 400,
+            fontSize: 22,
+            lineHeight: "28px",
+            color: "#1F2753",
             transformOrigin: "left center",
             ["--stage" as string]: 0,
           }}
@@ -711,133 +694,411 @@ function WorkMobile() {
         <p
           className="w-full anim-bubbly-grow"
           style={{
-            fontSize: 16,
+            fontFamily: SOLWAY,
+            fontWeight: 400,
+            fontSize: 14,
             lineHeight: "20px",
-            letterSpacing: "2px",
+            letterSpacing: "0.25px",
+            color: "#1F2753",
             transformOrigin: "left center",
-            ["--stage" as string]: 1,
+            ["--stage" as string]: 0.4,
           }}
         >
           confidently adapt to the context.
         </p>
       </div>
 
-      {/* Preview image — FIXED frame (Figma 319:1672, h=282). z-10 so
-          it sits in front of any background; cross-fades on selection.
-          Stage 2: fades in after the title rows, before the experience
-          list rows (stages 4+) start their bubbly entrance. */}
+      {/* Bio Container — flex-1 fills remaining vertical space */}
       <div
-        className="absolute overflow-hidden anim-fade-stage"
-        style={{
-          left: 16,
-          right: 16,
-          top: 122,
-          height: 282,
-          viewTransitionName: "work-preview",
-          zIndex: 10,
-          ["--stage" as string]: 2,
-        }}
+        className="w-full flex-1 min-h-0 flex flex-col items-center"
+        style={{ gap: 16 }}
       >
-        <img
-          key={selectedIdx}
-          src={currentPreview}
-          alt=""
-          className="absolute inset-0 w-full h-full object-cover block anim-fade"
-          style={{ animationDuration: "400ms" }}
-        />
-      </div>
-
-      {/* "My Experiences" label (image bottom y=404 + 20 gap = 424) */}
-      <p
-        className="absolute text-[#5A5D70] anim-bubbly-grow"
-        style={{
-          left: 16,
-          right: 16,
-          top: 424,
-          fontWeight: 500,
-          fontSize: 20,
-          lineHeight: "26px",
-          letterSpacing: "0.5px",
-          transformOrigin: "left center",
-          ["--stage" as string]: 3,
-        }}
-      >
-        My Experiences
-      </p>
-
-      {/* Experience list + scrollbar — fills the gap between the
-          header (bottom y=450) and the CTAs (top y=662): top=466,
-          bottom=646, height=180. */}
-      <div
-        className="absolute flex"
-        style={{
-          left: 16,
-          right: 16,
-          top: 466,
-          height: 180,
-          gap: 8,
-        }}
-      >
+        {/* Section header: chevron + label + chevron (Figma 439:3861) */}
         <div
-          ref={scrollRef}
-          className="no-scrollbar flex-1 min-w-0 overflow-y-auto flex flex-col"
+          className="w-full flex items-center justify-center anim-bubbly-grow"
           style={{
-            scrollBehavior: "smooth",
-            overscrollBehavior: "contain",
-            gap: 12,
+            gap: 16,
+            paddingTop: 4,
+            paddingBottom: 4,
+            transformOrigin: "center center",
+            ["--stage" as string]: 0.8,
           }}
         >
-          {EXPERIENCES.map((item, i) => (
-            <span
-              key={`${item.name}-${i}`}
-              className="block w-full anim-bubbly-grow shrink-0"
-              style={{
-                transformOrigin: "left center",
-                ["--stage" as string]: 4 + i * 0.25,
-              }}
-            >
-              <MobileExperienceRow
-                item={item}
-                selected={selectedIdx === i}
-                onSelect={() => setSelectedIdx(i)}
-              />
-            </span>
-          ))}
+          <button
+            type="button"
+            onClick={() => goSection(-1)}
+            aria-label="Previous section"
+            className="shrink-0 flex items-center justify-center cursor-pointer"
+            style={{ width: 24, height: 24 }}
+          >
+            <ChevronLeftIcon />
+          </button>
+          <p
+            key={`label-${sectionIdx}`}
+            className="flex-1 min-w-0 anim-bounce-pop"
+            style={{
+              fontFamily: SOLWAY,
+              fontWeight: 400,
+              fontSize: 16,
+              lineHeight: "24px",
+              letterSpacing: "0.15px",
+              color: "#111323",
+              textAlign: "center",
+            }}
+          >
+            {sectionLabel}
+          </p>
+          <button
+            type="button"
+            onClick={() => goSection(1)}
+            aria-label="Next section"
+            className="shrink-0 flex items-center justify-center cursor-pointer"
+            style={{ width: 24, height: 24 }}
+          >
+            <ChevronRightIcon />
+          </button>
         </div>
-        <MobileScrollbar scrollRef={scrollRef} />
+
+        {/* Profile image — h-282, view-transition target shared with
+            the desktop preview frame so the image morphs cleanly when
+            navigating away and back. The Image is keyed by its *src*
+            so it only re-mounts (and fades) when the actual preview
+            asset changes — when consecutive selections share the
+            FALLBACK_PREVIEW the DOM is reused and there's no flicker. */}
+        <div
+          className="w-full relative overflow-hidden shrink-0"
+          style={{
+            height: 282,
+            viewTransitionName: "work-preview",
+          }}
+        >
+          <Image
+            key={currentPreview}
+            src={currentPreview}
+            alt=""
+            fill
+            sizes="358px"
+            className="object-cover block anim-fade"
+            style={{ animationDuration: "400ms" }}
+          />
+        </div>
+
+        {/* Text and Experiences Container — flex-1 absorbs whatever
+            vertical space is left between the image and the CTA so
+            the selected pill stays anchored at top and the unselected
+            list grows to fill the rest. */}
+        <div
+          className="w-full flex-1 min-h-0 flex items-start"
+          style={{ gap: 8 }}
+        >
+          <div
+            className="flex-1 min-w-0 h-full overflow-hidden flex flex-col items-center"
+            style={{ gap: 12 }}
+          >
+            {/* Selected pill — cream bg, 18/24 name + 12/16 industry +
+                12/16 light short + 12/24 date + 11/16 light description.
+                Wrapper is keyed by *sectionIdx only* so the bouncy
+                scale-pop only fires on tier change. Within a tier,
+                the SelectedPill stays mounted and its internal name+
+                date row cross-transitions (slide up + fade) while the
+                industry / company / description update in place. */}
+            <div
+              key={`pill-${sectionIdx}`}
+              className="w-full shrink-0 anim-bounce-pop"
+            >
+              <SelectedPill experience={currentExperience} />
+            </div>
+
+            {/* Unselected items below — rotated tail. Same key
+                strategy as the pill: bouncy pop on tier change only,
+                content swaps in place when the user advances within a
+                tier (60 ms delay so the tail still trails the pill on
+                tier change). */}
+            <div
+              key={`tail-${sectionIdx}`}
+              className="w-full flex flex-col items-center anim-bounce-pop"
+              style={{ gap: 12, animationDelay: "60ms" }}
+            >
+              {tail.map((item, i) => {
+                const targetIdx = (safeSelectedIdx + i + 1) % itemCount;
+                return (
+                  <button
+                    type="button"
+                    key={`${item.name}-${targetIdx}`}
+                    onClick={() => setSelectedIdx(targetIdx)}
+                    className="w-full flex items-center shrink-0 cursor-pointer"
+                    style={{ gap: 12, opacity: 0.5 }}
+                    aria-label={`Select ${item.name}`}
+                  >
+                    <div
+                      className="flex-1 min-w-0 flex items-end"
+                      style={{ gap: 4 }}
+                    >
+                      <p
+                        className="whitespace-nowrap shrink-0 text-left"
+                        style={{
+                          fontFamily: SOLWAY,
+                          fontWeight: 400,
+                          fontSize: 14,
+                          lineHeight: "20px",
+                          letterSpacing: "0.25px",
+                          color: "#1B2249",
+                        }}
+                      >
+                        {item.name}
+                      </p>
+                      <span
+                        className="flex-1 min-w-0 self-end"
+                        style={{
+                          height: 1,
+                          backgroundImage: DASH_GRADIENT,
+                          backgroundRepeat: "repeat-x",
+                          backgroundSize: "100% 1px",
+                          marginBottom: 4,
+                        }}
+                        aria-hidden
+                      />
+                    </div>
+                    <p
+                      className="whitespace-nowrap shrink-0"
+                      style={{
+                        fontFamily: SOLWAY,
+                        fontWeight: 500,
+                        fontSize: 12,
+                        lineHeight: "16px",
+                        letterSpacing: "0.5px",
+                        color: "#1B2249",
+                      }}
+                    >
+                      {yearsOnly(item.date)}
+                    </p>
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+
+          {/* Scroll indicator — only visible when there are more than 3
+              items (selected + 2 unselected fit on screen, anything
+              beyond needs the indicator to hint that more exist). */}
+          {itemCount > 3 && (
+            <div
+              className="self-stretch overflow-hidden relative shrink-0"
+              style={{
+                width: 2,
+                backgroundColor: "#EDEAE4",
+                borderRadius: 4,
+              }}
+              aria-hidden
+            >
+              <div
+                className="absolute -translate-x-1/2 left-1/2"
+                style={{
+                  width: 4,
+                  height: `${100 / itemCount}%`,
+                  top: `${(safeSelectedIdx / itemCount) * 100}%`,
+                  backgroundColor: "#28315F",
+                  borderRadius: 4,
+                  transition:
+                    "top 320ms cubic-bezier(0.34, 1.56, 0.64, 1)",
+                }}
+              />
+            </div>
+          )}
+        </div>
+
+        {/* MY CV — only CTA on mobile, matching the desktop work page */}
+        <div className="w-full flex items-start shrink-0">
+          <span
+            className="anim-bubbly-grow flex-1 flex"
+            style={{ ["--stage" as string]: 1.6 }}
+          >
+            <CTAButton
+              iconSrc="/assets/icon-cta-cv.svg"
+              label="MY CV"
+              variant="secondary"
+            />
+          </span>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+const NAME_STYLE: React.CSSProperties = {
+  fontFamily: SOLWAY,
+  fontWeight: 400,
+  fontSize: 18,
+  lineHeight: "24px",
+  letterSpacing: "0.15px",
+  color: "#111323",
+};
+
+const DATE_STYLE: React.CSSProperties = {
+  fontFamily: SOLWAY,
+  fontWeight: 400,
+  fontSize: 12,
+  lineHeight: "24px",
+  letterSpacing: "0.15px",
+  color: "#111323",
+};
+
+const useIsoLayoutEffect =
+  typeof window !== "undefined" ? useLayoutEffect : useEffect;
+
+/* Selected pill — Figma 439:3682 / 439:3878. Cream bg, rounded-8,
+   px-8 py-12. The name+date row at the top cross-transitions on
+   selection change (previous slides up + fades out, new slides up
+   from below + fades in with bubbly overshoot); the industry,
+   company, and description below update in place. Wrapped as an
+   anchor when the experience has a case-study route. */
+function SelectedPill({ experience }: { experience: Experience | undefined }) {
+  // Track the previous experience so we can render an outgoing layer
+  // alongside the incoming one for the dual-layer cross-transition.
+  // useLayoutEffect runs before paint, so the outgoing layer + the
+  // incoming-key bump land in the same frame as the new content —
+  // no flash of the new content sitting at rest before the animation
+  // kicks in.
+  const [outgoingExp, setOutgoingExp] = useState<Experience | null>(null);
+  const [incomingTick, setIncomingTick] = useState(0);
+  const lastExpRef = useRef<Experience | undefined>(undefined);
+
+  useIsoLayoutEffect(() => {
+    const last = lastExpRef.current;
+    if (last && experience && last.name !== experience.name) {
+      setOutgoingExp(last);
+      setIncomingTick((t) => t + 1);
+      lastExpRef.current = experience;
+      const timer = setTimeout(() => setOutgoingExp(null), 500);
+      return () => clearTimeout(timer);
+    }
+    lastExpRef.current = experience;
+  }, [experience]);
+
+  if (!experience) return null;
+
+  // First mount (incomingTick === 0) renders the name + date with no
+  // animation class — there's no "previous" content to slide out of
+  // the way. After that, every prop change bumps incomingTick and
+  // re-mounts the incoming layer with the bubbly slide-up.
+  const incomingAnim = incomingTick > 0 ? "anim-pill-name-in" : "";
+
+  const inner = (
+    <div
+      className="w-full flex flex-col items-start"
+      style={{
+        backgroundColor: "#F9F5EB",
+        borderRadius: 8,
+        paddingLeft: 8,
+        paddingRight: 8,
+        paddingTop: 12,
+        paddingBottom: 12,
+        gap: 8,
+      }}
+    >
+      {/* Name + date — animated layer. Fixed-height row with two
+          absolute layers (outgoing + incoming) so the previous title
+          can slide up out of frame while the new title slides up into
+          place, both clipped to the row's bounds by overflow:hidden. */}
+      <div
+        className="w-full relative"
+        style={{ height: 24, overflow: "hidden" }}
+      >
+        {outgoingExp && (
+          <div
+            key={`out-${incomingTick}`}
+            className="absolute inset-0 flex items-start justify-between anim-pill-name-out"
+            style={{ gap: 8 }}
+          >
+            <p className="whitespace-nowrap" style={NAME_STYLE}>
+              {outgoingExp.name}
+            </p>
+            <p className="whitespace-nowrap shrink-0" style={DATE_STYLE}>
+              {outgoingExp.date}
+            </p>
+          </div>
+        )}
+        <div
+          key={`in-${incomingTick}`}
+          className={`absolute inset-0 flex items-start justify-between ${incomingAnim}`}
+          style={{ gap: 8 }}
+        >
+          <p className="whitespace-nowrap" style={NAME_STYLE}>
+            {experience.name}
+          </p>
+          <p className="whitespace-nowrap shrink-0" style={DATE_STYLE}>
+            {experience.date}
+          </p>
+        </div>
       </div>
 
-      {/* CTAs — Get in touch + MY CV. Sit just above the nav (bottom
-          120 = nav-pad 32 + nav-height 88). */}
-      <div
-        className="absolute flex items-start"
-        style={{ left: 16, right: 16, bottom: 136, gap: 12 }}
-      >
-        <span
-          className="anim-bubbly-grow flex-1 flex"
-          style={{ ["--stage" as string]: 8 }}
+      {/* Industry + company — content swaps in place on prop change.
+          w-full so the column claims the pill's content width instead
+          of hugging its widest child — without this a long industry
+          string never wraps and grows the column past the pill. */}
+      <div className="w-full flex flex-col items-start" style={{ gap: 4 }}>
+        {experience.industry && (
+          <p
+            className="w-full"
+            style={{
+              fontFamily: SOLWAY,
+              fontWeight: 400,
+              fontSize: 12,
+              lineHeight: "16px",
+              letterSpacing: "0.5px",
+              color: "#111323",
+            }}
+          >
+            {experience.industry}
+          </p>
+        )}
+        <p
+          className="w-full"
+          style={{
+            fontFamily: SOLWAY,
+            fontWeight: 300,
+            fontSize: 12,
+            lineHeight: "16px",
+            letterSpacing: "0.5px",
+            color: "#111323",
+          }}
         >
-          <CTAButton
-            href="/contact"
-            iconSrc="/assets/icon-cta-chat.svg"
-            label="Get in touch"
-            variant="primary"
-            uppercase
-          />
-        </span>
-        <span
-          className="anim-bubbly-grow flex-1 flex"
-          style={{ ["--stage" as string]: 9 }}
-        >
-          <CTAButton
-            iconSrc="/assets/icon-cta-cv.svg"
-            label="MY CV"
-            variant="secondary"
-          />
-        </span>
+          {experience.short}
+        </p>
       </div>
-    </>
+
+      {/* Description — content swaps in place on prop change */}
+      {experience.description && (
+        <p
+          className="w-full text-left"
+          style={{
+            fontFamily: SOLWAY,
+            fontWeight: 300,
+            fontSize: 11,
+            lineHeight: "16px",
+            letterSpacing: "0.5px",
+            color: "#111323",
+          }}
+        >
+          {experience.description}
+        </p>
+      )}
+    </div>
   );
+
+  if (experience.caseStudy) {
+    return (
+      <a
+        href={experience.caseStudy}
+        className="block w-full no-underline shrink-0"
+        style={{ color: "inherit" }}
+        aria-label={`${experience.name} — open case study`}
+      >
+        {inner}
+      </a>
+    );
+  }
+  return <div className="w-full shrink-0">{inner}</div>;
 }
 
 export default function Work() {

@@ -76,12 +76,14 @@ export default function ScaledShell({
       // restored from minimized) which would collapse content to scale 0.
       if (w === 0 || h === 0) return;
 
-      // Combine server-side UA hint with actual viewport width: a phone
-      // shows mobile even if it's reporting a wide viewport (some
-      // browsers default to 980 px in desktop-mode), and a desktop
-      // browser still flips to mobile when its window is narrowed
-      // below the breakpoint (responsive testing).
-      const mobile = initialIsMobile || w < MOBILE_BREAKPOINT;
+      // Pure width-based breakpoint — `initialIsMobile` is only used
+      // as a SSR hint so phones don't flash the desktop layout before
+      // hydration. Once the client mounts, the actual viewport width
+      // is the only signal, so a desktop browser at any window size
+      // ≥ 768 px shows the desktop canvas (and any browser narrower
+      // than that — phones, narrowed desktop windows, DevTools mobile
+      // emulators — shows the mobile canvas).
+      const mobile = w < MOBILE_BREAKPOINT;
       setIsMobile(mobile);
 
       if (mobile) {
@@ -101,7 +103,7 @@ export default function ScaledShell({
     apply();
     window.addEventListener("resize", apply);
     return () => window.removeEventListener("resize", apply);
-  }, [initialIsMobile]);
+  }, []);
 
   if (isCaseStudy) {
     return (
