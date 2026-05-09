@@ -29,16 +29,26 @@ const GRAY_NAVY = "#5A5D70";
 // Approximate natural height of MC1's content (Figma 313:2747 — header
 // + image+details + CTA row + paddings). Used as the "design" reference
 // when scaling expanded content to fit shorter viewports.
-const DESIGN_VH = 950;
+const DESIGN_VH = 877;
 // Compact bar (MC2 — Figma 333:3203) total height: border-4 + py-32 +
 // content(title 32 + subtitle 16 = 48) + py-32 + border-4 = 120.
 export const MC2_HEIGHT = 120;
 
-// Hero image dimensions. Figma reference is 596 × 409 (313:2774); we
-// run a touch larger so the hero reads more prominently next to the
-// detail-items column without overflowing the design height.
-const IMAGE_WIDTH = 760;
-const IMAGE_HEIGHT = 540;
+// Hero image dimensions, matching Figma 313:2774 / 313:3257 / 313:3185
+// (596 × 408). Six detail items at 48px each + five 24px gaps total
+// exactly 408, so the items column aligns flush top/bottom with the
+// hero next to it.
+const IMAGE_WIDTH = 596;
+const IMAGE_HEIGHT = 408;
+
+// Outer card insets: at MC1 the cream "Main Content" frame (Figma
+// 313:3197) sits 48 px below the viewport top and 120 px in from each
+// side, with all four corners rounded. As the user scrolls those
+// margins lerp to 0 and the card morphs into the MC2 compact bar that
+// hugs the viewport edge with only its bottom corners rounded.
+const MC1_TOP_MARGIN = 48;
+const MC1_HORIZONTAL_MARGIN = 120;
+const CARD_CORNER = 24;
 
 const MC1_PADDING_X = 40;
 const MC2_PADDING_X = 120;
@@ -344,7 +354,19 @@ function CaseStudyHeaderDesktop({
   }, []);
 
   const progress = clamp01(scrollY / vh);
-  const cardHeight = Math.max(MC2_HEIGHT, vh + MC2_HEIGHT - scrollY);
+  // Outer-card geometry. At MC1 the card is inset (top 48, sides 120)
+  // with all four corners rounded; at MC2 it hugs the viewport edge
+  // with only its bottom corners rounded. cardBottom (in viewport
+  // coordinates) keeps the same `vh + MC2 − scrollY` curve as before
+  // so the body offset (`calc(100vh + 120px)`) still meets the card
+  // seamlessly at every scroll position.
+  const cardTop = lerp(MC1_TOP_MARGIN, 0, progress);
+  const cardSide = lerp(MC1_HORIZONTAL_MARGIN, 0, progress);
+  const cardHeight = Math.max(
+    MC2_HEIGHT,
+    vh + MC2_HEIGHT - scrollY - cardTop
+  );
+  const cornerTop = lerp(CARD_CORNER, 0, progress);
   const expandedScale = Math.min(
     1,
     (vh - MC2_HEIGHT) / (DESIGN_VH - MC2_HEIGHT)
@@ -388,14 +410,16 @@ function CaseStudyHeaderDesktop({
       onClick={handleCardClick}
       style={{
         position: "fixed",
-        top: 0,
-        left: 0,
-        right: 0,
+        top: cardTop,
+        left: cardSide,
+        right: cardSide,
         height: cardHeight,
         zIndex: 50,
         backgroundColor: CREAM,
-        borderBottomLeftRadius: 24 * progress,
-        borderBottomRightRadius: 24 * progress,
+        borderTopLeftRadius: cornerTop,
+        borderTopRightRadius: cornerTop,
+        borderBottomLeftRadius: CARD_CORNER,
+        borderBottomRightRadius: CARD_CORNER,
         overflow: "hidden",
         cursor: progress > 0.5 ? "pointer" : "default",
       }}
@@ -580,7 +604,7 @@ function CaseStudyHeaderDesktop({
               alt={heroImageAlt}
               fill
               priority
-              sizes="760px"
+              sizes="596px"
               className="pointer-events-none"
               style={{ objectFit: heroImageObjectFit }}
             />
