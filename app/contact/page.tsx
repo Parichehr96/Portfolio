@@ -6,7 +6,6 @@ import {
   EMAIL,
   PHONE_DISPLAY,
   SOCIALS,
-  TELEGRAM_URL,
   WHATSAPP_URL,
   type Social,
 } from "../_data/contact";
@@ -59,6 +58,8 @@ function SocialPill({ social }: { social: Social }) {
   // 40 × 40 inner wrapper, with the SVG rendered at its intrinsic
   // viewBox size and centered. Result matches Figma's nested-inset
   // composition pixel-for-pixel without hand-tuned per-icon CSS.
+  // Per-icon `verticalNudge` (translateY %) compensates for SVGs
+  // whose visible glyph isn't centered in their viewBox (Medium).
   const inner = (
     <span
       className="relative shrink-0 inline-flex items-center justify-center"
@@ -70,6 +71,11 @@ function SocialPill({ social }: { social: Social }) {
         width={social.iconWidth}
         height={social.iconHeight}
         className="block"
+        style={
+          social.verticalNudge
+            ? { transform: `translateY(${social.verticalNudge})` }
+            : undefined
+        }
       />
     </span>
   );
@@ -214,7 +220,8 @@ function ContactDesktop() {
             </a>
           </div>
 
-          {/* Phone block + WhatsApp / Telegram chips — stage 3 */}
+          {/* Phone block + WhatsApp chip — stage 3 (Telegram removed
+              per Figma 300:2277). */}
           <div
             className="w-full flex items-end gap-[32px] rounded-[24px] anim-bubbly-grow"
             style={{
@@ -240,46 +247,25 @@ function ContactDesktop() {
                 {PHONE_DISPLAY}
               </p>
             </div>
-            <div className="shrink-0 flex items-start gap-[32px]">
-              <a
-                href={WHATSAPP_URL}
-                target="_blank"
-                rel="noopener noreferrer"
-                aria-label={`WhatsApp ${PHONE_DISPLAY}`}
-                className="inline-flex items-center cursor-pointer hover:opacity-70 transition-opacity duration-200"
+            <a
+              href={WHATSAPP_URL}
+              target="_blank"
+              rel="noopener noreferrer"
+              aria-label={`WhatsApp ${PHONE_DISPLAY}`}
+              className="shrink-0 inline-flex items-center cursor-pointer hover:opacity-70 transition-opacity duration-200"
+            >
+              <span
+                className="text-[#1F2753] whitespace-nowrap"
+                style={{
+                  fontSize: 16,
+                  lineHeight: "24px",
+                  letterSpacing: "0.15px",
+                }}
               >
-                <span
-                  className="text-[#1F2753] whitespace-nowrap"
-                  style={{
-                    fontSize: 16,
-                    lineHeight: "24px",
-                    letterSpacing: "0.15px",
-                  }}
-                >
-                  WhatsApp
-                </span>
-                <ExternalChevronIcon />
-              </a>
-              <a
-                href={TELEGRAM_URL}
-                target="_blank"
-                rel="noopener noreferrer"
-                aria-label={`Telegram ${PHONE_DISPLAY}`}
-                className="inline-flex items-center cursor-pointer hover:opacity-70 transition-opacity duration-200"
-              >
-                <span
-                  className="text-[#1F2753] whitespace-nowrap"
-                  style={{
-                    fontSize: 16,
-                    lineHeight: "24px",
-                    letterSpacing: "0.15px",
-                  }}
-                >
-                  Telegram
-                </span>
-                <ExternalChevronIcon />
-              </a>
-            </div>
+                WhatsApp
+              </span>
+              <ExternalChevronIcon />
+            </a>
           </div>
 
           {/* Social Links Container — header stage 4, each pill icon
@@ -342,18 +328,25 @@ function ContactDesktop() {
 }
 
 /* === Mobile (Figma 312:2580) ===
-   Stacked layout, no illustration. Mail block, phone block, social
-   pills (62 × 62 each, wrap to 2 rows on narrow viewports), then
-   "BOOK A TIME SLOT?" as a single underline link.
+   Stacked layout, no illustration. Mail / phone are inline
+   `<email/phone> + ↗` links (matching desktop's mailto/WhatsApp
+   chips). Socials are 4 wrapping flex pills (LinkedIn, Dribbble,
+   Behance, Medium — Instagram and Telegram removed per latest
+   Figma). "BOOK A TIME SLOT?" closes the column.
    Type scales:
      - Title       Solway Regular 32/40 navy
      - Sub         Solway Regular 16/20 navy
      - Field label Solway Regular 14/24 grey-navy
-     - Field value Solway Regular 18/28 navy
+     - Field value Solway Regular 16/24 navy tracking-0.5 (Body/large)
      - CTA         Solway Light 16/28 navy underline */
 function MobileSocialPill({ social }: { social: Social }) {
+  // Wrapping flex pill matching Figma 312:2693: bg-white,
+  // 0.72 px cream-dark border, flex-1 min-w-px so 4 pills share the
+  // row width with `gap-x: 16` and wrap to a second row when the
+  // viewport gets narrow. Inner icon is 24 × 24, scaled from the
+  // SVG's intrinsic 40 × 40 viewBox.
   const baseClass =
-    "shrink-0 flex items-center justify-center bg-white border-[#EDEAE4] border border-solid transition-colors duration-200";
+    "flex-1 min-w-0 flex items-center justify-center bg-white transition-colors duration-200";
   const inner = (
     <span
       className="relative shrink-0 inline-flex items-center justify-center"
@@ -365,18 +358,25 @@ function MobileSocialPill({ social }: { social: Social }) {
         width={social.iconWidth * (24 / 40)}
         height={social.iconHeight * (24 / 40)}
         className="block"
+        style={
+          social.verticalNudge
+            ? { transform: `translateY(${social.verticalNudge})` }
+            : undefined
+        }
       />
     </span>
   );
-  const sizeStyle = {
-    width: 62,
-    height: 62,
-    borderRadius: 17.28,
-    padding: 17.28,
-  } as const;
+  const style: React.CSSProperties = {
+    paddingLeft: 16,
+    paddingRight: 16,
+    paddingTop: 20,
+    paddingBottom: 20,
+    borderRadius: 122,
+    border: "0.72px solid #EDEAE4",
+  };
   if (!social.href) {
     return (
-      <span aria-label={social.alt} className={baseClass} style={sizeStyle}>
+      <span aria-label={social.alt} className={baseClass} style={style}>
         {inner}
       </span>
     );
@@ -388,10 +388,24 @@ function MobileSocialPill({ social }: { social: Social }) {
       rel="noopener noreferrer"
       aria-label={social.alt}
       className={`${baseClass} hover:bg-[#F9F5EB]`}
-      style={sizeStyle}
+      style={style}
     >
       {inner}
     </a>
+  );
+}
+
+function ExternalChevronIconSmall() {
+  return (
+    <span className="relative shrink-0 inline-flex items-center justify-center w-[24px] h-[24px]">
+      <img
+        src="/assets/icon-link-external.svg"
+        alt=""
+        width={24}
+        height={24}
+        className="block"
+      />
+    </span>
   );
 }
 
@@ -426,16 +440,17 @@ function ContactMobile() {
 
       {/* Bio Container */}
       <div className="w-full flex-1 min-h-0 flex flex-col items-center gap-[40px] overflow-hidden">
-        {/* Mail block */}
+        {/* Mail block — label + email link with link-external icon
+            (Figma 429:3480). */}
         <div
-          className="w-full flex flex-col items-start gap-[4px] anim-bubbly-grow"
+          className="w-full flex flex-col items-start gap-[8px] anim-bubbly-grow"
           style={{
             transformOrigin: "left top",
             ["--stage" as string]: 2,
           }}
         >
           <p
-            className="w-full text-[#5A5D70]"
+            className="w-full text-[#5A5D70] whitespace-nowrap"
             style={{
               fontSize: 14,
               lineHeight: "24px",
@@ -447,50 +462,75 @@ function ContactMobile() {
           <a
             href={`mailto:${EMAIL}`}
             aria-label={`Email ${EMAIL}`}
-            className="w-full text-[#1F2753] hover:opacity-70 transition-opacity duration-200"
-            style={{
-              fontSize: 18,
-              lineHeight: "28px",
-            }}
+            className="inline-flex items-center cursor-pointer hover:opacity-70 transition-opacity duration-200"
           >
-            {EMAIL}
+            <span
+              className="text-[#1F2753] whitespace-nowrap"
+              style={{
+                fontSize: 16,
+                lineHeight: "24px",
+                letterSpacing: "0.5px",
+              }}
+            >
+              {EMAIL}
+            </span>
+            <ExternalChevronIconSmall />
           </a>
         </div>
 
-        {/* Phone block */}
+        {/* Phone block — label + number on the left, WhatsApp chip on
+            the right (Figma 429:3486; Telegram removed). */}
         <div
-          className="w-full flex flex-col items-start gap-[4px] anim-bubbly-grow"
+          className="w-full flex items-end gap-[32px] anim-bubbly-grow"
           style={{
             transformOrigin: "left top",
             ["--stage" as string]: 3,
           }}
         >
-          <p
-            className="w-full text-[#5A5D70]"
-            style={{
-              fontSize: 14,
-              lineHeight: "24px",
-              letterSpacing: "0.15px",
-            }}
-          >
-            Text me (WhatsApp, Telegram)
-          </p>
+          <div className="shrink-0 flex flex-col items-start gap-[8px] whitespace-nowrap">
+            <p
+              className="text-[#5A5D70]"
+              style={{
+                fontSize: 14,
+                lineHeight: "24px",
+                letterSpacing: "0.15px",
+              }}
+            >
+              Text me
+            </p>
+            <p
+              className="text-[#1F2753]"
+              style={{
+                fontSize: 16,
+                lineHeight: "24px",
+                letterSpacing: "0.5px",
+              }}
+            >
+              {PHONE_DISPLAY}
+            </p>
+          </div>
           <a
             href={WHATSAPP_URL}
             target="_blank"
             rel="noopener noreferrer"
             aria-label={`WhatsApp ${PHONE_DISPLAY}`}
-            className="w-full text-[#1F2753] hover:opacity-70 transition-opacity duration-200"
-            style={{
-              fontSize: 18,
-              lineHeight: "28px",
-            }}
+            className="shrink-0 inline-flex items-center cursor-pointer hover:opacity-70 transition-opacity duration-200"
           >
-            {PHONE_DISPLAY}
+            <span
+              className="text-[#1F2753] whitespace-nowrap"
+              style={{
+                fontSize: 16,
+                lineHeight: "24px",
+                letterSpacing: "0.5px",
+              }}
+            >
+              WhatsApp
+            </span>
+            <ExternalChevronIconSmall />
           </a>
         </div>
 
-        {/* Social Links */}
+        {/* Social Links — 4 wrapping pills (Figma 312:2692) */}
         <div
           className="w-full flex flex-col items-start gap-[16px] anim-bubbly-grow"
           style={{
@@ -510,12 +550,12 @@ function ContactMobile() {
           </p>
           <div
             className="w-full flex flex-wrap items-start"
-            style={{ rowGap: 12, columnGap: 12 }}
+            style={{ rowGap: 24, columnGap: 16 }}
           >
             {SOCIALS.map((s, i) => (
               <span
                 key={s.alt}
-                className="anim-bubbly-grow"
+                className="anim-bubbly-grow flex-1 min-w-0 flex"
                 style={{ ["--stage" as string]: 4 + (i + 1) * 0.3 }}
               >
                 <MobileSocialPill social={s} />
