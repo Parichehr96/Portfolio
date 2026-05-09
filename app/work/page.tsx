@@ -1,11 +1,12 @@
 "use client";
 
-import { useEffect, useLayoutEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import CTAButton from "../_components/CTAButton";
 import LinkExternalIcon from "../_components/LinkExternalIcon";
 import { useIsMobile } from "../_components/useIsMobile";
 import {
   EXPERIENCES,
+  EXPERIENCE_SECTIONS,
   FALLBACK_PREVIEW,
   type Experience,
 } from "../_data/experiences";
@@ -13,37 +14,79 @@ import {
 /* === FIGMA DESIGN TOKENS (Work, node 300:2201) ===
    Rendered inside ScaledShell (which handles the 1512 × 982 scale).
    Bio Section header (gap-12, w=1272):
-     - "I've worked in multiple industries..." Solway Regular 44/52 navy
-     - "Saas, B2B, ERP, Startup, Crypto, etc."  Solway Regular 20/24 navy
+     - "I'm experienced in a range,"      Solway Regular 44/52 navy
+     - "confidently adapt to the context." Solway Regular 20/24 tracking-2 navy
    Bio Container (h=665, gap-40, pb-80):
      - Project preview frame on the LEFT (h-full aspect-square,
        viewTransitionName matches the home/about/contact hero)
      - Text and Experiences Container on the RIGHT (flex-1, gap-32):
        · "My Experiences" Solway Medium 20/26
-       · 8 experience rows. The selected row gets a navy pill (with white
-         text, no dashed leader); the navy highlight slides between rows
-         with a bubbly cubic-bezier easing on hover. Non-selected rows
-         show a 1 px dashed line filling the space between the icon and
-         the date — rendered as a CSS repeating-linear-gradient so it
-         auto-stretches to any viewport width.
+       · 9 experience rows. The selected row renders a cream pill
+         (Figma 302:2414, bg #F9F5EB, px-24 py-12, rounded-122) with
+         "Visit" + name 22/28 + full date, all in navy-darker. The pill
+         bg is rendered DIRECTLY on the row container so it stays pixel-
+         locked to the content. Unselected rows show name 16/24 +
+         dashed leader + year-only date 12/16 at 50% opacity.
        · Primary "GET IN TOUCH" → /contact (Cream bg)
        · Secondary "MY CV" (Cream Dark border) — no destination yet.
    Floating nav: rendered by ScaledShell (Work active = position 2).
 ============================================================= */
 
-const SPACE_GROTESK = "var(--font-space-grotesk), sans-serif";
 const SOLWAY = "var(--font-solway), serif";
-
-// Spring/overshoot easing for the navy highlight slide between rows.
-const HIGHLIGHT_TRANSITION =
-  "top 600ms cubic-bezier(0.34, 1.56, 0.64, 1), height 600ms cubic-bezier(0.34, 1.56, 0.64, 1)";
-const COLOR_TRANSITION = "color 400ms ease";
 
 // Dashed leader pattern: 4 px dash, 4 px gap, repeats horizontally to fill
 // any width. Background-image-based so the same span renders crisply on
 // any viewport / scale without re-counting characters.
 const DASH_GRADIENT =
   "repeating-linear-gradient(to right, #7E7F85 0, #7E7F85 4px, transparent 4px, transparent 8px)";
+
+// Two easings, picked deliberately:
+//   BUBBLY — overshoots past the target so it pops on layout properties
+//     (padding, font-size, gap, border-radius, font-weight, transform).
+//     y2 = 1.7 gives a noticeable bounce — value crests ~7% past target
+//     around the middle of the curve before settling. Reads as a soft
+//     spring on size changes.
+//   SMOOTH — Material's ease-out, no overshoot. Used for COLOR and
+//     OPACITY: overshoot on those properties dips past the destination
+//     (a fade-out briefly goes "even more transparent" before clamping
+//     back), which the eye reads as a flicker / brief glitch where the
+//     cream pill appears to vanish then return.
+// All durations are synchronized at 500 ms so opacity, bg, padding,
+// transform, and font-size all start and end together — that prevents
+// timing mismatches where one property finishes early and produces a
+// between-states "unselected" appearance during the transition. 500 ms
+// is intentionally long enough for the spring to read as bouncy
+// without feeling laggy.
+const BUBBLY = "cubic-bezier(0.34, 1.7, 0.64, 1)";
+const SMOOTH = "cubic-bezier(0.4, 0, 0.2, 1)";
+const T = 500;
+const ROW_TRANSITION = [
+  `background-color ${T}ms ${SMOOTH}`,
+  `border-radius ${T}ms ${BUBBLY}`,
+  `padding ${T}ms ${BUBBLY}`,
+  `gap ${T}ms ${BUBBLY}`,
+  `transform ${T}ms ${BUBBLY}`,
+  `opacity ${T}ms ${SMOOTH}`,
+].join(", ");
+const TEXT_TRANSITION = [
+  `font-size ${T}ms ${BUBBLY}`,
+  `line-height ${T}ms ${BUBBLY}`,
+  `letter-spacing ${T}ms ${BUBBLY}`,
+  `font-weight ${T}ms ${BUBBLY}`,
+  `color ${T}ms ${SMOOTH}`,
+].join(", ");
+
+/** Compact year format for unselected rows (Figma 365:21144 etc.):
+ *  "Apr 2021 - Nov 2021" → "2021"  (single year — start == end)
+ *  "May 2021 - Sep 2022" → "2021 - 2022"
+ *  Selected rows keep the full month-year range untouched. */
+function yearsOnly(dateRange: string): string {
+  const matches = dateRange.match(/\d{4}/g);
+  if (!matches || matches.length === 0) return dateRange;
+  const first = matches[0];
+  const last = matches[matches.length - 1];
+  return first === last ? first : `${first} - ${last}`;
+}
 
 function ExperienceRow({
   item,
@@ -52,49 +95,65 @@ function ExperienceRow({
   item: Experience;
   selected: boolean;
 }) {
-  const nameColor = selected ? "#FFFFFF" : "#1B2249";
-  const shortColor = selected ? "#DDE0F1" : "#7E7F85";
-  const dateColor = selected ? "#FFFFFF" : "#1B2249";
+  // Figma 302:2414 — selected = cream pill (bg #F9F5EB, px-24 py-12,
+  // rounded-122) with name 22/28 + date 16/24 in navy-darker (#111323).
+  // Unselected = 50% opacity, name 16/24 + dashed leader + date 12/16
+  // (Solway Medium, year-only) in #1B2249.
+  //
+  // Single DOM tree across both states (name and dashed-leader always
+  // rendered) so CSS transitions on font-size, padding, gap, etc. apply
+  // continuously — the cream pill bubbles in/out smoothly when the user
+  // hovers between rows. Final values are exact Figma values, so every
+  // resting hover state is still pixel-perfect.
+  const selectedColor = "#111323";
+  const unselectedColor = "#1B2249";
+  const nameColor = selected ? selectedColor : unselectedColor;
+  const dateColor = selected ? selectedColor : unselectedColor;
+  const dateText = selected ? item.date : yearsOnly(item.date);
 
   return (
-    <div className="w-full flex items-end gap-[12px]">
-      {/* Cluster — flex-1 so it eats the row width up to the date. The
-          dashed leader inside is also flex-1 so it stretches to whatever
-          space is left after name + short + icon. */}
-      <div className="flex-1 min-w-0 flex items-end gap-[4px]">
-        <p
-          className="whitespace-nowrap shrink-0"
-          style={{
-            fontFamily: SPACE_GROTESK,
-            fontWeight: 400,
-            fontSize: 16,
-            lineHeight: "24px",
-            letterSpacing: "0.15px",
-            color: nameColor,
-            transition: COLOR_TRANSITION,
-          }}
-        >
-          {item.name}
-        </p>
+    <div
+      className="w-full flex items-center"
+      style={{
+        gap: selected ? 8 : 12,
+        paddingLeft: selected ? 24 : 0,
+        paddingRight: selected ? 24 : 0,
+        paddingTop: selected ? 12 : 0,
+        paddingBottom: selected ? 12 : 0,
+        backgroundColor: selected ? "#F9F5EB" : "transparent",
+        borderRadius: selected ? 122 : 0,
+        // Subtle scale pop — the unselected state sits at 0.97, and
+        // becoming selected springs it up to 1.0 via the BUBBLY curve,
+        // which crests around 1.03 before settling. Combined with the
+        // padding/gap/font-size bubble, the cream pill feels like it
+        // "lands" with a spring instead of inflating linearly.
+        transform: selected ? "scale(1)" : "scale(0.97)",
+        transformOrigin: "left center",
+        opacity: selected ? 1 : 0.5,
+        transition: ROW_TRANSITION,
+      }}
+    >
+      <div className="flex-1 min-w-0 flex items-end" style={{ gap: 4 }}>
         <p
           className="whitespace-nowrap shrink-0"
           style={{
             fontFamily: SOLWAY,
-            fontWeight: 300,
-            fontSize: 16,
-            lineHeight: "24px",
-            letterSpacing: "0.15px",
-            color: shortColor,
-            transition: COLOR_TRANSITION,
+            fontWeight: 400,
+            fontSize: selected ? 22 : 14,
+            lineHeight: selected ? "28px" : "20px",
+            letterSpacing: selected ? "0px" : "0.25px",
+            color: nameColor,
+            transition: TEXT_TRANSITION,
           }}
         >
-          {item.short}
+          {item.name}
         </p>
-        <LinkExternalIcon light={selected} />
-        {/* Dashed leader. Always rendered, but fades to opacity 0 on
-            the selected row so the navy pill behind reads as a clean
-            highlight. The CSS gradient auto-stretches to fill any
-            width — responsive across desktop and tablet viewports. */}
+        {/* Dashed leader stays in the DOM in both states — it's flex-1
+            so it fills the space between name and date. When selected
+            it fades to opacity 0 so the cream pill behind reads as a
+            clean highlight. Keeping it always-rendered means the row's
+            DOM doesn't change on hover, so the bubbly transitions on
+            font-size/padding/gap aren't interrupted by element swaps. */}
         <span
           className="flex-1 min-w-0 self-end"
           style={{
@@ -104,7 +163,7 @@ function ExperienceRow({
             backgroundSize: "100% 1px",
             marginBottom: 4,
             opacity: selected ? 0 : 1,
-            transition: "opacity 400ms ease",
+            transition: `opacity ${T}ms ${SMOOTH}`,
           }}
           aria-hidden
         />
@@ -112,16 +171,16 @@ function ExperienceRow({
       <p
         className="whitespace-nowrap shrink-0"
         style={{
-          fontFamily: SPACE_GROTESK,
-          fontWeight: 400,
-          fontSize: 16,
-          lineHeight: "24px",
-          letterSpacing: "0.15px",
+          fontFamily: SOLWAY,
+          fontWeight: selected ? 400 : 500,
+          fontSize: selected ? 16 : 12,
+          lineHeight: selected ? "24px" : "16px",
+          letterSpacing: "0.5px",
           color: dateColor,
-          transition: COLOR_TRANSITION,
+          transition: TEXT_TRANSITION,
         }}
       >
-        {item.date}
+        {dateText}
       </p>
     </div>
   );
@@ -134,26 +193,22 @@ function ExperienceRow({
    delegation oddity in the scaled shell, and falls back to a plain
    page load if the JS bundle fails to hydrate. */
 function ExperienceRowItem({
-  itemRef,
   item,
   selected,
   onSelect,
   stage,
 }: {
-  itemRef: (el: HTMLDivElement | null) => void;
   item: Experience;
   selected: boolean;
   onSelect: () => void;
   stage: number;
 }) {
   const inner = <ExperienceRow item={item} selected={selected} />;
-  // anim-bubbly-grow goes on the same element that itemRef points at
-  // so the navy highlight pill (which reads item.offsetTop /
-  // offsetHeight) sees the right layout position. Wrapping this in an
-  // extra div with `transform` would reset offsetParent to that
-  // wrapper and break the highlight slide.
+  // No outer padding — the row itself owns its padding (selected =
+  // px-24 py-12, unselected = none) so the cream pill bg, rendered on
+  // the row container, is pixel-locked to the row's content box.
   const baseClass =
-    "relative block w-full p-[8px] no-underline anim-bubbly-grow";
+    "relative block w-full no-underline anim-bubbly-grow";
   const stageStyle: React.CSSProperties = {
     transformOrigin: "left center",
     ["--stage" as string]: stage,
@@ -161,9 +216,6 @@ function ExperienceRowItem({
   if (item.caseStudy) {
     return (
       <a
-        ref={(el: HTMLAnchorElement | null) =>
-          itemRef(el as unknown as HTMLDivElement)
-        }
         href={item.caseStudy}
         className={baseClass}
         style={{ cursor: "pointer", color: "inherit", ...stageStyle }}
@@ -177,7 +229,6 @@ function ExperienceRowItem({
   }
   return (
     <div
-      ref={itemRef}
       className={baseClass}
       style={{ cursor: "default", ...stageStyle }}
       onMouseEnter={onSelect}
@@ -190,42 +241,9 @@ function ExperienceRowItem({
 
 function WorkDesktop() {
   // Index of the experience currently being previewed. Hover drives this;
-  // the very first row (ONTON) is selected on mount per Figma.
-  const [selectedIdx, setSelectedIdx] = useState(0);
-  const itemRefs = useRef<(HTMLDivElement | null)[]>([]);
-  const containerRef = useRef<HTMLDivElement | null>(null);
-  // top + height (in the items-container's local box, scale-independent
-  // via offsetTop / offsetHeight) of the navy highlight pill.
-  const [highlight, setHighlight] = useState<{
-    top: number;
-    height: number;
-  } | null>(null);
-
-  const updateHighlight = () => {
-    const item = itemRefs.current[selectedIdx];
-    if (!item) return;
-    setHighlight({
-      top: item.offsetTop,
-      height: item.offsetHeight,
-    });
-  };
-
-  // Recompute on selected change AND on mount, before the browser paints
-  // so the highlight starts in the right place with no flash.
-  useLayoutEffect(() => {
-    updateHighlight();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [selectedIdx]);
-
-  // Recompute on viewport resize — the ScaledShell transforms the parent,
-  // but offsetTop / offsetHeight are scale-independent so this only matters
-  // if line-wrapping changes the row heights.
-  useEffect(() => {
-    const onResize = () => updateHighlight();
-    window.addEventListener("resize", onResize);
-    return () => window.removeEventListener("resize", onResize);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [selectedIdx]);
+  // ONTON (idx 1, in the Featured Case Studies section) is selected on
+  // mount per Figma 300:2201.
+  const [selectedIdx, setSelectedIdx] = useState(1);
 
   const currentExperience = EXPERIENCES[selectedIdx];
   const currentPreview = currentExperience?.preview ?? FALLBACK_PREVIEW;
@@ -233,13 +251,12 @@ function WorkDesktop() {
   return (
     <>
       <div className="absolute inset-0 flex flex-col items-center pt-[80px] pb-[40px] px-[120px] gap-[80px]">
-        {/* Bio Section header — stage 0 + 1 (top-left) */}
-        <div
-          className="w-full flex flex-col items-start gap-[12px] text-[#1F2753]"
-          style={{ letterSpacing: "2px" }}
-        >
+        {/* Bio Section header (Figma 300:2203) — title is Solway 44/52
+            with no letter-spacing; subtitle is Solway 20/24 tracking 2px.
+            Title is whitespace-nowrap per the design. */}
+        <div className="w-full flex flex-col items-start gap-[12px] text-[#1F2753]">
           <p
-            className="w-full anim-bubbly-grow"
+            className="w-full whitespace-nowrap anim-bubbly-grow"
             style={{
               fontSize: 44,
               lineHeight: "52px",
@@ -247,18 +264,19 @@ function WorkDesktop() {
               ["--stage" as string]: 0,
             }}
           >
-            I&rsquo;ve worked in multiple industries...
+            I&rsquo;m experienced in a range,
           </p>
           <p
             className="w-full anim-bubbly-grow"
             style={{
               fontSize: 20,
               lineHeight: "24px",
+              letterSpacing: "2px",
               transformOrigin: "left center",
               ["--stage" as string]: 1,
             }}
           >
-            Saas, B2B, ERP, Startup, Crypto, etc.
+            confidently adapt to the context.
           </p>
         </div>
 
@@ -300,84 +318,73 @@ function WorkDesktop() {
             </div>
             {currentExperience && (
               <>
-                {/* Name · Company · Industry line — anim-fade swaps with
-                    selectedIdx so it cross-fades when hovering rows. */}
+                {/* Industry · Company line (Figma 375:4586) — the
+                    project name now lives only inside the selected
+                    pill in the experience list, so the meta line
+                    under the preview reduces to industry · company.
+                    items-end so the smaller "PomeGroup" baselines
+                    under the bigger "Web3" without a baseline jump. */}
                 <div
                   key={`meta-${selectedIdx}`}
-                  className="flex items-start gap-[12px] anim-fade whitespace-nowrap"
-                  style={{
-                    fontSize: 16,
-                    lineHeight: "24px",
-                    letterSpacing: "0.15px",
-                    animationDuration: "400ms",
-                  }}
+                  className="flex items-end gap-[8px] anim-fade whitespace-nowrap"
+                  style={{ animationDuration: "400ms" }}
                 >
-                  <p
-                    className="shrink-0"
-                    style={{
-                      fontFamily: SPACE_GROTESK,
-                      fontWeight: 400,
-                      color: "#111323",
-                    }}
-                  >
-                    {currentExperience.name}
-                  </p>
-                  <p
-                    className="shrink-0"
-                    style={{
-                      fontFamily: SOLWAY,
-                      fontWeight: 400,
-                      color: "#1B2249",
-                    }}
-                  >
-                    ·
-                  </p>
-                  <p
-                    className="shrink-0"
-                    style={{
-                      fontFamily: SOLWAY,
-                      fontWeight: 300,
-                      color: "#7E7F85",
-                    }}
-                  >
-                    {currentExperience.short}
-                  </p>
                   {currentExperience.industry && (
                     <>
                       <p
                         className="shrink-0"
                         style={{
                           fontFamily: SOLWAY,
-                          fontWeight: 400,
+                          fontWeight: 300,
+                          fontSize: 16,
+                          lineHeight: "24px",
+                          letterSpacing: "0.15px",
                           color: "#1B2249",
                         }}
                       >
-                        ·
+                        {currentExperience.industry}
                       </p>
                       <p
                         className="shrink-0"
                         style={{
                           fontFamily: SOLWAY,
-                          fontWeight: 300,
-                          color: "#7E7F85",
+                          fontWeight: 400,
+                          fontSize: 16,
+                          lineHeight: "24px",
+                          letterSpacing: "0.15px",
+                          color: "#1B2249",
                         }}
                       >
-                        {currentExperience.industry}
+                        ·
                       </p>
                     </>
                   )}
+                  <p
+                    className="shrink-0"
+                    style={{
+                      fontFamily: SOLWAY,
+                      fontWeight: 300,
+                      fontSize: 14,
+                      lineHeight: "24px",
+                      letterSpacing: "0.15px",
+                      color: "#7E7F85",
+                    }}
+                  >
+                    {currentExperience.short}
+                  </p>
                 </div>
-                {/* Description — Solway Medium 12/16, also anim-fade keyed
-                    by selectedIdx so it follows the hover. */}
+                {/* Description (Figma 375:4589) — Solway Regular 16/24,
+                    letterSpacing 0.5, navy. anim-fade keyed by
+                    selectedIdx so it follows the hover. */}
                 {currentExperience.description && (
                   <p
                     key={`desc-${selectedIdx}`}
                     className="w-full anim-fade"
                     style={{
                       fontFamily: SOLWAY,
-                      fontWeight: 500,
-                      fontSize: 12,
-                      lineHeight: "16px",
+                      fontWeight: 400,
+                      fontSize: 16,
+                      lineHeight: "24px",
                       letterSpacing: "0.5px",
                       color: "#1F2753",
                       animationDuration: "400ms",
@@ -392,75 +399,84 @@ function WorkDesktop() {
 
           {/* Text and Experiences Container — h-full so the inner
               experience-list flexes (justify-between) and pushes the
-              CTAs to the bottom of the 606-tall bio container, sitting
+              CTA to the bottom of the 606-tall bio container, sitting
               just above the FloatingNav. */}
           <div className="flex-1 min-w-0 h-full flex flex-col items-start gap-[32px]">
-            {/* "My Experiences" label — stage 2 */}
-            <p
-              className="w-full text-[#5A5D70] anim-bubbly-grow shrink-0"
-              style={{
-                fontWeight: 500,
-                fontSize: 20,
-                lineHeight: "26px",
-                letterSpacing: "0.5px",
-                transformOrigin: "left center",
-                ["--stage" as string]: 2,
-              }}
-            >
-              My Experiences
-            </p>
-
-            {/* Experience list — flex-1 + justify-between (Figma
-                302:2360): the 9 rows distribute evenly between header
-                and CTAs so the column always fills the bio container
-                regardless of row count. */}
-            <div
-              ref={containerRef}
-              className="relative w-full flex flex-col items-start justify-between flex-1 min-h-0 rounded-[24px]"
-            >
-              {/* Animated highlight */}
-              {highlight && (
-                <div
-                  className="absolute left-0 right-0 bg-[#1F2753] rounded-[8px] pointer-events-none"
-                  style={{
-                    top: highlight.top,
-                    height: highlight.height,
-                    transition: HIGHLIGHT_TRANSITION,
-                  }}
-                />
-              )}
-
-              {EXPERIENCES.map((item, i) => (
-                <ExperienceRowItem
-                  key={`${item.name}-${i}`}
-                  itemRef={(el) => {
-                    itemRefs.current[i] = el;
-                  }}
-                  item={item}
-                  selected={selectedIdx === i}
-                  onSelect={() => setSelectedIdx(i)}
-                  stage={3 + i * 0.5}
-                />
-              ))}
+            {/* Experience list — three named sections (Figma 429:3498
+                / 429:3499 / 429:3546) distributed via justify-between
+                across the column. Inside each section, header + items
+                use gap-16 (16 px). The selected row renders its cream
+                pill bg directly on the row container so the box stays
+                pixel-locked to the row's content + padding. */}
+            <div className="w-full flex flex-col items-start justify-between flex-1 min-h-0 rounded-[24px]">
+              {/* Build stages with a pure reduce so the cascade is a
+                  single continuous flow (0.4 stage = 64 ms apart)
+                  across every header and item — no pause at section
+                  boundaries. Each section consumes 1 stage for its
+                  header + N stages for its items; the next section
+                  picks up immediately from where the previous left off. */}
+              {EXPERIENCE_SECTIONS.reduce<{
+                start: number;
+                nodes: React.ReactNode[];
+              }>(
+                (acc, section) => {
+                  const headerStage = acc.start;
+                  const itemCount = section.end - section.start;
+                  const itemStages = Array.from(
+                    { length: itemCount },
+                    (_, i) => headerStage + 0.4 * (i + 1),
+                  );
+                  const nextStart = headerStage + 0.4 * (itemCount + 1);
+                  const node = (
+                    <div
+                      key={section.label}
+                      className="w-full flex flex-col items-start gap-[16px]"
+                    >
+                      <p
+                        className="w-full anim-bubbly-grow"
+                        style={{
+                          fontFamily: SOLWAY,
+                          fontWeight: 400,
+                          fontSize: 16,
+                          lineHeight: "24px",
+                          letterSpacing: "0.15px",
+                          color: "#111323",
+                          transformOrigin: "left center",
+                          ["--stage" as string]: headerStage,
+                        }}
+                      >
+                        {section.label}
+                      </p>
+                      <div className="w-full flex flex-col items-start gap-[16px]">
+                        {EXPERIENCES.slice(section.start, section.end).map(
+                          (item, i) => {
+                            const flatIdx = section.start + i;
+                            return (
+                              <ExperienceRowItem
+                                key={`${item.name}-${flatIdx}`}
+                                item={item}
+                                selected={selectedIdx === flatIdx}
+                                onSelect={() => setSelectedIdx(flatIdx)}
+                                stage={itemStages[i]}
+                              />
+                            );
+                          },
+                        )}
+                      </div>
+                    </div>
+                  );
+                  return { start: nextStart, nodes: [...acc.nodes, node] };
+                },
+                { start: 2, nodes: [] },
+              ).nodes}
             </div>
 
-            {/* CTAs — each button stages individually as the last two. */}
-            <div className="w-full flex items-start gap-[20px] shrink-0">
+            {/* CTA — Figma 319:2261 now shows only "MY CV" full-width
+                across the row (no "Get in touch" pill). */}
+            <div className="w-full flex items-start shrink-0">
               <span
                 className="anim-bubbly-grow flex-1 flex"
                 style={{ ["--stage" as string]: 8 }}
-              >
-                <CTAButton
-                  href="/contact"
-                  iconSrc="/assets/icon-cta-chat.svg"
-                  label="Get in touch"
-                variant="primary"
-                  uppercase
-                />
-              </span>
-              <span
-                className="anim-bubbly-grow flex-1 flex"
-                style={{ ["--stage" as string]: 9 }}
               >
                 <CTAButton
                   iconSrc="/assets/icon-cta-cv.svg"
@@ -690,18 +706,19 @@ function WorkMobile() {
             ["--stage" as string]: 0,
           }}
         >
-          I&rsquo;ve worked in multiple industries...
+          I&rsquo;m experienced in a range,
         </p>
         <p
           className="w-full anim-bubbly-grow"
           style={{
             fontSize: 16,
             lineHeight: "20px",
+            letterSpacing: "2px",
             transformOrigin: "left center",
             ["--stage" as string]: 1,
           }}
         >
-          Saas, B2B, ERP, Startup, Crypto, etc.
+          confidently adapt to the context.
         </p>
       </div>
 
