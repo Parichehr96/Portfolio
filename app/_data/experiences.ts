@@ -49,6 +49,7 @@ export const EXPERIENCES: Experience[] = [
     industry: "E-commerce · B2B",
     description:
       "A unified digital ecosystem (consumer site, agent dashboard, repairman app) for one of Iran’s largest auto parts manufacturers.",
+    caseStudy: "/work/ezam-part",
   },
   {
     name: "WOW Global Solution",
