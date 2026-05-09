@@ -29,16 +29,16 @@ const GRAY_NAVY = "#5A5D70";
 // Approximate natural height of MC1's content (Figma 313:2747 — header
 // + image+details + CTA row + paddings). Used as the "design" reference
 // when scaling expanded content to fit shorter viewports.
-const DESIGN_VH = 877;
+const DESIGN_VH = 950;
 // Compact bar (MC2 — Figma 333:3203) total height: border-4 + py-32 +
 // content(title 32 + subtitle 16 = 48) + py-32 + border-4 = 120.
 export const MC2_HEIGHT = 120;
 
-// Hero image fixed dimensions from Figma 313:2774: 596 × 409. Whole
-// image is visible at natural aspect; sits flush right next to the
-// flex-1 detail items column.
-const IMAGE_WIDTH = 596;
-const IMAGE_HEIGHT = 409;
+// Hero image dimensions. Figma reference is 596 × 409 (313:2774); we
+// run a touch larger so the hero reads more prominently next to the
+// detail-items column without overflowing the design height.
+const IMAGE_WIDTH = 760;
+const IMAGE_HEIGHT = 540;
 
 const MC1_PADDING_X = 40;
 const MC2_PADDING_X = 120;
@@ -75,6 +75,12 @@ export type CaseStudyHeaderProps = {
   detailItems: CaseStudyDetailItem[];
   heroImageSrc: string;
   heroImageAlt: string;
+  /** Object-fit for the hero image. Default `contain` preserves the
+   *  natural aspect ratio (used by case studies whose main image has
+   *  baked-in framing). `cover` fills the 596×409 frame edge-to-edge,
+   *  letting the image align top/bottom with the detail-items column —
+   *  appropriate for hero illustrations whose subject is centred. */
+  heroImageObjectFit?: "contain" | "cover";
   ctas: CaseStudyCTA[];
   /** Optional Back-to-/work label override for screen readers. */
   backHref?: string;
@@ -285,6 +291,7 @@ function CaseStudyHeaderDesktop({
   detailItems,
   heroImageSrc,
   heroImageAlt,
+  heroImageObjectFit = "contain",
   ctas,
   backHref = "/work",
 }: CaseStudyHeaderProps) {
@@ -560,11 +567,12 @@ function CaseStudyHeaderDesktop({
             ))}
           </div>
           <div
-            className="shrink-0 relative"
+            className="shrink-0 relative overflow-hidden"
             style={{
               width: IMAGE_WIDTH,
               height: IMAGE_HEIGHT,
               opacity: imageOpacity,
+              borderRadius: heroImageObjectFit === "cover" ? 16 : 0,
             }}
           >
             <Image
@@ -572,8 +580,9 @@ function CaseStudyHeaderDesktop({
               alt={heroImageAlt}
               fill
               priority
-              sizes="596px"
-              className="object-contain pointer-events-none"
+              sizes="760px"
+              className="pointer-events-none"
+              style={{ objectFit: heroImageObjectFit }}
             />
           </div>
         </div>
@@ -668,6 +677,7 @@ function CaseStudyHeaderMobile({
   detailItems,
   heroImageSrc,
   heroImageAlt,
+  heroImageObjectFit = "contain",
   ctas,
   backHref = "/work",
 }: CaseStudyHeaderProps) {
@@ -817,7 +827,8 @@ function CaseStudyHeaderMobile({
             fill
             priority
             sizes="(max-width: 767px) 100vw, 596px"
-            className="object-contain pointer-events-none"
+            className="pointer-events-none"
+            style={{ objectFit: heroImageObjectFit }}
           />
         </div>
 

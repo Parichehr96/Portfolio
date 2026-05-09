@@ -39,6 +39,7 @@ export const EXPERIENCES: Experience[] = [
     industry: "Mobile App · Consumer · Web3",
     description:
       "A Telegram Mini App connecting crypto communities to on-chain event verification, letting organisers issue and participants collect proof-of-attendance badges in-chat.",
+    caseStudy: "/work/onton",
   },
   {
     name: "Ezam Part",
