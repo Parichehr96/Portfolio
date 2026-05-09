@@ -31,6 +31,7 @@ export const EXPERIENCES: Experience[] = [
     industry: "SaaS · Productivity Tool",
     description:
       "A Calendar integration that makes the digital carbon cost and mental load of online meetings visible — uplifting mental health and productivity.",
+    caseStudy: "/work/mindful-meet",
   },
   {
     name: "ONTON",
