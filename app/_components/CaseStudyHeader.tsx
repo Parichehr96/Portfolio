@@ -620,20 +620,65 @@ function CaseStudyHeaderDesktop({
   );
 }
 
-/* Mobile case-study header — no desktop morph. Static stacked layout
-   (back / title / subtitle / hero / details / CTAs) in normal flow;
-   when the user scrolls past it, a sticky compact bar (back + title)
-   slides in from the top.
+/* Mobile case-study header — sized per Figma 446:8137.
 
-   This intentionally diverges from the desktop morphing card because
-   the desktop card's content (six detail items + 596×409 hero + four
-   CTAs) won't fit a phone viewport without ugly clipping. The mobile
-   version is a more conventional case-study header and works on every
-   phone size.
+   MC1 (Figma 446:8139): cream card in *normal document flow*, 20 px
+   below the page top and 16 px in from each side, 12 px internal
+   padding, all four corners rounded 24 px. As the user scrolls the
+   card moves up the page naturally; body sections follow it directly
+   in document flow so they're "right after" the card and rise into
+   view as the card scrolls past.
+
+   MC2: a 56 px compact bar pinned to the viewport top, full-width
+   with only the bottom corners rounded and 16 px horizontal padding.
+   Emerges via *scroll-driven* slide + fade — `translateY` and
+   `opacity` are tied directly to scroll progress (not a CSS one-shot
+   animation), and the morph is front-loaded so MC2 is fully formed
+   right around the moment MC1's header scrolls past the viewport
+   top. Visually MC2 takes over from MC1's own header as MC1
+   continues to scroll past beneath it.
    ---------------------------------------------------------------- */
 
 const MOBILE_PAGE_PADDING = 16;
-const MOBILE_STICKY_HEIGHT = 56;
+const MOBILE_MC1_TOP = 20;
+const MOBILE_MC2_HEIGHT = 56;
+const MOBILE_CARD_CORNER = 24;
+const MOBILE_CARD_PADDING = 12;
+
+function MobileDetailItem({ label, value }: CaseStudyDetailItem) {
+  return (
+    <div className="w-full flex flex-col" style={{ gap: 4 }}>
+      <p
+        className="w-full"
+        style={{
+          color: NAVY,
+          fontFamily: SOLWAY,
+          fontWeight: 700,
+          fontSize: 12,
+          lineHeight: "16px",
+          letterSpacing: "0.5px",
+          margin: 0,
+        }}
+      >
+        {label}
+      </p>
+      <p
+        className="w-full"
+        style={{
+          color: NAVY,
+          fontFamily: SOLWAY,
+          fontWeight: 400,
+          fontSize: 12,
+          lineHeight: "16px",
+          letterSpacing: "0.5px",
+          margin: 0,
+        }}
+      >
+        {value}
+      </p>
+    </div>
+  );
+}
 
 function MobileCTAButton({
   href,
@@ -644,16 +689,16 @@ function MobileCTAButton({
   uppercase,
 }: CaseStudyCTA) {
   const baseClass =
-    "w-full inline-flex items-center justify-center gap-[12px] py-[14px] px-[16px] rounded-[120px] transition-colors duration-200 cursor-pointer";
+    "w-full inline-flex items-center justify-center gap-[12px] px-[16px] py-[12px] rounded-[120px] transition-colors duration-200 cursor-pointer";
   const variantClass =
     variant === "primary"
       ? "bg-white hover:bg-[#EDEAE4]"
-      : "bg-transparent border-[2px] border-solid border-white hover:bg-white/30";
+      : "bg-transparent border-[2.6px] border-solid border-white hover:bg-white/30";
   const inner = (
     <>
       <span
         className="relative shrink-0 inline-block"
-        style={{ width: 20, height: 20 }}
+        style={{ width: 24, height: 24 }}
       >
         <img
           src={iconSrc}
@@ -667,7 +712,7 @@ function MobileCTAButton({
           color: NAVY,
           fontFamily: SOLWAY,
           fontWeight: 400,
-          fontSize: 14,
+          fontSize: 12,
           lineHeight: "18px",
           textTransform: uppercase ? "uppercase" : undefined,
         }}
@@ -705,29 +750,30 @@ function CaseStudyHeaderMobile({
   ctas,
   backHref = "/work",
 }: CaseStudyHeaderProps) {
-  const [scrolled, setScrolled] = useState(false);
+  const [scrollY, setScrollY] = useState(0);
+  const [vh, setVh] = useState(800);
+  const [cardBlock, setCardBlock] = useState(0);
+  const [headerHeight, setHeaderHeight] = useState(96);
+  const cardRef = useRef<HTMLDivElement>(null);
   const headerRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
+    const cardEl = cardRef.current;
     const headerEl = headerRef.current;
-    if (!headerEl) return;
+    if (!cardEl || !headerEl) return;
 
-    // Reveal the sticky compact bar when the user has scrolled past
-    // ~80% of the static header. We compute the threshold once on
-    // mount and on resize; rAF-throttle the scroll handler so we
-    // don't churn React on every frame.
-    let threshold = 0;
     let frame = 0;
-
     const measure = () => {
-      threshold = Math.max(0, headerEl.offsetHeight * 0.8);
+      setHeaderHeight(headerEl.offsetHeight);
+      setCardBlock(cardEl.offsetTop + cardEl.offsetHeight);
+      setVh(window.innerHeight);
     };
 
     const onScroll = () => {
       if (frame !== 0) return;
       frame = requestAnimationFrame(() => {
         frame = 0;
-        setScrolled(window.scrollY > threshold);
+        setScrollY(window.scrollY);
       });
     };
 
@@ -740,37 +786,62 @@ function CaseStudyHeaderMobile({
     onScroll();
     window.addEventListener("scroll", onScroll, { passive: true });
     window.addEventListener("resize", onResize);
+    const ro = new ResizeObserver(measure);
+    ro.observe(cardEl);
+    ro.observe(headerEl);
     return () => {
       if (frame !== 0) cancelAnimationFrame(frame);
       window.removeEventListener("scroll", onScroll);
       window.removeEventListener("resize", onResize);
+      ro.disconnect();
     };
   }, []);
 
+  // Delay the morph until MC1's bottom (= the CTAs) is fully in
+  // viewport — that's when "MC1 should scroll until the CTAs are
+  // visible then starts to transform into MC2". On small phones MC1
+  // is taller than vh so the user has to scroll down to see CTAs;
+  // on tall phones (vh > cardBlock) CTAs are visible immediately and
+  // morphStart is clamped to 0.
+  const morphStart =
+    cardBlock > 0 ? Math.max(0, cardBlock - vh) : 0;
+  const morphDistance = Math.max(1, MOBILE_MC1_TOP + headerHeight);
+  const progress = clamp01((scrollY - morphStart) / morphDistance);
+  // Cross-fade MC1's own header against the emerging MC2 bar so the
+  // back button + title don't visually appear in two places at once
+  // (the user explicitly asked for "MC2 shouldn't appear on the MC1,
+  // it should emerge from MC1"). As MC2 fades in, MC1's header fades
+  // out at the same rate.
+  const mc1HeaderOpacity = 1 - progress;
+
   return (
     <>
-      {/* Sticky compact bar — slides in once the user scrolls past
-          most of the static header. */}
+      {/* MC2 compact bar — emerges via scroll-driven slide + fade as
+          MC1's own header scrolls up past the viewport top. The bar
+          is z-indexed above MC1, so it visually replaces MC1's header
+          while the rest of MC1 (hero, details, CTAs) continues to
+          scroll past beneath it. */}
       <div
-        aria-hidden={!scrolled}
+        aria-hidden={progress < 0.5}
         style={{
           position: "fixed",
           top: 0,
           left: 0,
           right: 0,
-          height: MOBILE_STICKY_HEIGHT,
+          height: MOBILE_MC2_HEIGHT,
           backgroundColor: CREAM,
-          borderBottomLeftRadius: 16,
-          borderBottomRightRadius: 16,
+          borderBottomLeftRadius: MOBILE_CARD_CORNER,
+          borderBottomRightRadius: MOBILE_CARD_CORNER,
           padding: `0 ${MOBILE_PAGE_PADDING}px`,
           display: "flex",
           alignItems: "center",
           gap: 12,
           zIndex: 50,
-          transform: scrolled ? "translateY(0)" : "translateY(-100%)",
-          transition: "transform 220ms ease-out",
-          boxShadow: scrolled ? "0 2px 8px rgba(31,39,83,0.08)" : "none",
-          pointerEvents: scrolled ? "auto" : "none",
+          transform: `translateY(${-MOBILE_MC2_HEIGHT * (1 - progress)}px)`,
+          opacity: progress,
+          boxShadow:
+            progress > 0.5 ? "0 2px 8px rgba(31,39,83,0.08)" : "none",
+          pointerEvents: progress > 0.5 ? "auto" : "none",
         }}
       >
         <BackButton href={backHref} />
@@ -779,57 +850,96 @@ function CaseStudyHeaderMobile({
           style={{
             color: NAVY,
             fontFamily: SOLWAY,
-            fontWeight: 500,
+            fontWeight: 400,
             fontSize: 16,
             lineHeight: "20px",
+            margin: 0,
             overflow: "hidden",
             textOverflow: "ellipsis",
             whiteSpace: "nowrap",
+            textAlign: "left",
           }}
         >
           {title}
         </p>
+        <div
+          aria-hidden
+          style={{
+            width: BACK_BUTTON_SIZE,
+            height: BACK_BUTTON_SIZE,
+            opacity: 0,
+          }}
+        />
       </div>
 
-      {/* Static header — normal flow, full-width stack. */}
-      <header
-        ref={headerRef}
+      {/* MC1 — full cream card in normal document flow per Figma
+          446:8139. Sits 20 px below the page top, 16 px in from each
+          side, 12 px internal padding, all four corners rounded
+          24 px. Scrolls naturally with the page; body sections sit
+          immediately beneath it in the document. */}
+      <div
+        ref={cardRef}
         style={{
+          margin: `${MOBILE_MC1_TOP}px ${MOBILE_PAGE_PADDING}px 0`,
+          padding: MOBILE_CARD_PADDING,
           backgroundColor: CREAM,
-          borderBottomLeftRadius: 24,
-          borderBottomRightRadius: 24,
-          padding: `${MOBILE_PAGE_PADDING}px ${MOBILE_PAGE_PADDING}px 32px`,
+          borderRadius: MOBILE_CARD_CORNER,
           display: "flex",
           flexDirection: "column",
-          gap: 24,
+          gap: 32,
         }}
       >
-        {/* Back row */}
-        <div style={{ paddingTop: 8 }}>
-          <BackButton href={backHref} />
-        </div>
-
-        {/* Title + subtitle */}
-        <div className="flex flex-col gap-[8px]">
-          <h1
-            style={{
-              color: NAVY,
-              fontFamily: SOLWAY,
-              fontWeight: 400,
-              fontSize: 28,
-              lineHeight: "36px",
-              margin: 0,
-            }}
+        {/* Header — back row + subtitle. Measured via headerRef so we
+            know exactly when it scrolls past the viewport top. Fades
+            out as MC2 emerges so the title and back button don't
+            visually appear twice during the transition. */}
+        <div
+          ref={headerRef}
+          className="w-full flex flex-col"
+          style={{
+            gap: 8,
+            opacity: mc1HeaderOpacity,
+            pointerEvents: mc1HeaderOpacity > 0.01 ? "auto" : "none",
+          }}
+        >
+          <div
+            className="w-full flex items-center"
+            style={{ gap: 12, height: BACK_BUTTON_SIZE }}
           >
-            {title}
-          </h1>
+            <BackButton href={backHref} />
+            <p
+              className="flex-1 min-w-0"
+              style={{
+                color: NAVY,
+                fontFamily: SOLWAY,
+                fontWeight: 400,
+                fontSize: 22,
+                lineHeight: "28px",
+                margin: 0,
+                textAlign: "center",
+              }}
+            >
+              {title}
+            </p>
+            <div
+              aria-hidden
+              style={{
+                width: BACK_BUTTON_SIZE,
+                height: BACK_BUTTON_SIZE,
+                opacity: 0,
+              }}
+            />
+          </div>
           <p
+            className="w-full"
             style={{
               color: NAVY,
               fontFamily: SOLWAY,
               fontWeight: 400,
-              fontSize: 16,
-              lineHeight: "22px",
+              fontSize: 12,
+              lineHeight: "16px",
+              letterSpacing: "0.4px",
+              textAlign: "center",
               margin: 0,
             }}
           >
@@ -837,43 +947,46 @@ function CaseStudyHeaderMobile({
           </p>
         </div>
 
-        {/* Hero image — full-width, aspect ratio preserved. */}
-        <div
-          className="relative w-full overflow-hidden"
-          style={{
-            aspectRatio: `${IMAGE_WIDTH} / ${IMAGE_HEIGHT}`,
-            borderRadius: 16,
-          }}
-        >
-          <Image
-            src={heroImageSrc}
-            alt={heroImageAlt}
-            fill
-            priority
-            sizes="(max-width: 767px) 100vw, 596px"
-            className="pointer-events-none"
-            style={{ objectFit: heroImageObjectFit }}
-          />
-        </div>
-
-        {/* Detail items — vertical stack */}
-        <div className="flex flex-col gap-[16px] w-full">
-          {detailItems.map((item) => (
-            <DetailItem
-              key={item.label}
-              label={item.label}
-              value={item.value}
+        {/* Hero image + two-column detail grid (Figma 446:8146/8147). */}
+        <div className="w-full flex flex-col" style={{ gap: 20 }}>
+          <div
+            className="relative w-full overflow-hidden"
+            style={{
+              aspectRatio: `${IMAGE_WIDTH} / ${IMAGE_HEIGHT}`,
+              borderRadius: 16,
+            }}
+          >
+            <Image
+              src={heroImageSrc}
+              alt={heroImageAlt}
+              fill
+              priority
+              sizes="(max-width: 767px) 100vw, 596px"
+              className="pointer-events-none"
+              style={{ objectFit: heroImageObjectFit }}
             />
-          ))}
+          </div>
+          <div
+            className="grid grid-cols-2 w-full"
+            style={{ rowGap: 12, columnGap: 8 }}
+          >
+            {detailItems.map((item) => (
+              <MobileDetailItem
+                key={item.label}
+                label={item.label}
+                value={item.value}
+              />
+            ))}
+          </div>
         </div>
 
-        {/* CTAs — stacked full-width pills */}
-        <div className="flex flex-col gap-[12px] w-full">
+        {/* CTA stack — full-width pills, 16 px gap per Figma 446:8155. */}
+        <div className="w-full flex flex-col" style={{ gap: 16 }}>
           {ctas.map((cta) => (
             <MobileCTAButton key={cta.label} {...cta} />
           ))}
         </div>
-      </header>
+      </div>
     </>
   );
 }

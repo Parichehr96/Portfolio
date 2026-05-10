@@ -273,13 +273,15 @@
 
    Breakpoint: 768 px (matches MOBILE_BREAKPOINT in useIsMobile.ts). */
 .cs-body-offset {
-  /* 100vh = morphing CaseStudyHeader fills first viewport on desktop;
-     +120px = MC2 bar height once the card collapses. */
-  margin-top: calc(100vh + 120px);
+  /* Mobile default: body sits in normal document flow directly after
+     the in-flow MC1 card with no extra offset. Desktop overrides this
+     below to push body content beneath the morphing fixed-position
+     CaseStudyHeader. */
+  margin-top: 0;
 }
 
 .cs-body-padding {
-  padding: 80px 120px;
+  padding: 32px 16px;
 }
 
 .cs-section-row {
@@ -299,15 +301,14 @@
     gap: 40px;
     align-items: flex-start;
   }
-}
-
-@media (max-width: 767px) {
   .cs-body-offset {
-    /* No fixed header on mobile — the simpler stacked header is in
-       normal flow, so body content sits naturally below it. */
-    margin-top: 0;
+    /* Desktop morphing CaseStudyHeader is fixed-position and fills
+       the first viewport (`100vh`) plus the MC2 compact bar height
+       (`120px`); body content needs to sit beneath it in document
+       coords so the scroll-driven morph stays seamless. */
+    margin-top: calc(100vh + 120px);
   }
   .cs-body-padding {
-    padding: 32px 16px;
+    padding: 80px 120px;
   }
 }
