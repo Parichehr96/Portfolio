@@ -17,6 +17,11 @@ export type Experience = {
    *  cluster is clickable so the surrounding date/dashed leader don't
    *  steal the click. */
   caseStudy?: string;
+  /** When set, an external-link arrow is rendered next to the name
+   *  (early-works rows in Figma 300:2201). Opens in a new tab. Use
+   *  for Behance / portfolio links on legacy projects that don't have
+   *  a dedicated case-study route. */
+  externalUrl?: string;
 };
 
 /* Order matches the desktop /work page sections (Figma 300:2201):
@@ -84,6 +89,8 @@ export const EXPERIENCES: Experience[] = [
     industry: "ERP · EdTech · Web App",
     description:
       "A redesign of Iran’s national university ERP used by students nationwide — simplifying enrolment, grades, and academic workflows.",
+    externalUrl:
+      "https://www.behance.net/gallery/157018767/Golestan-Educational-ERP-for-universities-(Redesign)",
   },
   {
     name: "Filala",
@@ -92,6 +99,8 @@ export const EXPERIENCES: Experience[] = [
     industry: "Mobile App · EdTech",
     description:
       "A read-aloud children’s book app for under-5s, paired with a physical device that displays story illustrations as animated slideshows.",
+    externalUrl:
+      "https://www.behance.net/gallery/157057987/Filala-Library-mobile-app-for-kids-2-5-years-old",
   },
   {
     name: "Living Maples",
@@ -100,6 +109,8 @@ export const EXPERIENCES: Experience[] = [
     industry: "Mobile App · Healthcare",
     description:
       "A pill reminder app for Canadians 60+, designed with elderly-first principles and engaging visuals that motivate without blame.",
+    externalUrl:
+      "https://www.behance.net/gallery/157009357/Living-Maples-Pill-reminder-app-for-seniors-over-60",
   },
 ];
 

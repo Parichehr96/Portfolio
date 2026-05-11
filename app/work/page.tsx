@@ -93,6 +93,61 @@ function yearsOnly(dateRange: string): string {
   return first === last ? first : `${first} - ${last}`;
 }
 
+/** Behance arrow next to early-works names (Figma 300:2201 / 449:8726).
+ *  Two modes:
+ *    - `interactive` (default): standalone `<a>` with `stopPropagation`,
+ *      for use inside non-link parents like the mobile tail's
+ *      `<div role="button">` select rows. The icon can be clicked
+ *      directly to open the external URL without first selecting.
+ *    - `interactive={false}`: visual-only `<span>`, used inside row
+ *      wrappers that are *already* anchors (`ExperienceRowItem`,
+ *      `ExperienceDetail`) — nesting anchors is invalid HTML, and the
+ *      parent anchor already handles the click for the whole row. */
+function ExternalLinkIcon({
+  href,
+  label,
+  interactive = true,
+}: {
+  href: string;
+  label: string;
+  interactive?: boolean;
+}) {
+  if (!interactive) {
+    return (
+      <span
+        className="shrink-0 inline-block relative"
+        style={{ width: 20, height: 20 }}
+        aria-hidden
+      >
+        <img
+          src="/assets/icon-link-external.svg"
+          alt=""
+          className="absolute inset-0 w-full h-full block"
+        />
+      </span>
+    );
+  }
+  const stop = (e: React.MouseEvent) => e.stopPropagation();
+  return (
+    <a
+      href={href}
+      target="_blank"
+      rel="noopener noreferrer"
+      onClick={stop}
+      onMouseDown={stop}
+      aria-label={`Open ${label} on Behance`}
+      className="shrink-0 inline-block relative cursor-pointer hover:opacity-80 transition-opacity duration-200"
+      style={{ width: 20, height: 20 }}
+    >
+      <img
+        src="/assets/icon-link-external.svg"
+        alt=""
+        className="absolute inset-0 w-full h-full block"
+      />
+    </a>
+  );
+}
+
 function ExperienceRow({
   item,
   selected,
@@ -153,6 +208,13 @@ function ExperienceRow({
         >
           {item.name}
         </p>
+        {item.externalUrl && (
+          <ExternalLinkIcon
+            href={item.externalUrl}
+            label={item.name}
+            interactive={false}
+          />
+        )}
         {/* Dashed leader stays in the DOM in both states — it's flex-1
             so it fills the space between name and date. When selected
             it fades to opacity 0 so the cream pill behind reads as a
@@ -227,6 +289,22 @@ function ExperienceRowItem({
         onMouseEnter={onSelect}
         onFocus={onSelect}
         aria-label={`${item.name} — open case study`}
+      >
+        {inner}
+      </a>
+    );
+  }
+  if (item.externalUrl) {
+    return (
+      <a
+        href={item.externalUrl}
+        target="_blank"
+        rel="noopener noreferrer"
+        className={baseClass}
+        style={{ cursor: "pointer", color: "inherit", ...stageStyle }}
+        onMouseEnter={onSelect}
+        onFocus={onSelect}
+        aria-label={`${item.name} — open on Behance`}
       >
         {inner}
       </a>
@@ -822,10 +900,17 @@ function WorkMobile() {
               {tail.map((item, i) => {
                 const targetIdx = (safeSelectedIdx + i + 1) % itemCount;
                 return (
-                  <button
-                    type="button"
+                  <div
                     key={`${item.name}-${targetIdx}`}
+                    role="button"
+                    tabIndex={0}
                     onClick={() => setSelectedIdx(targetIdx)}
+                    onKeyDown={(e) => {
+                      if (e.key === "Enter" || e.key === " ") {
+                        e.preventDefault();
+                        setSelectedIdx(targetIdx);
+                      }
+                    }}
                     className="w-full flex items-center shrink-0 cursor-pointer"
                     style={{ gap: 12, opacity: 0.5 }}
                     aria-label={`Select ${item.name}`}
@@ -847,6 +932,12 @@ function WorkMobile() {
                       >
                         {item.name}
                       </p>
+                      {item.externalUrl && (
+                        <ExternalLinkIcon
+                          href={item.externalUrl}
+                          label={item.name}
+                        />
+                      )}
                       <span
                         className="flex-1 min-w-0 self-end"
                         style={{
@@ -872,7 +963,7 @@ function WorkMobile() {
                     >
                       {yearsOnly(item.date)}
                     </p>
-                  </button>
+                  </div>
                 );
               })}
             </div>
@@ -1007,12 +1098,21 @@ function SelectedPill({ experience }: { experience: Experience | undefined }) {
         {outgoingExp && (
           <div
             key={`out-${incomingTick}`}
-            className="absolute inset-0 flex items-start justify-between anim-pill-name-out"
+            className="absolute inset-0 flex items-center justify-between anim-pill-name-out"
             style={{ gap: 8 }}
           >
-            <p className="whitespace-nowrap" style={NAME_STYLE}>
-              {outgoingExp.name}
-            </p>
+            <div className="flex items-center min-w-0" style={{ gap: 6 }}>
+              <p className="whitespace-nowrap" style={NAME_STYLE}>
+                {outgoingExp.name}
+              </p>
+              {outgoingExp.externalUrl && (
+                <ExternalLinkIcon
+                  href={outgoingExp.externalUrl}
+                  label={outgoingExp.name}
+                  interactive={false}
+                />
+              )}
+            </div>
             <p className="whitespace-nowrap shrink-0" style={DATE_STYLE}>
               {outgoingExp.date}
             </p>
@@ -1020,12 +1120,21 @@ function SelectedPill({ experience }: { experience: Experience | undefined }) {
         )}
         <div
           key={`in-${incomingTick}`}
-          className={`absolute inset-0 flex items-start justify-between ${incomingAnim}`}
+          className={`absolute inset-0 flex items-center justify-between ${incomingAnim}`}
           style={{ gap: 8 }}
         >
-          <p className="whitespace-nowrap" style={NAME_STYLE}>
-            {experience.name}
-          </p>
+          <div className="flex items-center min-w-0" style={{ gap: 6 }}>
+            <p className="whitespace-nowrap" style={NAME_STYLE}>
+              {experience.name}
+            </p>
+            {experience.externalUrl && (
+              <ExternalLinkIcon
+                href={experience.externalUrl}
+                label={experience.name}
+                interactive={false}
+              />
+            )}
+          </div>
           <p className="whitespace-nowrap shrink-0" style={DATE_STYLE}>
             {experience.date}
           </p>
@@ -1093,6 +1202,20 @@ function SelectedPill({ experience }: { experience: Experience | undefined }) {
         className="block w-full no-underline shrink-0"
         style={{ color: "inherit" }}
         aria-label={`${experience.name} — open case study`}
+      >
+        {inner}
+      </a>
+    );
+  }
+  if (experience.externalUrl) {
+    return (
+      <a
+        href={experience.externalUrl}
+        target="_blank"
+        rel="noopener noreferrer"
+        className="block w-full no-underline shrink-0"
+        style={{ color: "inherit" }}
+        aria-label={`${experience.name} — open on Behance`}
       >
         {inner}
       </a>
