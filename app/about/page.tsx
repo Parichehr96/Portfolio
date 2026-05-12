@@ -442,7 +442,9 @@ function AboutDesktop() {
                 <SkillsColumnHeader>Methodes</SkillsColumnHeader>
                 <div className="flex flex-col items-start justify-center gap-[4px]">
                   {METHODES.map((item) => (
-                    <SkillBullet key={item}>{item}</SkillBullet>
+                    <SkillBullet key={item}>
+                      {item}
+                    </SkillBullet>
                   ))}
                 </div>
               </div>
@@ -451,7 +453,9 @@ function AboutDesktop() {
                   <SkillsColumnHeader>Soft Skills</SkillsColumnHeader>
                   <div className="flex flex-col items-start justify-center gap-[4px]">
                     {SOFT_SKILLS.map((item) => (
-                      <SkillBullet key={item}>{item}</SkillBullet>
+                      <SkillBullet key={item}>
+                        {item}
+                      </SkillBullet>
                     ))}
                   </div>
                 </div>
@@ -459,7 +463,9 @@ function AboutDesktop() {
                   <SkillsColumnHeader>Tools</SkillsColumnHeader>
                   <div className="flex flex-col items-start justify-center gap-[4px]">
                     {TOOLS.map((item) => (
-                      <SkillBullet key={item}>{item}</SkillBullet>
+                      <SkillBullet key={item}>
+                        {item}
+                      </SkillBullet>
                     ))}
                   </div>
                 </div>
@@ -878,7 +884,9 @@ function AboutMobile() {
                 <SkillsColumnHeader>Methodes</SkillsColumnHeader>
                 <div className="flex flex-col items-start gap-[4px]">
                   {METHODES.map((item) => (
-                    <SkillBullet key={item}>{item}</SkillBullet>
+                    <SkillBullet key={item}>
+                      {item}
+                    </SkillBullet>
                   ))}
                 </div>
               </div>
@@ -886,7 +894,9 @@ function AboutMobile() {
                 <SkillsColumnHeader>Soft Skills</SkillsColumnHeader>
                 <div className="flex flex-col items-start gap-[4px]">
                   {SOFT_SKILLS.map((item) => (
-                    <SkillBullet key={item}>{item}</SkillBullet>
+                    <SkillBullet key={item}>
+                      {item}
+                    </SkillBullet>
                   ))}
                 </div>
               </div>
@@ -894,7 +904,9 @@ function AboutMobile() {
                 <SkillsColumnHeader>Tools</SkillsColumnHeader>
                 <div className="flex flex-col items-start gap-[4px]">
                   {TOOLS.map((item) => (
-                    <SkillBullet key={item}>{item}</SkillBullet>
+                    <SkillBullet key={item}>
+                      {item}
+                    </SkillBullet>
                   ))}
                 </div>
               </div>

@@ -647,8 +647,6 @@ function WorkMobile() {
 
   const sectionCount = EXPERIENCE_SECTIONS.length;
   const section = EXPERIENCE_SECTIONS[sectionIdx];
-  // Strip the trailing " -" from the desktop-style label for the
-  // mobile section title (the chevrons replace the dash visually).
   const sectionLabel = section.label.replace(/\s*-\s*$/, "");
   const sectionItems = EXPERIENCES.slice(section.start, section.end);
   const itemCount = sectionItems.length;

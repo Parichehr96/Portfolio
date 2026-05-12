@@ -257,7 +257,7 @@ function CompactLink({
     fontSize: 14,
     lineHeight: "20px",
     letterSpacing: "0.25px",
-    textDecoration: "underline",
+    textDecorationLine: "underline",
     textDecorationStyle: "solid",
     whiteSpace: "nowrap",
   };

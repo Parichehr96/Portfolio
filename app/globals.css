@@ -20,6 +20,22 @@
   --ease-standard: cubic-bezier(0.4, 0, 0.2, 1);
 }
 
+/* === Custom cursor (Figma 457:8739) ===
+   Replace the browser's default arrow with the navy `cursor-speed-1`
+   icon site-wide on desktop. Applied via a universal selector with
+   `!important` so it wins over per-element `cursor: pointer` /
+   `cursor: text` defaults (links, buttons, inputs) and the cursor
+   stays uniform everywhere. Skipped under 768 px because touch
+   devices don't have a cursor — the rule would just bloat the CSS
+   and trip up some mobile browsers that try to render it. */
+@media (min-width: 768px) {
+  *,
+  *::before,
+  *::after {
+    cursor: url("/assets/cursor.svg") 4 2, default !important;
+  }
+}
+
 /* === Sequenced home-page load animation ===
    Plays only on the very first visit / hard refresh of `/`.
    Timeline (no gaps between segments, total 2.8 s):
