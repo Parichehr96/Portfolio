@@ -1,15 +1,13 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import Link from "next/link";
 import CTAButton from "../_components/CTAButton";
 import LinkExternalIcon from "../_components/LinkExternalIcon";
 import { useIsMobile } from "../_components/useIsMobile";
-import { useViewTransitionRouter } from "../_lib/useViewTransitionRouter";
 import {
   ACADEMIC,
   CERTIFICATES,
-  HOBBY_ICONS,
+  INTERESTS,
   METHODES,
   SOFT_SKILLS,
   TOOLS,
@@ -40,8 +38,18 @@ import {
 const SOLWAY = "var(--font-solway), serif";
 
 function EducationRow({ item }: { item: Item }) {
-  return (
-    <div className="w-full flex items-end justify-center gap-[8px]">
+  // Hover state mirrors the /work selected pill — cream bg, pill
+  // radius, breathing-room padding bubble in with a bubbly easing so
+  // the row reads as "bubbling up" on hover. `group/hover` on the
+  // anchor means anywhere on the row triggers the inner pill state.
+  const inner = (
+    <div
+      className="w-full flex items-end justify-center gap-[8px] rounded-[122px] group-hover:bg-[#F9F5EB] group-hover:px-[24px] group-hover:py-[8px]"
+      style={{
+        transition:
+          "background-color 300ms ease-out, padding 300ms cubic-bezier(0.34, 1.5, 0.64, 1), border-radius 300ms cubic-bezier(0.34, 1.5, 0.64, 1)",
+      }}
+    >
       <div className="flex-1 min-w-0 flex items-center gap-[8px]">
         <p
           className="text-[#1B2249] whitespace-nowrap shrink-0"
@@ -64,7 +72,7 @@ function EducationRow({ item }: { item: Item }) {
           >
             {item.short}
           </p>
-          <LinkExternalIcon />
+          {item.url && <LinkExternalIcon />}
         </div>
         <span
           className="flex-1 min-w-0 overflow-hidden whitespace-nowrap text-[#7E7F85]"
@@ -86,6 +94,21 @@ function EducationRow({ item }: { item: Item }) {
       </p>
     </div>
   );
+  if (item.url) {
+    return (
+      <a
+        href={item.url}
+        target="_blank"
+        rel="noopener noreferrer"
+        className="group block w-full no-underline cursor-pointer"
+        style={{ color: "inherit" }}
+        aria-label={`${item.name} — ${item.short} (opens in a new tab)`}
+      >
+        {inner}
+      </a>
+    );
+  }
+  return inner;
 }
 
 function SectionTitle({ children }: { children: React.ReactNode }) {
@@ -284,6 +307,38 @@ function CustomScrollbar({
 function AboutDesktop() {
   const scrollRef = useRef<HTMLDivElement | null>(null);
 
+  // Forward wheel events from anywhere on the page to the inner bio
+  // scroll container. The page itself isn't a normal document — it's
+  // rendered inside ScaledShell's fixed canvas, so the browser's
+  // native scroll bubbles nowhere unless the cursor is already inside
+  // the scrollable bio area. Adding a window-level wheel listener
+  // makes the bio scroll whenever the user wheels, regardless of
+  // where the cursor sits (over the illustration, the title, the bio
+  // — any of it). `behavior: "auto"` overrides the scroll container's
+  // `scroll-behavior: smooth` so the forwarded scroll uses the same
+  // instant per-event motion as a native wheel — matching speed
+  // between scrolling over the image and scrolling inside the bio
+  // itself. `deltaMode` is normalised because some browsers (most
+  // notably Firefox) emit wheel deltas in lines (mode 1) or pages
+  // (mode 2) instead of pixels.
+  useEffect(() => {
+    const el = scrollRef.current;
+    if (!el) return;
+    const onWheel = (e: WheelEvent) => {
+      // When the wheel is already happening over the scroll container
+      // (or any descendant of it), let the native handler take over —
+      // otherwise we'd double-scroll.
+      if (el.contains(e.target as Node)) return;
+      e.preventDefault();
+      let delta = e.deltaY;
+      if (e.deltaMode === 1) delta *= 16; // lines → px
+      else if (e.deltaMode === 2) delta *= el.clientHeight; // pages → px
+      el.scrollBy({ top: delta, behavior: "auto" });
+    };
+    window.addEventListener("wheel", onWheel, { passive: false });
+    return () => window.removeEventListener("wheel", onWheel);
+  }, []);
+
   return (
     <>
       {/* Illustration (face crop). Same `viewTransitionName` as the other
@@ -412,8 +467,11 @@ function AboutDesktop() {
             </div>
           </div>
 
-          {/* My Hobbies — 10 icons in a row. Section header is stage 10;
-              each icon sub-stages 10.0..10.9 so they pop one-by-one. */}
+          {/* My Interests (Figma 302:2532 → 429:3596) — 9 icons in a row.
+              Section header is stage 10; each interest sub-stages
+              10.0..10.x so the icons pop in one-by-one. Each interest
+              renders as a 32 × 32 icon with a Solway Regular 10/16
+              label in #7E7F85 beneath. */}
           <div
             className="w-full flex flex-col items-start gap-[20px] shrink-0 anim-bubbly-grow"
             style={{
@@ -421,50 +479,58 @@ function AboutDesktop() {
               ["--stage" as string]: 10,
             }}
           >
-            <SectionTitle>My Hobbies</SectionTitle>
+            <SectionTitle>My Interests</SectionTitle>
             <div
-              className="flex items-center justify-between"
-              style={{ width: 596 }}
+              className="flex items-center justify-center"
+              style={{ gap: 12 }}
             >
-              {HOBBY_ICONS.map((src, i) => (
+              {INTERESTS.map((interest, i) => (
                 <span
-                  key={src}
-                  className="relative shrink-0 inline-block anim-bubbly-grow"
+                  key={interest.label}
+                  className="shrink-0 inline-flex flex-col items-center anim-bubbly-grow"
                   style={{
-                    width: 32,
-                    height: 32,
+                    width: 54,
+                    gap: 4,
                     ["--stage" as string]: 10 + i * 0.25,
                   }}
-                  aria-hidden
                 >
-                  <img
-                    src={src}
-                    alt=""
-                    className="absolute inset-0 w-full h-full block"
-                  />
+                  <span
+                    className="relative shrink-0 inline-block"
+                    style={{ width: 32, height: 32 }}
+                    aria-hidden
+                  >
+                    <img
+                      src={interest.icon}
+                      alt=""
+                      className="absolute inset-0 w-full h-full block"
+                    />
+                  </span>
+                  <span
+                    className="shrink-0 whitespace-nowrap text-center"
+                    style={{
+                      fontFamily: SOLWAY,
+                      fontWeight: 400,
+                      fontSize: 10,
+                      lineHeight: "16px",
+                      letterSpacing: "0.5px",
+                      color: "#7E7F85",
+                    }}
+                  >
+                    {interest.label}
+                  </span>
                 </span>
               ))}
             </div>
           </div>
 
-          {/* CTAs — Each button bubbles individually as the last two
-              stages (12 and 13). */}
-          <div className="w-full flex items-start gap-[20px] shrink-0">
+          {/* CTA — single secondary "MY EXPERIENCES" pill per Figma
+              319:2782 (desktop) / 478:4457 (mobile). Stretches full
+              width like the original two-button row so the bottom
+              spacing of the scroll area stays the same. */}
+          <div className="w-full flex items-start shrink-0">
             <span
               className="anim-bubbly-grow flex-1 flex"
               style={{ ["--stage" as string]: 12 }}
-            >
-              <CTAButton
-                href="/contact"
-                iconSrc="/assets/icon-cta-chat.svg"
-                label="Get in touch"
-                variant="primary"
-                uppercase
-              />
-            </span>
-            <span
-              className="anim-bubbly-grow flex-1 flex"
-              style={{ ["--stage" as string]: 13 }}
             >
               <CTAButton
                 href="/work"
@@ -585,7 +651,7 @@ function MobileBioText({ baseStage }: { baseStage: number }) {
    (Figma 312:1762). No dotted leader on mobile, since each row is
    single-column. */
 function MobileEducationRow({ item }: { item: Item }) {
-  return (
+  const inner = (
     <div className="w-full flex flex-col items-start">
       <div className="w-full flex gap-[8px] items-center">
         <p
@@ -609,7 +675,7 @@ function MobileEducationRow({ item }: { item: Item }) {
           >
             {item.short}
           </p>
-          <LinkExternalIcon />
+          {item.url && <LinkExternalIcon />}
         </div>
       </div>
       <p
@@ -620,6 +686,21 @@ function MobileEducationRow({ item }: { item: Item }) {
       </p>
     </div>
   );
+  if (item.url) {
+    return (
+      <a
+        href={item.url}
+        target="_blank"
+        rel="noopener noreferrer"
+        className="block w-full no-underline cursor-pointer hover:opacity-80 transition-opacity duration-200"
+        style={{ color: "inherit" }}
+        aria-label={`${item.name} — ${item.short} (opens in a new tab)`}
+      >
+        {inner}
+      </a>
+    );
+  }
+  return inner;
 }
 
 function MobileListSection({
@@ -651,35 +732,81 @@ function MobileListSection({
 
 function AboutMobile() {
   const scrollRef = useRef<HTMLDivElement | null>(null);
-  const { handleClick } = useViewTransitionRouter();
-  const handleWorkClick = handleClick("/work");
+  // Scroll-driven illustration opacity. At the top of the bio the
+  // illustration sits at full strength behind the content; as the
+  // user scrolls down, it fades out 1 → 0 and is fully gone by the
+  // time they reach the end of the bio. Scrolling back up restores
+  // it the same way. rAF-throttled so we don't churn React on every
+  // frame.
+  const [scrollProgress, setScrollProgress] = useState(0);
+
+  useEffect(() => {
+    const el = scrollRef.current;
+    if (!el) return;
+    let frame = 0;
+    const update = () => {
+      const max = el.scrollHeight - el.clientHeight;
+      const p = max > 0 ? el.scrollTop / max : 0;
+      setScrollProgress(Math.max(0, Math.min(1, p)));
+    };
+    const onScroll = () => {
+      if (frame !== 0) return;
+      frame = requestAnimationFrame(() => {
+        frame = 0;
+        update();
+      });
+    };
+    update();
+    el.addEventListener("scroll", onScroll, { passive: true });
+    window.addEventListener("resize", onScroll);
+    return () => {
+      if (frame !== 0) cancelAnimationFrame(frame);
+      el.removeEventListener("scroll", onScroll);
+      window.removeEventListener("resize", onScroll);
+    };
+  }, []);
+
+  const illustrationOpacity = 1 - scrollProgress;
 
   return (
     <div className="absolute inset-0 flex flex-col items-center pt-[64px] pb-[120px] px-[16px] gap-[24px]">
       {/* Background illustration — bottom-right. z-10 so it sits in
           front of the scrolling bio text where they overlap (image
           stays visible on top). FloatingNav (z-20 in ScaledShell) is
-          still in front of it. Same `viewTransitionName` as the other
-          three pages → cross-page morph. Fades in as stage 13, after
-          the title, bio paragraphs, sections, and CTA all finish. */}
+          still in front of it.
+
+          Two nested wrappers so the two opacity sources don't fight
+          each other:
+            • Outer div holds the scroll-driven opacity (1 at the top
+              of the bio, 0 at the very end). Inline style wins because
+              nothing else writes opacity here.
+            • Inner div carries the `anim-fade-stage` mount fade-in
+              and the shared `viewTransitionName` for cross-page morph. */}
       <div
-        className="absolute pointer-events-none anim-fade-stage"
+        className="absolute pointer-events-none"
         style={{
           left: "calc(50% + 106.5px)",
           bottom: -1,
           width: 429,
           height: 429,
           transform: "translateX(-50%)",
-          viewTransitionName: "hero-illustration",
           zIndex: 10,
-          ["--stage" as string]: 13,
+          opacity: illustrationOpacity,
         }}
       >
-        <img
-          src="/assets/illustration-about.png"
-          alt=""
-          className="w-full h-full object-cover block"
-        />
+        <div
+          className="w-full h-full anim-fade-stage"
+          style={{
+            viewTransitionName: "hero-illustration",
+            ["--stage" as string]: 13,
+          }}
+        >
+          <img
+            src="/assets/illustration-about.png"
+            alt=""
+            className="w-full h-full object-cover block"
+          />
+        </div>
       </div>
 
       {/* Bio Section header — "You can call me Pari," + "Nice to meet you!" */}
@@ -774,7 +901,12 @@ function AboutMobile() {
             </div>
           </div>
 
-          {/* My Hobbies — 5 cols × 2 rows on mobile (Figma 312:1854). */}
+          {/* My Interests (Figma 478:4385 mobile) — two centred rows:
+              first row 5 items with 31.2 px gaps, second row 4 items
+              with 30.4 px gaps. Each item is 25.6 px wide with a
+              25.6 × 25.6 icon and a Solway Regular 8/12.8 label in
+              #7E7F85 beneath. Labels overflow the cell width and stay
+              centred (`whitespace-nowrap`). */}
           <div
             className="w-full flex flex-col items-start gap-[20px] shrink-0 anim-bubbly-grow"
             style={{
@@ -782,58 +914,77 @@ function AboutMobile() {
               ["--stage" as string]: 10,
             }}
           >
-            <SectionTitle>My Hobbies</SectionTitle>
+            <SectionTitle>My Interests</SectionTitle>
             <div
-              className="grid w-full"
-              style={{
-                gridTemplateColumns: "repeat(5, minmax(0, 1fr))",
-                rowGap: 12,
-                columnGap: 8,
-                justifyItems: "start",
-              }}
+              className="w-full flex flex-col items-center"
+              style={{ gap: 12 }}
             >
-              {HOBBY_ICONS.map((src, i) => (
-                <span
-                  key={src}
-                  className="relative shrink-0 inline-block anim-bubbly-grow"
-                  style={{
-                    width: 24,
-                    height: 24,
-                    ["--stage" as string]: 10 + i * 0.25,
-                  }}
-                  aria-hidden
-                >
-                  <img
-                    src={src}
-                    alt=""
-                    className="absolute inset-0 w-full h-full block"
-                  />
-                </span>
-              ))}
+              {[INTERESTS.slice(0, 5), INTERESTS.slice(5)].map(
+                (row, rowIdx) => (
+                  <div
+                    key={rowIdx}
+                    className="flex items-center"
+                    style={{ gap: rowIdx === 0 ? 31.2 : 30.4 }}
+                  >
+                    {row.map((interest, i) => (
+                      <span
+                        key={interest.label}
+                        className="shrink-0 inline-flex flex-col items-center anim-bubbly-grow"
+                        style={{
+                          width: 25.6,
+                          gap: 3.2,
+                          ["--stage" as string]:
+                            10 + (rowIdx * 5 + i) * 0.25,
+                        }}
+                      >
+                        <span
+                          className="relative shrink-0 inline-block"
+                          style={{ width: 25.6, height: 25.6 }}
+                          aria-hidden
+                        >
+                          <img
+                            src={interest.icon}
+                            alt=""
+                            className="absolute inset-0 w-full h-full block"
+                          />
+                        </span>
+                        <span
+                          className="shrink-0 whitespace-nowrap text-center"
+                          style={{
+                            fontFamily: SOLWAY,
+                            fontWeight: 400,
+                            fontSize: 8,
+                            lineHeight: "12.8px",
+                            letterSpacing: "0.4px",
+                            color: "#7E7F85",
+                          }}
+                        >
+                          {interest.label}
+                        </span>
+                      </span>
+                    ))}
+                  </div>
+                )
+              )}
             </div>
           </div>
 
-          {/* "MY WORK EXPERIENCES?" — single underline link CTA (Figma
-              312:1911). Drives the same view-transition as the desktop
-              MY EXPERIENCES button. */}
-          <Link
-            href="/work"
-            onClick={handleWorkClick}
-            className="w-full anim-bubbly-grow shrink-0 cursor-pointer"
-            style={{
-              fontFamily: SOLWAY,
-              fontWeight: 300,
-              fontSize: 16,
-              lineHeight: "28px",
-              color: "#1F2753",
-              textDecoration: "underline",
-              textDecorationStyle: "solid",
-              transformOrigin: "left center",
-              ["--stage" as string]: 12,
-            }}
-          >
-            MY WORK EXPERIENCES?
-          </Link>
+          {/* CTA — single secondary "MY EXPERIENCES" pill per Figma
+              478:4457 (mobile). Same component used on desktop so the
+              styling stays aligned across breakpoints. */}
+          <div className="w-full flex items-start shrink-0">
+            <span
+              className="anim-bubbly-grow flex-1 flex"
+              style={{ ["--stage" as string]: 12 }}
+            >
+              <CTAButton
+                href="/work"
+                iconSrc="/assets/icon-cta-work.svg"
+                label="MY EXPERIENCES"
+                variant="secondary"
+              />
+            </span>
+          </div>
         </div>
       </div>
     </div>

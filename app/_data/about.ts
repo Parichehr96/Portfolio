@@ -2,18 +2,46 @@ export type AcademicItem = {
   name: string;
   short: string;
   date: string;
+  /** External URL — when set, the row becomes a link (opens in a new
+   *  tab) and an external-link arrow renders between the short and the
+   *  dashed leader per Figma 302:2532 (node 319:2640 etc.). */
+  url?: string;
 };
 
 export const ACADEMIC: AcademicItem[] = [
-  { name: "Master Interaction Design", short: "HVA", date: "2025 - Present" },
-  { name: "Bachelor Industrial Design", short: "AUI", date: "2017 - 2022" },
+  {
+    name: "Master Interaction Design",
+    short: "HVA",
+    date: "2025 - Present",
+    url: "https://www.masterdigitaldesign.com/",
+  },
+  {
+    name: "Bachelor Industrial Design",
+    short: "AUI",
+    date: "2017 - 2022",
+    url: "https://www.aui.ac.ir",
+  },
 ];
 
 export const CERTIFICATES: AcademicItem[] = [
-  { name: "Typography", short: "Uxcel", date: "2025" },
-  { name: "GenAI for UX Designers", short: "Coursera", date: "2025" },
-  { name: "Google UX Design", short: "Coursera", date: "2024" },
-  { name: "Agile Project", short: "Coursera", date: "2022" },
+  {
+    name: "Typography",
+    short: "Uxcel",
+    date: "2025",
+    url: "https://app.uxcel.com/certificates/5AKU06K2NRCJ",
+  },
+  {
+    name: "Google UX Design",
+    short: "Coursera",
+    date: "2024",
+    url: "https://www.coursera.org/account/accomplishments/professional-cert/SLTKQ66UJJFG?utm_source=link&utm_medium=certificate&utm_content=cert_image&utm_campaign=sharing_cta&utm_product=prof",
+  },
+  {
+    name: "Agile Project",
+    short: "Coursera",
+    date: "2022",
+    url: "https://www.coursera.org/account/accomplishments/certificate/LJGFKFZA52AL",
+  },
 ];
 
 export const METHODES = [
@@ -39,15 +67,18 @@ export const SOFT_SKILLS = [
 
 export const TOOLS = ["Figma", "Miro", "Analytical softwares"];
 
-export const HOBBY_ICONS = [
-  "/assets/icon-hobby-fire-exit.svg",
-  "/assets/icon-hobby-boat.svg",
-  "/assets/icon-hobby-luggage.svg",
-  "/assets/icon-hobby-vinyl.svg",
-  "/assets/icon-hobby-puzzle.svg",
-  "/assets/icon-hobby-video-player.svg",
-  "/assets/icon-hobby-camera.svg",
-  "/assets/icon-hobby-chess.svg",
-  "/assets/icon-hobby-cheers.svg",
-  "/assets/icon-hobby-microphone.svg",
+/** "My Interests" row (Figma 302:2532 → 429:3596). Each entry renders
+ *  as a 32 × 32 icon with a Solway Regular 10/16 label beneath. Order
+ *  matches the Figma source; the dropped chess icon is no longer on
+ *  the canvas. */
+export const INTERESTS: { icon: string; label: string }[] = [
+  { icon: "/assets/icon-hobby-fire-exit.svg", label: "Exercise" },
+  { icon: "/assets/icon-hobby-boat.svg", label: "Ocean" },
+  { icon: "/assets/icon-hobby-luggage.svg", label: "Traveling" },
+  { icon: "/assets/icon-hobby-vinyl.svg", label: "Music" },
+  { icon: "/assets/icon-hobby-video-player.svg", label: "Movie" },
+  { icon: "/assets/icon-hobby-puzzle.svg", label: "Puzzles" },
+  { icon: "/assets/icon-hobby-cheers.svg", label: "Party" },
+  { icon: "/assets/icon-hobby-camera.svg", label: "Photography" },
+  { icon: "/assets/icon-hobby-microphone.svg", label: "Singing" },
 ];
