@@ -1,6 +1,5 @@
 "use client";
 
-import TopRightButtons from "../_components/TopRightButtons";
 import { useIsMobile } from "../_components/useIsMobile";
 import { fs } from "../_lib/typography";
 import {
@@ -154,35 +153,32 @@ function ContactDesktop() {
         {/* Bio Section header — stage 0 + 1 (top-left), with the
             stacked secondary buttons (theme + 1x) on the right per
             Figma 501:3782 / 501:3783. */}
-        <div className="w-full flex items-start gap-[20px]">
-          <div
-            className="flex-1 min-w-0 flex flex-col items-start gap-[12px] text-[var(--color-text-primary)]"
-            style={{ letterSpacing: "2px" }}
+        <div
+          className="w-full flex flex-col items-start gap-[12px] text-[var(--color-text-primary)]"
+          style={{ letterSpacing: "2px" }}
+        >
+          <p
+            className="w-full anim-bubbly-grow"
+            style={{
+              fontSize: fs(60),
+              lineHeight: "66px",
+              transformOrigin: "left center",
+              ["--stage" as string]: 0,
+            }}
           >
-            <p
-              className="w-full anim-bubbly-grow"
-              style={{
-                fontSize: fs(60),
-                lineHeight: "66px",
-                transformOrigin: "left center",
-                ["--stage" as string]: 0,
-              }}
-            >
-              Have something in mind?
-            </p>
-            <p
-              className="w-full anim-bubbly-grow"
-              style={{
-                fontSize: fs(32),
-                lineHeight: "40px",
-                transformOrigin: "left center",
-                ["--stage" as string]: 1,
-              }}
-            >
-              Let&rsquo;s talk about it.
-            </p>
-          </div>
-          <TopRightButtons stage={0.5} />
+            Have something in mind?
+          </p>
+          <p
+            className="w-full anim-bubbly-grow"
+            style={{
+              fontSize: fs(32),
+              lineHeight: "40px",
+              transformOrigin: "left center",
+              ["--stage" as string]: 1,
+            }}
+          >
+            Let&rsquo;s talk about it.
+          </p>
         </div>
 
         {/* Bio Container — stage 2 (mail/phone/social/CTA all bubble in

@@ -3,7 +3,9 @@
 import { useEffect, useLayoutEffect, useState } from "react";
 import { usePathname } from "next/navigation";
 import FloatingNav from "./FloatingNav";
+import TopRightButtons from "./TopRightButtons";
 import { IsMobileContext, MOBILE_BREAKPOINT } from "./useIsMobile";
+import { useShouldAnimate } from "./useShouldAnimate";
 
 const DESIGN_W = 1512;
 const DESIGN_H = 982;
@@ -68,6 +70,12 @@ export default function ScaledShell({
   // navigations keep this delay (it's already past at that point).
   const [navStartDelay] = useState(() => (pathname === "/" ? 1.7 : 0.6));
 
+  // True only on the very first paint of the session. Used to gate the
+  // first-time entrance animation for the persistent overlays —
+  // navigation between main pages keeps shouldAnimate=false so the
+  // FloatingNav and TopRightButtons stay completely static.
+  const shouldAnimate = useShouldAnimate();
+
   useIsomorphicLayoutEffect(() => {
     const apply = () => {
       const w = window.innerWidth;
@@ -120,6 +128,16 @@ export default function ScaledShell({
     );
   }
 
+  // First-session entrance for both persistent overlays (FloatingNav
+  // already gates its own pop-in via shouldAnimate; we mirror it here
+  // for the top-right buttons so they fade in once on the very first
+  // page of the session, then stay completely static across all
+  // subsequent navigations between Home/About/Work/Contact).
+  const topRightAnimClass = shouldAnimate ? "anim-fade-down" : "";
+  const topRightAnimStyle: React.CSSProperties = shouldAnimate
+    ? { animationDelay: `${navStartDelay}s`, animationDuration: "0.4s" }
+    : {};
+
   if (isMobile) {
     return (
       <IsMobileContext.Provider value={isMobile}>
@@ -140,6 +158,20 @@ export default function ScaledShell({
             }}
           >
             {children}
+
+            {/* Persistent top-right secondary buttons (theme + scale
+                picker). Mounted in the shell so they survive route
+                changes — no remount, no animation replay between
+                pages, and the scale dropdown can stay open across a
+                navigation. Position mirrors the mobile pt-24/px-16
+                page padding. z-30 keeps them above the FloatingNav
+                hover overlays. */}
+            <div
+              className={`absolute ${topRightAnimClass}`}
+              style={{ top: 24, right: 16, zIndex: 30, ...topRightAnimStyle }}
+            >
+              <TopRightButtons />
+            </div>
 
             {/* FloatingNav inside the canvas at the figma position
                 (left=4 so it sits 4 px from each edge of the 390-wide
@@ -177,6 +209,19 @@ export default function ScaledShell({
           }}
         >
           {children}
+
+          {/* Persistent top-right secondary buttons — same role as
+              FloatingNav: lives in the shell so navigating between
+              Home/About/Work/Contact never unmounts them. Position
+              matches the design's pt-80/px-120 padding (top=80,
+              right=120, button column 48-wide). z-30 sits above any
+              page content / hover overlays. */}
+          <div
+            className={`absolute ${topRightAnimClass}`}
+            style={{ top: 80, right: 120, zIndex: 30, ...topRightAnimStyle }}
+          >
+            <TopRightButtons />
+          </div>
 
           {/* Persistent floating nav at the canvas-relative position */}
           <div className="absolute" style={{ left: 565, top: 854 }}>

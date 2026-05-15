@@ -3,7 +3,6 @@
 import { useEffect, useRef, useState } from "react";
 import CTAButton from "../_components/CTAButton";
 import LinkExternalIcon from "../_components/LinkExternalIcon";
-import TopRightButtons from "../_components/TopRightButtons";
 import { useIsMobile } from "../_components/useIsMobile";
 import { fs } from "../_lib/typography";
 import {
@@ -369,40 +368,38 @@ function AboutDesktop() {
         />
       </div>
 
-      {/* Bio Section header — stage 0 (TL) + stage 1, with the stacked
-          secondary buttons (theme + 1x) pinned to the right edge of the
-          1272-wide row (Figma 501:3754 / 501:3755). */}
+      {/* Bio Section header — stage 0 (TL) + stage 1. The right-side
+          theme + scale buttons now live in ScaledShell so they
+          persist across navigation, freeing the title block to use
+          the full 1272-wide content area. */}
       <div
-        className="absolute left-[120px] top-[80px] flex items-start gap-[20px]"
+        className="absolute left-[120px] top-[80px] flex flex-col items-start gap-[12px]"
         style={{ width: 1272 }}
       >
-        <div className="flex-1 min-w-0 flex flex-col items-start gap-[12px]">
-          <p
-            className="w-full text-[var(--color-text-primary)] anim-bubbly-grow"
-            style={{
-              fontSize: fs(60),
-              lineHeight: "66px",
-              letterSpacing: "2px",
-              transformOrigin: "left center",
-              ["--stage" as string]: 0,
-            }}
-          >
-            You can call me Pari,
-          </p>
-          <p
-            className="w-full text-[var(--color-text-primary)] anim-bubbly-grow"
-            style={{
-              fontSize: fs(32),
-              lineHeight: "40px",
-              letterSpacing: "2px",
-              transformOrigin: "left center",
-              ["--stage" as string]: 1,
-            }}
-          >
-            Nice to meet you!
-          </p>
-        </div>
-        <TopRightButtons stage={0.5} />
+        <p
+          className="w-full text-[var(--color-text-primary)] anim-bubbly-grow"
+          style={{
+            fontSize: fs(60),
+            lineHeight: "66px",
+            letterSpacing: "2px",
+            transformOrigin: "left center",
+            ["--stage" as string]: 0,
+          }}
+        >
+          You can call me Pari,
+        </p>
+        <p
+          className="w-full text-[var(--color-text-primary)] anim-bubbly-grow"
+          style={{
+            fontSize: fs(32),
+            lineHeight: "40px",
+            letterSpacing: "2px",
+            transformOrigin: "left center",
+            ["--stage" as string]: 1,
+          }}
+        >
+          Nice to meet you!
+        </p>
       </div>
 
       {/* Bio Container — illustration on the left is the matching layer

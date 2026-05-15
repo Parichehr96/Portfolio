@@ -149,30 +149,17 @@ function ScaleButton() {
   );
 }
 
-export default function TopRightButtons({
-  stage,
-  align = "top",
-}: {
-  /** --stage value for the bubbly mount animation. Pass the same stage
-   *  the title row uses so the buttons pop in alongside it. */
-  stage: number;
-  /** Vertical alignment within the parent flex row. Defaults to "top"
-   *  so the buttons sit alongside the first title line; pass "center"
-   *  when wrapping a single tall title element (e.g. the home name). */
-  align?: "top" | "center";
-}) {
+/* Lifted into ScaledShell so the component never unmounts on
+   navigation between main pages — the dropdown can stay open across
+   route changes, and the buttons no longer replay any mount
+   animation each time the user clicks Home/About/Work/Contact. The
+   shell handles the first-session entrance fade. */
+export default function TopRightButtons() {
   const { theme, toggleTheme } = useTheme();
   const isDark = theme === "dark";
 
   return (
-    <div
-      className="shrink-0 flex flex-col items-start gap-[20px] anim-bubbly-grow"
-      style={{
-        justifyContent: align === "center" ? "center" : "flex-start",
-        transformOrigin: "right top",
-        ["--stage" as string]: stage,
-      }}
-    >
+    <div className="shrink-0 flex flex-col items-start gap-[20px]">
       <button
         type="button"
         onClick={toggleTheme}

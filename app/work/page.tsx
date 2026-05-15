@@ -8,7 +8,6 @@ import {
   useState,
 } from "react";
 import CTAButton from "../_components/CTAButton";
-import TopRightButtons from "../_components/TopRightButtons";
 import { useIsMobile } from "../_components/useIsMobile";
 import { fs } from "../_lib/typography";
 import {
@@ -349,37 +348,34 @@ function WorkDesktop() {
     <>
       <div className="absolute inset-0 flex flex-col items-center pt-[80px] pb-[40px] px-[120px] gap-[40px]">
         {/* Bio Section header (Figma 300:2203) — title is Solway 44/52
-            with no letter-spacing; subtitle is Solway 20/24 tracking 2px.
-            Title is whitespace-nowrap per the design. The stacked
-            secondary buttons (theme + 1x) sit on the right per Figma
-            501:3768 / 501:3769. */}
-        <div className="w-full flex items-start gap-[20px]">
-          <div className="flex-1 min-w-0 flex flex-col items-start gap-[12px] text-[var(--color-text-primary)]">
-            <p
-              className="w-full whitespace-nowrap anim-bubbly-grow"
-              style={{
-                fontSize: fs(44),
-                lineHeight: "52px",
-                transformOrigin: "left center",
-                ["--stage" as string]: 0,
-              }}
-            >
-              I&rsquo;m experienced in a range,
-            </p>
-            <p
-              className="w-full anim-bubbly-grow"
-              style={{
-                fontSize: fs(20),
-                lineHeight: "24px",
-                letterSpacing: "2px",
-                transformOrigin: "left center",
-                ["--stage" as string]: 1,
-              }}
-            >
-              confidently adapt to the context.
-            </p>
-          </div>
-          <TopRightButtons stage={0.5} />
+            with no letter-spacing; subtitle is Solway 20/24 tracking
+            2px. Title is whitespace-nowrap per the design. The
+            theme + scale buttons live in ScaledShell so they persist
+            across navigation. */}
+        <div className="w-full flex flex-col items-start gap-[12px] text-[var(--color-text-primary)]">
+          <p
+            className="w-full whitespace-nowrap anim-bubbly-grow"
+            style={{
+              fontSize: fs(44),
+              lineHeight: "52px",
+              transformOrigin: "left center",
+              ["--stage" as string]: 0,
+            }}
+          >
+            I&rsquo;m experienced in a range,
+          </p>
+          <p
+            className="w-full anim-bubbly-grow"
+            style={{
+              fontSize: fs(20),
+              lineHeight: "24px",
+              letterSpacing: "2px",
+              transformOrigin: "left center",
+              ["--stage" as string]: 1,
+            }}
+          >
+            confidently adapt to the context.
+          </p>
         </div>
 
         {/* Bio Container — preview frame on the left is the matching

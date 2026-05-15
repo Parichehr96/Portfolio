@@ -1,7 +1,6 @@
 "use client";
 
 import Link from "next/link";
-import TopRightButtons from "./_components/TopRightButtons";
 import { useIsMobile } from "./_components/useIsMobile";
 import { useViewTransitionRouter } from "./_lib/useViewTransitionRouter";
 import { fs } from "./_lib/typography";
@@ -77,27 +76,25 @@ function HomeDesktop() {
           className="w-full flex flex-col items-start gap-[20px] flex-1 min-h-px"
           style={{ color: "var(--color-text-primary)" }}
         >
-          {/* Name row — "Parichehr" + stacked secondary buttons (theme +
-              1x) on the right (Figma 497:3615 / 497:3627). */}
-          <div className="w-full flex items-start gap-[20px]">
-            {/* "Parichehr" — top-left, stage 0. Per Figma 488:4617 /
-                497:3737: 240/190 tracking-4px (the previous 16px
-                tracking + 260 px leading were carried over from an
-                older artboard). */}
-            <p
-              className="font-normal flex-1 min-w-0 anim-bubbly-grow"
-              style={{
-                fontSize: fs(240),
-                lineHeight: "190px",
-                letterSpacing: "4px",
-                transformOrigin: "left center",
-                ...STAGE(0),
-              }}
-            >
-              Parichehr
-            </p>
-            <TopRightButtons stage={0.5} align="center" />
-          </div>
+          {/* "Parichehr" — top-left, stage 0. Per Figma 488:4617 /
+              497:3737: 240/190 tracking-4px (the previous 16px
+              tracking + 260 px leading were carried over from an
+              older artboard). The right-side theme + scale buttons
+              now live in ScaledShell so they persist across
+              navigation; the page no longer needs to reserve space
+              for them. */}
+          <p
+            className="font-normal w-full anim-bubbly-grow"
+            style={{
+              fontSize: fs(240),
+              lineHeight: "190px",
+              letterSpacing: "4px",
+              transformOrigin: "left center",
+              ...STAGE(0),
+            }}
+          >
+            Parichehr
+          </p>
 
           {/* Profile info row (Figma 511:8022). Inline group:
               "Talebzadeh · Product Designer", all Solway Light 20/36
