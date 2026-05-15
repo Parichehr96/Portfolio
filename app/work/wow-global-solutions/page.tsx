@@ -14,6 +14,7 @@ import RequestImagesBlock from "./_components/RequestImagesBlock";
 import StakeholderDiagram from "./_components/StakeholderDiagram";
 import SystemBlock from "./_components/SystemBlock";
 import SystemSummaryBlock from "./_components/SystemSummaryBlock";
+import { fs } from "../../_lib/typography";
 
 /* WOW Global Solution case study (Figma 313:2747).
    Server Component — the only client island is the morphing
@@ -337,7 +338,7 @@ function Phase2HRModule() {
             color: NAVY,
             fontFamily: SOLWAY,
             fontWeight: 400,
-            fontSize: 16,
+            fontSize: fs(16),
             lineHeight: "24px",
             letterSpacing: "0.5px",
             listStyle: "disc",

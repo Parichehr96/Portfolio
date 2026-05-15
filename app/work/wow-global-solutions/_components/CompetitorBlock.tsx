@@ -1,4 +1,5 @@
 import { color, font } from "../../../_lib/tokens";
+import { fs } from "../../../_lib/typography";
 
 /* WOW HR module — competitor analysis block. Three product cards
    (BambooHR, Personio, Bob) on a cream backdrop with a heading row. */
@@ -72,7 +73,7 @@ function CompetitorCard({
             color: CREAM_LIGHTER,
             fontFamily: SOLWAY,
             fontWeight: 400,
-            fontSize: 28,
+            fontSize: fs(28),
             lineHeight: "36px",
           }}
         >
@@ -109,7 +110,7 @@ function CardField({
           color: GRAY_NAVY,
           fontFamily: SOLWAY,
           fontWeight: 400,
-          fontSize: 14,
+          fontSize: fs(14),
           lineHeight: "20px",
           letterSpacing: "0.25px",
         }}
@@ -124,7 +125,7 @@ function CardField({
               color: NAVY,
               fontFamily: SOLWAY,
               fontWeight: 700,
-              fontSize: 16,
+              fontSize: fs(16),
               lineHeight: "24px",
               letterSpacing: "0.15px",
             }}
@@ -138,7 +139,7 @@ function CardField({
             color: NAVY,
             fontFamily: SOLWAY,
             fontWeight: 500,
-            fontSize: 14,
+            fontSize: fs(14),
             lineHeight: "20px",
             letterSpacing: "0.1px",
           }}
@@ -179,7 +180,7 @@ export default function CompetitorBlock() {
             color: NAVY,
             fontFamily: SOLWAY,
             fontWeight: 400,
-            fontSize: 24,
+            fontSize: fs(24),
             lineHeight: "32px",
           }}
         >
@@ -190,7 +191,7 @@ export default function CompetitorBlock() {
             color: NAVY,
             fontFamily: SOLWAY,
             fontWeight: 400,
-            fontSize: 16,
+            fontSize: fs(16),
             lineHeight: "24px",
             letterSpacing: "0.15px",
           }}

@@ -20,6 +20,122 @@
   --ease-standard: cubic-bezier(0.4, 0, 0.2, 1);
 }
 
+/* === Theme tokens ===
+   Two themes: light (default) and dark. Themes are switched by
+   `data-theme="dark"` on <html> (set by the ThemeProvider, with a
+   pre-hydration inline script in the layout to avoid a flash).
+
+   Below we declare semantic CSS variables that pages and components
+   read (e.g. `var(--color-bg-page)`). Light values are declared on the
+   :root selector so they apply when no attribute is present; the
+   `[data-theme="dark"]` block overrides them when dark is active.
+
+   Components keep using the existing palette tokens (--color-navy,
+   --color-cream, ...) when the value should NOT change between
+   themes; semantic tokens are reserved for things that genuinely
+   swap (page background, primary text, nav backgrounds, etc.). */
+:root {
+  --color-bg-page: #FFFFFF;
+  --color-text-primary: #1F2753;
+  --color-text-secondary: #5A5D70;
+  --color-text-muted: #7E7F85;
+  --color-text-tagline: #1F2753;
+  --color-border-soft: #EDEAE4;
+  --color-secondary-button-text: #1B2249;
+  /* Floating nav. Active = navy fill + white-themed icon, inactive =
+     white pill (matches the cream Union backdrop) + navy-themed icon. */
+  --color-nav-active-bg: #1F2753;
+  --color-nav-inactive-bg: #FFFFFF;
+  --color-nav-pill-bg: #F9F5EB;
+  --color-nav-hover-overlay: rgba(31, 39, 83, 0.1);
+  /* Selected experience-row pill on /work — cream in light, navy
+     darker in dark so the pill still reads as "lifted" from the page. */
+  --color-experience-pill-bg: #F9F5EB;
+  --color-experience-pill-text: #111323;
+  /* Custom scroll indicator (used by About bio + Work mobile list).
+     Light: cream-dark track + navy-deep thumb. Dark per spec: navy-
+     light track + cream thumb. */
+  --color-scroll-track: #EDEAE4;
+  --color-scroll-thumb: #28315F;
+  /* Hover wash for outlined "secondary" pills (social buttons, etc.).
+     Light mode lays a 60% cream tint over the white card; dark mode
+     uses a translucent cream so the hover reads on the navy page
+     without producing the muddy white/cream crossfade the earlier
+     `bg-cream` ruleset gave us. */
+  --color-cream-hover-overlay: rgba(249, 245, 235, 0.6);
+  /* Hero illustration tint multiplier applied via filter. Dark theme
+     uses opacity 0.9 per Figma 488:4617 — implemented with `opacity`
+     on the image wrapper (set inline by pages that opt in). */
+  --hero-illustration-opacity: 1;
+  /* === Font-size scale ===
+     Three discrete scales applied as an additive px offset stamped
+     onto every `fontSize: fs(N)` style (which expands to
+     `calc(Npx + var(--fs-offset, 0px))`). The value is also "anchored"
+     by the `body { font-size: ... }` rule below — without an in-CSS
+     reference Lightning CSS treats the property as dead code and
+     strips the [data-scale] override blocks from the bundle. */
+  --fs-offset: 0px;
+}
+
+html[data-scale="2"] {
+  --fs-offset: 1px;
+}
+html[data-scale="3"] {
+  --fs-offset: 2px;
+}
+
+/* Anchor `--fs-offset`: a real CSS rule that references the variable
+   so Lightning CSS keeps it (and the [data-scale] overrides above)
+   live. Body font-size also inherits down into anything that
+   doesn't set its own — picking a small base means the scale is
+   visible even on text the fs() helper hasn't yet wrapped. */
+body {
+  font-size: calc(16px + var(--fs-offset, 0px));
+}
+
+/* === Themed-icon utility ===
+   Many SVGs in `/public/assets` ship as dark navy artwork drawn for a
+   light background (CTA glyphs, hobby icons, social pills, link-
+   external chevrons, etc.). On the dark navy page they would vanish
+   into the background, so add `themed-icon` to the wrapper around an
+   <img>: in dark mode the dark navy parts shift to a light blue that
+   matches the navigation icon palette, while warmer accent colours
+   move along with them so the icon still reads as one design.
+
+   How the chain works on a #1F2753 navy stroke:
+     1. `invert(1)`       — navy → cream/yellow (#E0D8AC)
+     2. `hue-rotate(180deg)` — cream/yellow → light blue (#ACB6E0)
+   Light mode is untouched (no filter), so the source SVG art stays
+   exact when the page is light. */
+[data-theme="dark"] .themed-icon img {
+  filter: invert(1) hue-rotate(180deg);
+}
+
+[data-theme="dark"] {
+  --color-bg-page: #1F2753;
+  --color-text-primary: #FFFFFF;
+  --color-text-secondary: #DDE0F1;
+  --color-text-muted: #DDE0F1;
+  --color-text-tagline: #FEFBF5;
+  --color-border-soft: #EDEAE4;
+  --color-secondary-button-text: #FFFFFF;
+  --color-nav-active-bg: #F9F5EB;
+  --color-nav-inactive-bg: #1B2249;
+  --color-nav-pill-bg: #1B2249;
+  --color-nav-hover-overlay: rgba(255, 255, 255, 0.08);
+  --color-experience-pill-bg: #28315F;
+  --color-experience-pill-text: #FFFFFF;
+  --color-scroll-track: #28315F;
+  --color-scroll-thumb: #F9F5EB;
+  --color-cream-hover-overlay: rgba(249, 245, 235, 0.12);
+  --hero-illustration-opacity: 0.9;
+  /* Override the nav-pill.svg's internal --fill-0 so its single path
+     repaints to the dark navy. The asset already declares
+     `fill="var(--fill-0, #F9F5EB)"`, so this value cascades into the
+     SVG and recolours the Union without swapping the asset. */
+  --fill-0: #1B2249;
+}
+
 /* === Custom cursor (Figma 457:8739) ===
    Replace the browser's default arrow with the navy `cursor-speed-1`
    icon site-wide on desktop. Applied via a universal selector with
@@ -33,6 +149,13 @@
   *::before,
   *::after {
     cursor: url("/assets/cursor.svg") 4 2, default !important;
+  }
+  /* Dark mode swaps the navy cursor for a cream copy of the same SVG
+     so the pointer stays visible on the navy page background. */
+  [data-theme="dark"] *,
+  [data-theme="dark"] *::before,
+  [data-theme="dark"] *::after {
+    cursor: url("/assets/cursor-cream.svg") 4 2, default !important;
   }
 }
 
@@ -208,14 +331,15 @@
    Three concurrent tracks during a route change between Home / About /
    Work / Contact:
 
-     1. MATCHING LAYER — hero illustration (move + scale, 1500 ms)
-        Each page's illustration carries `viewTransitionName:
-        "hero-illustration"`. Where the View Transitions API is
-        supported (Chrome, Edge, Safari 18+) the illustration physically
-        moves and scales between its start and end positions while its
-        OLD content fades out and the NEW content fades in inside the
-        same group — exactly the "scale and move where there are image
-        in both pages" behaviour.
+     1. MATCHING LAYER — hero illustration (move + scale, 900 ms)
+        Every main page's hero image — /, /about, /contact, AND /work's
+        project preview — carries `viewTransitionName: "hero-illustration"`.
+        Where the View Transitions API is supported (Chrome, Edge,
+        Safari 18+) the illustration physically moves and scales
+        between its start and end positions while its OLD content
+        fades out and the NEW content fades in inside the same group
+        — exactly the "smart-animate" morph between every pair of
+        main pages that have an image.
 
      2. NON-MATCHING ELEMENTS — old fades out (400 ms)
         Everything else on the OLD page (page-specific images, icons,
@@ -242,29 +366,21 @@
   opacity: 0;
 }
 
-/* Hero illustration morph: 900 ms is long enough to read the move +
-   scale clearly but short enough that it doesn't feel laggy. The
-   GROUP animates the box position/size; OLD and NEW animate their
-   content cross-fade in sync. */
+/* Hero illustration morph: long enough to read the move + scale as a
+   single fluid gesture. easeInOutQuart eases in AND out of both ends
+   so motion never snaps. Group (box position/size), old (fade-out),
+   and new (fade-in) all share the same curve and duration so the
+   cross-fade sits exactly on top of the morph — the picture reads as
+   one silky glide rather than two snapping snapshots. */
 ::view-transition-group(hero-illustration) {
-  animation-duration: 900ms;
-  animation-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+  animation-duration: 1200ms;
+  animation-timing-function: cubic-bezier(0.76, 0, 0.24, 1);
 }
 
 ::view-transition-old(hero-illustration),
 ::view-transition-new(hero-illustration) {
-  animation-duration: 900ms;
-  animation-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
-}
-
-/* Work preview gets its own group so it fades cleanly between /work
-   and the other main pages instead of cross-morphing with the person
-   illustration. */
-::view-transition-group(work-preview),
-::view-transition-old(work-preview),
-::view-transition-new(work-preview) {
-  animation-duration: 500ms;
-  animation-timing-function: ease-out;
+  animation-duration: 1200ms;
+  animation-timing-function: cubic-bezier(0.76, 0, 0.24, 1);
 }
 
 /* Hide native scrollbar entirely. The About bio area uses a custom

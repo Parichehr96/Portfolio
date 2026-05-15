@@ -1,6 +1,7 @@
 import Image from "next/image";
 import ScaleToFit from "../../../_components/case-study/ScaleToFit";
 import { color, font } from "../../../_lib/tokens";
+import { fs } from "../../../_lib/typography";
 
 /* WOW Figma 313:2841 — 908×800 cream-lighter container with two-column
    nested navy panels (Style Guide tab + Guides image left, two
@@ -61,7 +62,7 @@ export default function PhaseImageBlock() {
                   top: 28,
                   width: 204,
                   fontFamily: SOLWAY,
-                  fontSize: 32,
+                  fontSize: fs(32),
                   lineHeight: "40px",
                 }}
               >

@@ -1,6 +1,7 @@
 import Image from "next/image";
 import type React from "react";
 import { color, font } from "../../_lib/tokens";
+import { fs } from "../../_lib/typography";
 
 /* === Shared case-study body primitives ===
    These are the small building blocks used inside every long-form
@@ -17,11 +18,11 @@ export type SectionTitleSize = "xl" | "lg" | "md";
 
 const SECTION_TITLE_SIZES: Record<
   SectionTitleSize,
-  { fontSize: number; lineHeight: string; fontWeight: number }
+  { fontSize: string; lineHeight: string; fontWeight: number }
 > = {
-  xl: { fontSize: 32, lineHeight: "40px", fontWeight: 700 },
-  lg: { fontSize: 28, lineHeight: "36px", fontWeight: 700 },
-  md: { fontSize: 24, lineHeight: "32px", fontWeight: 700 },
+  xl: { fontSize: fs(32), lineHeight: "40px", fontWeight: 700 },
+  lg: { fontSize: fs(28), lineHeight: "36px", fontWeight: 700 },
+  md: { fontSize: fs(24), lineHeight: "32px", fontWeight: 700 },
 };
 
 export function SectionTitle({
@@ -46,7 +47,7 @@ const BODY_STYLE: React.CSSProperties = {
   color: NAVY,
   fontFamily: SOLWAY,
   fontWeight: 400,
-  fontSize: 16,
+  fontSize: fs(16),
   lineHeight: "24px",
   letterSpacing: "0.5px",
 };
@@ -77,7 +78,7 @@ export function ImageCaption({ children }: { children: React.ReactNode }) {
         color: NAVY,
         fontFamily: SOLWAY,
         fontWeight: 400,
-        fontSize: 14,
+        fontSize: fs(14),
         lineHeight: "20px",
         letterSpacing: "0.25px",
         textAlign: "left",
@@ -175,7 +176,7 @@ export function ReflectionBlock({
           color: NAVY_DARK,
           fontFamily: SOLWAY,
           fontWeight: 400,
-          fontSize: 22,
+          fontSize: fs(22),
           lineHeight: "28px",
         }}
       >

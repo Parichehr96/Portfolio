@@ -1,6 +1,8 @@
 "use client";
 
+import TopRightButtons from "../_components/TopRightButtons";
 import { useIsMobile } from "../_components/useIsMobile";
+import { fs } from "../_lib/typography";
 import {
   CALENDAR_URL,
   EMAIL,
@@ -39,7 +41,7 @@ const SOLWAY = "var(--font-solway), serif";
 
 function ExternalChevronIcon() {
   return (
-    <span className="relative shrink-0 inline-flex items-center justify-center w-[24px] h-[24px]">
+    <span className="themed-icon relative shrink-0 inline-flex items-center justify-center w-[24px] h-[24px]">
       <img
         src="/assets/icon-link-external.svg"
         alt=""
@@ -51,25 +53,35 @@ function ExternalChevronIcon() {
   );
 }
 
+/* Secondary-button-style social pill (Figma 516:8115 etc.). Fixed
+   86.4 × 76.8 outline pill with a 28.8 × 28.8 themed icon and a 1.92 px
+   cream-dark border. Hover applies a single cream wash via the
+   shared `--color-cream-hover-overlay` token so it reads cleanly on
+   both themes. */
+const SOCIAL_PILL_W = 86.4;
+const SOCIAL_PILL_H = 76.8;
+const SOCIAL_PILL_ICON = 28.8;
+const SOCIAL_PILL_BORDER = 1.92;
+
 function SocialPill({ social }: { social: Social }) {
   const baseClass =
-    "flex-1 min-w-0 flex items-center justify-center rounded-[100px] border-2 border-solid border-[#EDEAE4] bg-white transition-colors duration-200";
-  const interactive = "hover:bg-[#F9F5EB]";
-  // 40 × 40 inner wrapper, with the SVG rendered at its intrinsic
-  // viewBox size and centered. Result matches Figma's nested-inset
-  // composition pixel-for-pixel without hand-tuned per-icon CSS.
-  // Per-icon `verticalNudge` (translateY %) compensates for SVGs
-  // whose visible glyph isn't centered in their viewBox (Medium).
+    "shrink-0 flex items-center justify-center rounded-[122px] border-solid bg-transparent transition-colors duration-200";
+  const interactive =
+    "hover:bg-[var(--color-cream-hover-overlay)] cursor-pointer";
+  // 28.8 × 28.8 inner wrapper — the source SVGs were authored for a
+  // 40 px viewBox so each per-icon `iconWidth/iconHeight` is scaled
+  // down by 28.8/40 before being rendered. `themed-icon` swaps the
+  // navy artwork to the cream/blue dark-mode variant.
   const inner = (
     <span
-      className="relative shrink-0 inline-flex items-center justify-center"
-      style={{ width: 40, height: 40 }}
+      className="themed-icon relative shrink-0 inline-flex items-center justify-center"
+      style={{ width: SOCIAL_PILL_ICON, height: SOCIAL_PILL_ICON }}
     >
       <img
         src={social.src}
         alt=""
-        width={social.iconWidth}
-        height={social.iconHeight}
+        width={social.iconWidth * (SOCIAL_PILL_ICON / 40)}
+        height={social.iconHeight * (SOCIAL_PILL_ICON / 40)}
         className="block"
         style={
           social.verticalNudge
@@ -80,19 +92,20 @@ function SocialPill({ social }: { social: Social }) {
     </span>
   );
 
+  const style: React.CSSProperties = {
+    width: SOCIAL_PILL_W,
+    height: SOCIAL_PILL_H,
+    paddingLeft: 28.8,
+    paddingRight: 28.8,
+    paddingTop: 14.4,
+    paddingBottom: 14.4,
+    borderWidth: SOCIAL_PILL_BORDER,
+    borderColor: "var(--color-border-soft)",
+  };
+
   if (!social.href) {
     return (
-      <span
-        aria-label={social.alt}
-        className={baseClass}
-        style={{
-          height: 88,
-          paddingLeft: 2,
-          paddingRight: 2,
-          paddingTop: 12,
-          paddingBottom: 12,
-        }}
-      >
+      <span aria-label={social.alt} className={baseClass} style={style}>
         {inner}
       </span>
     );
@@ -105,13 +118,7 @@ function SocialPill({ social }: { social: Social }) {
       rel="noopener noreferrer"
       aria-label={social.alt}
       className={`${baseClass} ${interactive}`}
-      style={{
-        height: 88,
-        paddingLeft: 2,
-        paddingRight: 2,
-        paddingTop: 12,
-        paddingBottom: 12,
-      }}
+      style={style}
     >
       {inner}
     </a>
@@ -132,6 +139,7 @@ function ContactDesktop() {
           height: 816,
           transform: "translateX(-50%)",
           viewTransitionName: "hero-illustration",
+          opacity: "var(--hero-illustration-opacity)",
         }}
       >
         <img
@@ -143,33 +151,38 @@ function ContactDesktop() {
 
       {/* Page layout */}
       <div className="absolute inset-0 flex flex-col items-center pt-[80px] pb-[40px] px-[120px] gap-[80px]">
-        {/* Bio Section header — stage 0 + 1 (top-left) */}
-        <div
-          className="w-full flex flex-col items-start gap-[12px] text-[#1F2753]"
-          style={{ letterSpacing: "2px" }}
-        >
-          <p
-            className="w-full anim-bubbly-grow"
-            style={{
-              fontSize: 60,
-              lineHeight: "66px",
-              transformOrigin: "left center",
-              ["--stage" as string]: 0,
-            }}
+        {/* Bio Section header — stage 0 + 1 (top-left), with the
+            stacked secondary buttons (theme + 1x) on the right per
+            Figma 501:3782 / 501:3783. */}
+        <div className="w-full flex items-start gap-[20px]">
+          <div
+            className="flex-1 min-w-0 flex flex-col items-start gap-[12px] text-[var(--color-text-primary)]"
+            style={{ letterSpacing: "2px" }}
           >
-            Have something in mind?
-          </p>
-          <p
-            className="w-full anim-bubbly-grow"
-            style={{
-              fontSize: 32,
-              lineHeight: "40px",
-              transformOrigin: "left center",
-              ["--stage" as string]: 1,
-            }}
-          >
-            Let&rsquo;s talk about it.
-          </p>
+            <p
+              className="w-full anim-bubbly-grow"
+              style={{
+                fontSize: fs(60),
+                lineHeight: "66px",
+                transformOrigin: "left center",
+                ["--stage" as string]: 0,
+              }}
+            >
+              Have something in mind?
+            </p>
+            <p
+              className="w-full anim-bubbly-grow"
+              style={{
+                fontSize: fs(32),
+                lineHeight: "40px",
+                transformOrigin: "left center",
+                ["--stage" as string]: 1,
+              }}
+            >
+              Let&rsquo;s talk about it.
+            </p>
+          </div>
+          <TopRightButtons stage={0.5} />
         </div>
 
         {/* Bio Container — stage 2 (mail/phone/social/CTA all bubble in
@@ -196,9 +209,9 @@ function ContactDesktop() {
             }}
           >
             <p
-              className="text-[#5A5D70] whitespace-nowrap"
+              className="text-[var(--color-text-secondary)] whitespace-nowrap"
               style={{
-                fontSize: 16,
+                fontSize: fs(16),
                 lineHeight: "24px",
                 letterSpacing: "0.15px",
               }}
@@ -211,8 +224,8 @@ function ContactDesktop() {
               className="inline-flex items-center cursor-pointer hover:opacity-70 transition-opacity duration-200"
             >
               <span
-                className="text-[#1F2753] whitespace-nowrap"
-                style={{ fontSize: 20, lineHeight: "28px" }}
+                className="text-[var(--color-text-primary)] whitespace-nowrap"
+                style={{ fontSize: fs(20), lineHeight: "28px" }}
               >
                 {EMAIL}
               </span>
@@ -231,9 +244,9 @@ function ContactDesktop() {
           >
             <div className="shrink-0 flex flex-col items-start gap-[8px] whitespace-nowrap">
               <p
-                className="text-[#5A5D70]"
+                className="text-[var(--color-text-secondary)]"
                 style={{
-                  fontSize: 16,
+                  fontSize: fs(16),
                   lineHeight: "24px",
                   letterSpacing: "0.15px",
                 }}
@@ -241,8 +254,8 @@ function ContactDesktop() {
                 Text me
               </p>
               <p
-                className="text-[#1F2753]"
-                style={{ fontSize: 20, lineHeight: "28px" }}
+                className="text-[var(--color-text-primary)]"
+                style={{ fontSize: fs(20), lineHeight: "28px" }}
               >
                 {PHONE_DISPLAY}
               </p>
@@ -255,9 +268,9 @@ function ContactDesktop() {
               className="shrink-0 inline-flex items-center cursor-pointer hover:opacity-70 transition-opacity duration-200"
             >
               <span
-                className="text-[#1F2753] whitespace-nowrap"
+                className="text-[var(--color-text-primary)] whitespace-nowrap"
                 style={{
-                  fontSize: 16,
+                  fontSize: fs(16),
                   lineHeight: "24px",
                   letterSpacing: "0.15px",
                 }}
@@ -278,20 +291,24 @@ function ContactDesktop() {
             }}
           >
             <p
-              className="w-full text-[#5A5D70]"
+              className="w-full text-[var(--color-text-secondary)]"
               style={{
-                fontSize: 16,
+                fontSize: fs(16),
                 lineHeight: "24px",
                 letterSpacing: "0.15px",
               }}
             >
               Stay with me
             </p>
-            <div className="w-full flex items-start gap-[32px]">
+            {/* Fixed-width 72 × 64 secondary buttons (Figma 516:8115)
+                in a gap-32 row. Each `<span>` wrapper just carries the
+                stage so SocialPill itself doesn't have to know about
+                animation timing. */}
+            <div className="flex items-start gap-[32px]">
               {SOCIALS.map((s, i) => (
                 <span
                   key={s.alt}
-                  className="anim-bubbly-grow flex-1 flex"
+                  className="anim-bubbly-grow shrink-0 flex"
                   style={{ ["--stage" as string]: 4 + (i + 1) * 0.3 }}
                 >
                   <SocialPill social={s} />
@@ -307,11 +324,11 @@ function ContactDesktop() {
             target="_blank"
             rel="noopener noreferrer"
             aria-label="Book a time slot"
-            className="w-full text-[#1F2753] shrink-0 block cursor-pointer hover:opacity-70 transition-opacity duration-200 anim-bubbly-grow"
+            className="w-full text-[var(--color-text-primary)] shrink-0 block cursor-pointer hover:opacity-70 transition-opacity duration-200 anim-bubbly-grow"
             style={{
               fontFamily: SOLWAY,
               fontWeight: 300,
-              fontSize: 16,
+              fontSize: fs(16),
               lineHeight: "28px",
               textDecorationLine: "underline",
               textDecorationStyle: "solid",
@@ -346,10 +363,10 @@ function MobileSocialPill({ social }: { social: Social }) {
   // viewport gets narrow. Inner icon is 24 × 24, scaled from the
   // SVG's intrinsic 40 × 40 viewBox.
   const baseClass =
-    "flex-1 min-w-0 flex items-center justify-center bg-white transition-colors duration-200";
+    "flex-1 min-w-0 flex items-center justify-center bg-transparent transition-colors duration-200";
   const inner = (
     <span
-      className="relative shrink-0 inline-flex items-center justify-center"
+      className="themed-icon relative shrink-0 inline-flex items-center justify-center"
       style={{ width: 24, height: 24 }}
     >
       <img
@@ -372,7 +389,7 @@ function MobileSocialPill({ social }: { social: Social }) {
     paddingTop: 20,
     paddingBottom: 20,
     borderRadius: 122,
-    border: "0.72px solid #EDEAE4",
+    border: "0.72px solid var(--color-border-soft)",
   };
   if (!social.href) {
     return (
@@ -387,7 +404,7 @@ function MobileSocialPill({ social }: { social: Social }) {
       target="_blank"
       rel="noopener noreferrer"
       aria-label={social.alt}
-      className={`${baseClass} hover:bg-[#F9F5EB]`}
+      className={`${baseClass} hover:bg-[var(--color-cream-hover-overlay)]`}
       style={style}
     >
       {inner}
@@ -397,7 +414,7 @@ function MobileSocialPill({ social }: { social: Social }) {
 
 function ExternalChevronIconSmall() {
   return (
-    <span className="relative shrink-0 inline-flex items-center justify-center w-[24px] h-[24px]">
+    <span className="themed-icon relative shrink-0 inline-flex items-center justify-center w-[24px] h-[24px]">
       <img
         src="/assets/icon-link-external.svg"
         alt=""
@@ -413,11 +430,11 @@ function ContactMobile() {
   return (
     <div className="absolute inset-0 flex flex-col items-center pt-[64px] pb-[120px] px-[16px] gap-[40px]">
       {/* Title section */}
-      <div className="w-full flex flex-col items-start gap-[8px] shrink-0 text-[#1F2753]">
+      <div className="w-full flex flex-col items-start gap-[8px] shrink-0 text-[var(--color-text-primary)]">
         <p
           className="w-full anim-bubbly-grow"
           style={{
-            fontSize: 32,
+            fontSize: fs(32),
             lineHeight: "40px",
             transformOrigin: "left center",
             ["--stage" as string]: 0,
@@ -428,7 +445,7 @@ function ContactMobile() {
         <p
           className="w-full anim-bubbly-grow"
           style={{
-            fontSize: 16,
+            fontSize: fs(16),
             lineHeight: "20px",
             transformOrigin: "left center",
             ["--stage" as string]: 1,
@@ -450,9 +467,9 @@ function ContactMobile() {
           }}
         >
           <p
-            className="w-full text-[#5A5D70] whitespace-nowrap"
+            className="w-full text-[var(--color-text-secondary)] whitespace-nowrap"
             style={{
-              fontSize: 14,
+              fontSize: fs(14),
               lineHeight: "24px",
               letterSpacing: "0.15px",
             }}
@@ -465,9 +482,9 @@ function ContactMobile() {
             className="inline-flex items-center cursor-pointer hover:opacity-70 transition-opacity duration-200"
           >
             <span
-              className="text-[#1F2753] whitespace-nowrap"
+              className="text-[var(--color-text-primary)] whitespace-nowrap"
               style={{
-                fontSize: 16,
+                fontSize: fs(16),
                 lineHeight: "24px",
                 letterSpacing: "0.5px",
               }}
@@ -489,9 +506,9 @@ function ContactMobile() {
         >
           <div className="shrink-0 flex flex-col items-start gap-[8px] whitespace-nowrap">
             <p
-              className="text-[#5A5D70]"
+              className="text-[var(--color-text-secondary)]"
               style={{
-                fontSize: 14,
+                fontSize: fs(14),
                 lineHeight: "24px",
                 letterSpacing: "0.15px",
               }}
@@ -499,9 +516,9 @@ function ContactMobile() {
               Text me
             </p>
             <p
-              className="text-[#1F2753]"
+              className="text-[var(--color-text-primary)]"
               style={{
-                fontSize: 16,
+                fontSize: fs(16),
                 lineHeight: "24px",
                 letterSpacing: "0.5px",
               }}
@@ -517,9 +534,9 @@ function ContactMobile() {
             className="shrink-0 inline-flex items-center cursor-pointer hover:opacity-70 transition-opacity duration-200"
           >
             <span
-              className="text-[#1F2753] whitespace-nowrap"
+              className="text-[var(--color-text-primary)] whitespace-nowrap"
               style={{
-                fontSize: 16,
+                fontSize: fs(16),
                 lineHeight: "24px",
                 letterSpacing: "0.5px",
               }}
@@ -539,9 +556,9 @@ function ContactMobile() {
           }}
         >
           <p
-            className="w-full text-[#5A5D70]"
+            className="w-full text-[var(--color-text-secondary)]"
             style={{
-              fontSize: 14,
+              fontSize: fs(14),
               lineHeight: "24px",
               letterSpacing: "0.15px",
             }}
@@ -570,11 +587,11 @@ function ContactMobile() {
           target="_blank"
           rel="noopener noreferrer"
           aria-label="Book a time slot"
-          className="w-full text-[#1F2753] cursor-pointer hover:opacity-70 transition-opacity duration-200 anim-bubbly-grow"
+          className="w-full text-[var(--color-text-primary)] cursor-pointer hover:opacity-70 transition-opacity duration-200 anim-bubbly-grow"
           style={{
             fontFamily: SOLWAY,
             fontWeight: 300,
-            fontSize: 16,
+            fontSize: fs(16),
             lineHeight: "28px",
             textDecorationLine: "underline",
             textDecorationStyle: "solid",

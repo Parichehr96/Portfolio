@@ -8,6 +8,7 @@ import {
   SectionTitle,
 } from "../../_components/case-study/CaseStudyBody";
 import ResearchDiagram from "./_research-diagram";
+import { fs } from "../../_lib/typography";
 
 /* Challenquiz case study (Figma 313:3079).
    Header is the shared CaseStudyHeader; body sections below are
@@ -456,7 +457,7 @@ export default function ChallenquizCaseStudy() {
               gap: 12,
               fontFamily: SOLWAY,
               color: NAVY,
-              fontSize: 16,
+              fontSize: fs(16),
               lineHeight: "24px",
               letterSpacing: "0.5px",
             }}

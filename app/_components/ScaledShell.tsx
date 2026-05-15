@@ -109,8 +109,10 @@ export default function ScaledShell({
     return (
       <IsMobileContext.Provider value={isMobile}>
         <div
-          className="bg-white"
-          style={{ fontFamily: "var(--font-solway), serif" }}
+          style={{
+            fontFamily: "var(--font-solway), serif",
+            backgroundColor: "var(--color-bg-page)",
+          }}
         >
           {children}
         </div>
@@ -121,7 +123,10 @@ export default function ScaledShell({
   if (isMobile) {
     return (
       <IsMobileContext.Provider value={isMobile}>
-        <div className="fixed inset-0 overflow-hidden bg-white">
+        <div
+          className="fixed inset-0 overflow-hidden"
+          style={{ backgroundColor: "var(--color-bg-page)" }}
+        >
           <div
             className="absolute"
             style={{
@@ -155,7 +160,10 @@ export default function ScaledShell({
 
   return (
     <IsMobileContext.Provider value={isMobile}>
-      <div className="fixed inset-0 overflow-hidden bg-white">
+      <div
+        className="fixed inset-0 overflow-hidden"
+        style={{ backgroundColor: "var(--color-bg-page)" }}
+      >
         <div
           className="absolute"
           style={{

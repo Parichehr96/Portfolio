@@ -8,7 +8,9 @@ import {
   useState,
 } from "react";
 import CTAButton from "../_components/CTAButton";
+import TopRightButtons from "../_components/TopRightButtons";
 import { useIsMobile } from "../_components/useIsMobile";
+import { fs } from "../_lib/typography";
 import {
   EXPERIENCES,
   EXPERIENCE_SECTIONS,
@@ -23,7 +25,9 @@ import {
      - "confidently adapt to the context." Solway Regular 20/24 tracking-2 navy
    Bio Container (h=665, gap-40, pb-80):
      - Project preview frame on the LEFT (h-full aspect-square,
-       viewTransitionName matches the home/about/contact hero)
+       viewTransitionName "hero-illustration" — shared with the
+       home/about/contact hero so the image morphs across all four
+       main pages instead of just cross-fading)
      - Text and Experiences Container on the RIGHT (flex-1, gap-32):
        · "My Experiences" Solway Medium 20/26
        · 9 experience rows. The selected row renders a cream pill
@@ -73,8 +77,16 @@ const ROW_TRANSITION = [
   `transform ${T}ms ${BUBBLY}`,
   `opacity ${T}ms ${SMOOTH}`,
 ].join(", ");
+// `font-size` is intentionally omitted from this list: every fontSize
+// on the page resolves through `fs(N)` to `calc(Npx + var(--fs-offset))`,
+// and Chrome will not re-fire a `transition: font-size` when only the
+// inherited custom property changes — the transition machinery sees an
+// unchanged `calc()` expression and stalls the update, so the user's
+// 3x click appeared to do nothing on /work. Dropping the font-size
+// transition lets the new size apply instantly while the rest of the
+// hover bubble (line-height, letter-spacing, font-weight, padding,
+// gap, scale, opacity) still animates.
 const TEXT_TRANSITION = [
-  `font-size ${T}ms ${BUBBLY}`,
   `line-height ${T}ms ${BUBBLY}`,
   `letter-spacing ${T}ms ${BUBBLY}`,
   `font-weight ${T}ms ${BUBBLY}`,
@@ -115,7 +127,7 @@ function ExternalLinkIcon({
   if (!interactive) {
     return (
       <span
-        className="shrink-0 inline-block relative"
+        className="themed-icon shrink-0 inline-block relative"
         style={{ width: 20, height: 20 }}
         aria-hidden
       >
@@ -136,7 +148,7 @@ function ExternalLinkIcon({
       onClick={stop}
       onMouseDown={stop}
       aria-label={`Open ${label} on Behance`}
-      className="shrink-0 inline-block relative cursor-pointer hover:opacity-80 transition-opacity duration-200"
+      className="themed-icon shrink-0 inline-block relative cursor-pointer hover:opacity-80 transition-opacity duration-200"
       style={{ width: 20, height: 20 }}
     >
       <img
@@ -165,8 +177,8 @@ function ExperienceRow({
   // continuously — the cream pill bubbles in/out smoothly when the user
   // hovers between rows. Final values are exact Figma values, so every
   // resting hover state is still pixel-perfect.
-  const selectedColor = "#111323";
-  const unselectedColor = "#1B2249";
+  const selectedColor = "var(--color-experience-pill-text)";
+  const unselectedColor = "var(--color-text-primary)";
   const nameColor = selected ? selectedColor : unselectedColor;
   const dateColor = selected ? selectedColor : unselectedColor;
   const dateText = selected ? item.date : yearsOnly(item.date);
@@ -180,7 +192,9 @@ function ExperienceRow({
         paddingRight: selected ? 24 : 0,
         paddingTop: selected ? 12 : 0,
         paddingBottom: selected ? 12 : 0,
-        backgroundColor: selected ? "#F9F5EB" : "transparent",
+        backgroundColor: selected
+          ? "var(--color-experience-pill-bg)"
+          : "transparent",
         borderRadius: selected ? 122 : 0,
         // Subtle scale pop — the unselected state sits at 0.97, and
         // becoming selected springs it up to 1.0 via the BUBBLY curve,
@@ -199,7 +213,7 @@ function ExperienceRow({
           style={{
             fontFamily: SOLWAY,
             fontWeight: 400,
-            fontSize: selected ? 22 : 14,
+            fontSize: fs(selected ? 22 : 14),
             lineHeight: selected ? "28px" : "20px",
             letterSpacing: selected ? "0px" : "0.25px",
             color: nameColor,
@@ -240,7 +254,7 @@ function ExperienceRow({
         style={{
           fontFamily: SOLWAY,
           fontWeight: selected ? 400 : 500,
-          fontSize: selected ? 16 : 12,
+          fontSize: fs(selected ? 16 : 12),
           lineHeight: selected ? "24px" : "16px",
           letterSpacing: "0.5px",
           color: dateColor,
@@ -333,34 +347,39 @@ function WorkDesktop() {
 
   return (
     <>
-      <div className="absolute inset-0 flex flex-col items-center pt-[80px] pb-[40px] px-[120px] gap-[80px]">
+      <div className="absolute inset-0 flex flex-col items-center pt-[80px] pb-[40px] px-[120px] gap-[40px]">
         {/* Bio Section header (Figma 300:2203) — title is Solway 44/52
             with no letter-spacing; subtitle is Solway 20/24 tracking 2px.
-            Title is whitespace-nowrap per the design. */}
-        <div className="w-full flex flex-col items-start gap-[12px] text-[#1F2753]">
-          <p
-            className="w-full whitespace-nowrap anim-bubbly-grow"
-            style={{
-              fontSize: 44,
-              lineHeight: "52px",
-              transformOrigin: "left center",
-              ["--stage" as string]: 0,
-            }}
-          >
-            I&rsquo;m experienced in a range,
-          </p>
-          <p
-            className="w-full anim-bubbly-grow"
-            style={{
-              fontSize: 20,
-              lineHeight: "24px",
-              letterSpacing: "2px",
-              transformOrigin: "left center",
-              ["--stage" as string]: 1,
-            }}
-          >
-            confidently adapt to the context.
-          </p>
+            Title is whitespace-nowrap per the design. The stacked
+            secondary buttons (theme + 1x) sit on the right per Figma
+            501:3768 / 501:3769. */}
+        <div className="w-full flex items-start gap-[20px]">
+          <div className="flex-1 min-w-0 flex flex-col items-start gap-[12px] text-[var(--color-text-primary)]">
+            <p
+              className="w-full whitespace-nowrap anim-bubbly-grow"
+              style={{
+                fontSize: fs(44),
+                lineHeight: "52px",
+                transformOrigin: "left center",
+                ["--stage" as string]: 0,
+              }}
+            >
+              I&rsquo;m experienced in a range,
+            </p>
+            <p
+              className="w-full anim-bubbly-grow"
+              style={{
+                fontSize: fs(20),
+                lineHeight: "24px",
+                letterSpacing: "2px",
+                transformOrigin: "left center",
+                ["--stage" as string]: 1,
+              }}
+            >
+              confidently adapt to the context.
+            </p>
+          </div>
+          <TopRightButtons stage={0.5} />
         </div>
 
         {/* Bio Container — preview frame on the left is the matching
@@ -378,14 +397,17 @@ function WorkDesktop() {
         >
           {/* Project preview column — image on top + name/company/industry
               line + description (Figma 302:2375). The frame's
-              `viewTransitionName: work-preview` fades cleanly between
-              /work and the other main pages. The metadata + description
-              swap with the currently-hovered experience via React state. */}
+              `viewTransitionName: hero-illustration` is shared with the
+              hero illustrations on /, /about, /contact so the picture
+              physically morphs (move + scale + content cross-fade)
+              between Work and any other main page instead of just
+              disappearing/appearing. The metadata + description swap
+              with the currently-hovered experience via React state. */}
           <div className="h-full aspect-square shrink-0 flex flex-col gap-[12px] py-[8px] overflow-hidden">
             <div
               className="relative w-full overflow-hidden"
               style={{
-                viewTransitionName: "work-preview",
+                viewTransitionName: "hero-illustration",
                 aspectRatio: "1 / 1",
                 flex: "0 1 auto",
                 minHeight: 0,
@@ -419,10 +441,10 @@ function WorkDesktop() {
                         style={{
                           fontFamily: SOLWAY,
                           fontWeight: 300,
-                          fontSize: 16,
+                          fontSize: fs(16),
                           lineHeight: "24px",
                           letterSpacing: "0.15px",
-                          color: "#1B2249",
+                          color: "var(--color-text-primary)",
                         }}
                       >
                         {currentExperience.industry}
@@ -432,10 +454,10 @@ function WorkDesktop() {
                         style={{
                           fontFamily: SOLWAY,
                           fontWeight: 400,
-                          fontSize: 16,
+                          fontSize: fs(16),
                           lineHeight: "24px",
                           letterSpacing: "0.15px",
-                          color: "#1B2249",
+                          color: "var(--color-text-primary)",
                         }}
                       >
                         ·
@@ -447,10 +469,10 @@ function WorkDesktop() {
                     style={{
                       fontFamily: SOLWAY,
                       fontWeight: 300,
-                      fontSize: 14,
+                      fontSize: fs(14),
                       lineHeight: "24px",
                       letterSpacing: "0.15px",
-                      color: "#7E7F85",
+                      color: "var(--color-text-muted)",
                     }}
                   >
                     {currentExperience.short}
@@ -466,10 +488,10 @@ function WorkDesktop() {
                     style={{
                       fontFamily: SOLWAY,
                       fontWeight: 400,
-                      fontSize: 16,
+                      fontSize: fs(16),
                       lineHeight: "24px",
                       letterSpacing: "0.5px",
-                      color: "#1F2753",
+                      color: "var(--color-text-primary)",
                       animationDuration: "400ms",
                     }}
                   >
@@ -520,10 +542,10 @@ function WorkDesktop() {
                         style={{
                           fontFamily: SOLWAY,
                           fontWeight: 400,
-                          fontSize: 16,
+                          fontSize: fs(16),
                           lineHeight: "24px",
                           letterSpacing: "0.15px",
-                          color: "#111323",
+                          color: "var(--color-text-primary)",
                           transformOrigin: "left center",
                           ["--stage" as string]: headerStage,
                         }}
@@ -610,7 +632,7 @@ function ChevronLeftIcon({ size = 24 }: { size?: number }) {
     >
       <path
         d="M15 6L9 12L15 18"
-        stroke="#111323"
+        stroke="currentColor"
         strokeWidth="1.5"
         strokeLinecap="round"
         strokeLinejoin="round"
@@ -632,7 +654,7 @@ function ChevronRightIcon({ size = 24 }: { size?: number }) {
     >
       <path
         d="M9 6L15 12L9 18"
-        stroke="#111323"
+        stroke="currentColor"
         strokeWidth="1.5"
         strokeLinecap="round"
         strokeLinejoin="round"
@@ -733,8 +755,9 @@ function WorkMobile() {
 
   return (
     <div
-      className="absolute inset-0 flex flex-col items-center bg-white"
+      className="absolute inset-0 flex flex-col items-center"
       style={{
+        backgroundColor: "var(--color-bg-page)",
         paddingLeft: 16,
         paddingRight: 16,
         paddingTop: 32,
@@ -758,9 +781,9 @@ function WorkMobile() {
           style={{
             fontFamily: SOLWAY,
             fontWeight: 400,
-            fontSize: 22,
+            fontSize: fs(22),
             lineHeight: "28px",
-            color: "#1F2753",
+            color: "var(--color-text-primary)",
             transformOrigin: "left center",
             ["--stage" as string]: 0,
           }}
@@ -772,10 +795,10 @@ function WorkMobile() {
           style={{
             fontFamily: SOLWAY,
             fontWeight: 400,
-            fontSize: 14,
+            fontSize: fs(14),
             lineHeight: "20px",
             letterSpacing: "0.25px",
-            color: "#1F2753",
+            color: "var(--color-text-primary)",
             transformOrigin: "left center",
             ["--stage" as string]: 0.4,
           }}
@@ -815,10 +838,10 @@ function WorkMobile() {
             style={{
               fontFamily: SOLWAY,
               fontWeight: 400,
-              fontSize: 16,
+              fontSize: fs(16),
               lineHeight: "24px",
               letterSpacing: "0.15px",
-              color: "#111323",
+              color: "var(--color-text-primary)",
               textAlign: "center",
             }}
           >
@@ -835,17 +858,19 @@ function WorkMobile() {
           </button>
         </div>
 
-        {/* Profile image — h-282, view-transition target shared with
-            the desktop preview frame so the image morphs cleanly when
-            navigating away and back. The Image is keyed by its *src*
-            so it only re-mounts (and fades) when the actual preview
-            asset changes — when consecutive selections share the
-            FALLBACK_PREVIEW the DOM is reused and there's no flicker. */}
+        {/* Profile image — h-282, shared `hero-illustration` view-transition
+            target so the picture morphs cleanly between /work and the
+            hero illustrations on /, /about, /contact (and back to the
+            desktop preview frame, which carries the same name). The
+            Image is keyed by its *src* so it only re-mounts (and fades)
+            when the actual preview asset changes — when consecutive
+            selections share the FALLBACK_PREVIEW the DOM is reused and
+            there's no flicker. */}
         <div
           className="w-full relative overflow-hidden shrink-0"
           style={{
             height: 282,
-            viewTransitionName: "work-preview",
+            viewTransitionName: "hero-illustration",
           }}
         >
           <Image
@@ -922,10 +947,10 @@ function WorkMobile() {
                         style={{
                           fontFamily: SOLWAY,
                           fontWeight: 400,
-                          fontSize: 14,
+                          fontSize: fs(14),
                           lineHeight: "20px",
                           letterSpacing: "0.25px",
-                          color: "#1B2249",
+                          color: "var(--color-text-primary)",
                         }}
                       >
                         {item.name}
@@ -953,10 +978,10 @@ function WorkMobile() {
                       style={{
                         fontFamily: SOLWAY,
                         fontWeight: 500,
-                        fontSize: 12,
+                        fontSize: fs(12),
                         lineHeight: "16px",
                         letterSpacing: "0.5px",
-                        color: "#1B2249",
+                        color: "var(--color-text-primary)",
                       }}
                     >
                       {yearsOnly(item.date)}
@@ -975,7 +1000,7 @@ function WorkMobile() {
               className="self-stretch overflow-hidden relative shrink-0"
               style={{
                 width: 2,
-                backgroundColor: "#EDEAE4",
+                backgroundColor: "var(--color-scroll-track)",
                 borderRadius: 4,
               }}
               aria-hidden
@@ -986,7 +1011,7 @@ function WorkMobile() {
                   width: 4,
                   height: `${100 / itemCount}%`,
                   top: `${(safeSelectedIdx / itemCount) * 100}%`,
-                  backgroundColor: "#28315F",
+                  backgroundColor: "var(--color-scroll-thumb)",
                   borderRadius: 4,
                   transition:
                     "top 320ms cubic-bezier(0.34, 1.56, 0.64, 1)",
@@ -1017,19 +1042,19 @@ function WorkMobile() {
 const NAME_STYLE: React.CSSProperties = {
   fontFamily: SOLWAY,
   fontWeight: 400,
-  fontSize: 18,
+  fontSize: fs(18),
   lineHeight: "24px",
   letterSpacing: "0.15px",
-  color: "#111323",
+  color: "var(--color-experience-pill-text)",
 };
 
 const DATE_STYLE: React.CSSProperties = {
   fontFamily: SOLWAY,
   fontWeight: 400,
-  fontSize: 12,
+  fontSize: fs(12),
   lineHeight: "24px",
   letterSpacing: "0.15px",
-  color: "#111323",
+  color: "var(--color-experience-pill-text)",
 };
 
 const useIsoLayoutEffect =
@@ -1076,7 +1101,7 @@ function SelectedPill({ experience }: { experience: Experience | undefined }) {
     <div
       className="w-full flex flex-col items-start"
       style={{
-        backgroundColor: "#F9F5EB",
+        backgroundColor: "var(--color-experience-pill-bg)",
         borderRadius: 8,
         paddingLeft: 8,
         paddingRight: 8,
@@ -1150,10 +1175,10 @@ function SelectedPill({ experience }: { experience: Experience | undefined }) {
             style={{
               fontFamily: SOLWAY,
               fontWeight: 400,
-              fontSize: 12,
+              fontSize: fs(12),
               lineHeight: "16px",
               letterSpacing: "0.5px",
-              color: "#111323",
+              color: "var(--color-experience-pill-text)",
             }}
           >
             {experience.industry}
@@ -1164,10 +1189,10 @@ function SelectedPill({ experience }: { experience: Experience | undefined }) {
           style={{
             fontFamily: SOLWAY,
             fontWeight: 300,
-            fontSize: 12,
+            fontSize: fs(12),
             lineHeight: "16px",
             letterSpacing: "0.5px",
-            color: "#111323",
+            color: "var(--color-experience-pill-text)",
           }}
         >
           {experience.short}
@@ -1181,10 +1206,10 @@ function SelectedPill({ experience }: { experience: Experience | undefined }) {
           style={{
             fontFamily: SOLWAY,
             fontWeight: 300,
-            fontSize: 11,
+            fontSize: fs(11),
             lineHeight: "16px",
             letterSpacing: "0.5px",
-            color: "#111323",
+            color: "var(--color-experience-pill-text)",
           }}
         >
           {experience.description}

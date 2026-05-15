@@ -1,8 +1,10 @@
 "use client";
 
 import Link from "next/link";
+import TopRightButtons from "./_components/TopRightButtons";
 import { useIsMobile } from "./_components/useIsMobile";
 import { useViewTransitionRouter } from "./_lib/useViewTransitionRouter";
+import { fs } from "./_lib/typography";
 
 /* === FIGMA DESIGN TOKENS (Home) ===
    Desktop (node 288:1718): rendered inside ScaledShell which scales the
@@ -60,6 +62,7 @@ function HomeDesktop() {
           width: 868,
           height: 868,
           viewTransitionName: "hero-illustration",
+          opacity: "var(--hero-illustration-opacity)",
         }}
       >
         <img
@@ -70,41 +73,72 @@ function HomeDesktop() {
       </div>
 
       <div className="absolute inset-0 flex flex-col items-center pt-[80px] pb-[160px] px-[120px] gap-[20px]">
-        <div className="w-full flex flex-col items-start gap-[20px] flex-1 min-h-px text-[#1F2753]">
-          {/* "Parichehr" — top-left, stage 0 */}
-          <p
-            className="font-normal w-full anim-bubbly-grow"
-            style={{
-              fontSize: 240,
-              lineHeight: "260px",
-              letterSpacing: "16px",
-              transformOrigin: "left center",
-              ...STAGE(0),
-            }}
-          >
-            Parichehr
-          </p>
-
-          <div
-            className="w-full flex items-start justify-center flex-1 min-h-px"
-            style={{
-              fontWeight: 300,
-              fontSize: 24,
-              lineHeight: "36px",
-              letterSpacing: "5px",
-            }}
-          >
-            {/* "Talebzadeh" — stage 1 */}
+        <div
+          className="w-full flex flex-col items-start gap-[20px] flex-1 min-h-px"
+          style={{ color: "var(--color-text-primary)" }}
+        >
+          {/* Name row — "Parichehr" + stacked secondary buttons (theme +
+              1x) on the right (Figma 497:3615 / 497:3627). */}
+          <div className="w-full flex items-start gap-[20px]">
+            {/* "Parichehr" — top-left, stage 0. Per Figma 488:4617 /
+                497:3737: 240/190 tracking-4px (the previous 16px
+                tracking + 260 px leading were carried over from an
+                older artboard). */}
             <p
-              className="flex-1 min-w-0 anim-bubbly-grow"
-              style={{ transformOrigin: "left center", ...STAGE(1) }}
+              className="font-normal flex-1 min-w-0 anim-bubbly-grow"
+              style={{
+                fontSize: fs(240),
+                lineHeight: "190px",
+                letterSpacing: "4px",
+                transformOrigin: "left center",
+                ...STAGE(0),
+              }}
+            >
+              Parichehr
+            </p>
+            <TopRightButtons stage={0.5} align="center" />
+          </div>
+
+          {/* Profile info row (Figma 511:8022). Inline group:
+              "Talebzadeh · Product Designer", all Solway Light 20/36
+              tracking-2px, separated by a Regular 22/28 dot. */}
+          <div className="w-full flex items-center gap-[12px] whitespace-nowrap">
+            <p
+              className="shrink-0 anim-bubbly-grow"
+              style={{
+                fontWeight: 300,
+                fontSize: fs(20),
+                lineHeight: "36px",
+                letterSpacing: "2px",
+                transformOrigin: "left center",
+                ...STAGE(1),
+              }}
             >
               Talebzadeh
             </p>
-            {/* "Product Designer" — stage 2 (top-right) */}
             <p
-              className="whitespace-nowrap shrink-0 anim-bubbly-grow"
-              style={{ transformOrigin: "right center", ...STAGE(2) }}
+              className="shrink-0 anim-bubbly-grow"
+              style={{
+                fontWeight: 400,
+                fontSize: fs(22),
+                lineHeight: "28px",
+                transformOrigin: "center center",
+                ...STAGE(1.5),
+              }}
+              aria-hidden
+            >
+              ·
+            </p>
+            <p
+              className="shrink-0 anim-bubbly-grow"
+              style={{
+                fontWeight: 300,
+                fontSize: fs(20),
+                lineHeight: "36px",
+                letterSpacing: "2px",
+                transformOrigin: "left center",
+                ...STAGE(2),
+              }}
             >
               Product Designer
             </p>
@@ -112,19 +146,22 @@ function HomeDesktop() {
         </div>
 
         {/* Bio Container — bottom row, items-end. LEFT: 303-wide
-            column with bio paragraph + "Me?" cream pill. RIGHT
-            (flex-1): tagline at bottom-right. */}
-        <div className="w-full flex items-end justify-center text-[#1F2753] shrink-0">
-          {/* Left column — bio + Me? CTA */}
+            column with bio paragraph + "Know Me?" underlined link.
+            RIGHT (flex-1): tagline at bottom-right. */}
+        <div
+          className="w-full flex items-end justify-center shrink-0"
+          style={{ color: "var(--color-text-primary)" }}
+        >
+          {/* Left column — bio + Know Me? link */}
           <div
-            className="flex flex-col items-start justify-center gap-[40px] shrink-0"
+            className="flex flex-col items-start justify-center gap-[20px] shrink-0"
             style={{ width: 303, fontWeight: 300 }}
           >
             {/* Bio — stage 3 */}
             <p
               className="w-full anim-bubbly-grow"
               style={{
-                fontSize: 16,
+                fontSize: fs(16),
                 lineHeight: "24px",
                 transformOrigin: "left center",
                 ...STAGE(3),
@@ -132,29 +169,30 @@ function HomeDesktop() {
             >
               <BioParagraph />
             </p>
-            {/* "Me?" primary CTA — cream pill, links to /about. Stage 4. */}
+            {/* "Know Me?" link — Figma 497:3545. Underlined Solway
+                Regular 16/24, no pill background; left-aligned to sit
+                under the bio paragraph rather than centered. Stage 4. */}
             <Link
               href="/about"
               onClick={handleAboutClick}
-              className="w-full flex items-center justify-center rounded-[122px] anim-bubbly-grow bg-[#F9F5EB] hover:bg-[#EDEAE4] transition-colors duration-200"
+              className="text-left anim-bubbly-grow cursor-pointer hover:opacity-70 transition-opacity duration-200"
               style={{
-                paddingLeft: 24,
-                paddingRight: 24,
-                paddingTop: 12,
-                paddingBottom: 12,
-                color: "#1B2249",
+                color: "var(--color-text-primary)",
                 fontFamily: "var(--font-solway), serif",
                 fontWeight: 400,
-                fontSize: 16,
+                fontSize: fs(16),
                 lineHeight: "24px",
                 letterSpacing: "0.15px",
-                textAlign: "center",
+                textDecorationLine: "underline",
+                textDecorationStyle: "solid",
+                paddingTop: 4,
+                paddingBottom: 4,
                 transformOrigin: "left center",
                 ...STAGE(4),
               }}
-              aria-label="Me? — learn more about me"
+              aria-label="Know Me? — learn more about me"
             >
-              Me?
+              Know Me?
             </Link>
           </div>
 
@@ -162,15 +200,19 @@ function HomeDesktop() {
               bottom-aligned and right-aligned. */}
           <div className="flex-1 min-w-0 self-stretch flex flex-row items-end">
             <div className="flex-1 min-w-0 h-full flex flex-col items-end justify-end">
-              {/* Complexity tagline — stage 5 (bottom-right). */}
+              {/* Complexity tagline — stage 5 (bottom-right). Uses
+                  `--color-text-tagline` so it stays navy on light and
+                  switches to cream-lighter (#FEFBF5) on dark per
+                  Figma 488:4630. */}
               <p
                 className="anim-bubbly-grow"
                 style={{
                   fontWeight: 300,
-                  fontSize: 16,
+                  fontSize: fs(16),
                   lineHeight: "24px",
                   width: 251,
                   textAlign: "right",
+                  color: "var(--color-text-tagline)",
                   transformOrigin: "right center",
                   ...STAGE(5),
                 }}
@@ -233,11 +275,11 @@ function HomeMobile() {
         style={{ zIndex: 0 }}
       >
         {/* Bio Section header (Parichehr + name/role row). */}
-        <div className="w-full flex flex-col items-start gap-[16px] text-[#1F2753] shrink-0">
+        <div className="w-full flex flex-col items-start gap-[16px] text-[var(--color-text-primary)] shrink-0">
           <p
             className="w-full font-normal anim-bubbly-grow"
             style={{
-              fontSize: 60,
+              fontSize: fs(60),
               lineHeight: "64px",
               letterSpacing: "8px",
               transformOrigin: "left center",
@@ -250,7 +292,7 @@ function HomeMobile() {
             className="w-full flex items-start"
             style={{
               fontWeight: 300,
-              fontSize: 14,
+              fontSize: fs(14),
               lineHeight: "24px",
               letterSpacing: "2px",
             }}
@@ -274,7 +316,7 @@ function HomeMobile() {
             CTA. Order matches Figma 312:1669 (with the EN /
             brightness placeholder row removed). */}
         <div
-          className="w-full flex flex-col items-stretch gap-[24px] text-[#1F2753] shrink-0"
+          className="w-full flex flex-col items-stretch gap-[24px] text-[var(--color-text-primary)] shrink-0"
           style={{ fontWeight: 300 }}
         >
           {/* Complexity tagline — stage 3 (compact line height per
@@ -282,7 +324,7 @@ function HomeMobile() {
           <p
             className="w-full anim-bubbly-grow"
             style={{
-              fontSize: 14,
+              fontSize: fs(14),
               lineHeight: "18px",
               transformOrigin: "left center",
               ...STAGE(3),
@@ -295,7 +337,7 @@ function HomeMobile() {
           <p
             className="w-full anim-bubbly-grow"
             style={{
-              fontSize: 14,
+              fontSize: fs(14),
               lineHeight: "20px",
               transformOrigin: "left center",
               ...STAGE(4),
@@ -317,7 +359,7 @@ function HomeMobile() {
               color: "#1B2249",
               fontFamily: "var(--font-solway), serif",
               fontWeight: 400,
-              fontSize: 14,
+              fontSize: fs(14),
               lineHeight: "20px",
               letterSpacing: "0.1px",
               textAlign: "center",

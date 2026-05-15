@@ -3,6 +3,7 @@
 import Image from "next/image";
 import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import { useIsMobile } from "./useIsMobile";
+import { fs } from "../_lib/typography";
 
 /* === FINALIZED CASE-STUDY HEADER (MainCard) ============================
    Single morphing card used at the top of every case-study page. The
@@ -142,7 +143,7 @@ function DetailItem({ label, value }: CaseStudyDetailItem) {
           color: NAVY,
           fontFamily: SOLWAY,
           fontWeight: 700,
-          fontSize: 14,
+          fontSize: fs(14),
           lineHeight: "20px",
           letterSpacing: "0.1px",
         }}
@@ -155,7 +156,7 @@ function DetailItem({ label, value }: CaseStudyDetailItem) {
           color: NAVY,
           fontFamily: SOLWAY,
           fontWeight: 400,
-          fontSize: 16,
+          fontSize: fs(16),
           lineHeight: "24px",
           letterSpacing: "0.15px",
         }}
@@ -199,7 +200,7 @@ function CTAButton({
           color: NAVY,
           fontFamily: SOLWAY,
           fontWeight: 400,
-          fontSize: 14,
+          fontSize: fs(14),
           lineHeight: "18px",
           textTransform: uppercase ? "uppercase" : undefined,
         }}
@@ -254,7 +255,7 @@ function CompactLink({
     color: NAVY,
     fontFamily: SOLWAY,
     fontWeight: 400,
-    fontSize: 14,
+    fontSize: fs(14),
     lineHeight: "20px",
     letterSpacing: "0.25px",
     textDecorationLine: "underline",
@@ -442,7 +443,7 @@ function CaseStudyHeaderDesktop({
             style={{
               fontFamily: SOLWAY,
               fontWeight: 400,
-              fontSize: 44,
+              fontSize: fs(44),
               lineHeight: "64px",
               whiteSpace: "nowrap",
               margin: 0,
@@ -454,7 +455,7 @@ function CaseStudyHeaderDesktop({
             style={{
               fontFamily: SOLWAY,
               fontWeight: 400,
-              fontSize: 22,
+              fontSize: fs(22),
               lineHeight: "28px",
               whiteSpace: "nowrap",
               margin: 0,
@@ -496,7 +497,7 @@ function CaseStudyHeaderDesktop({
             color: NAVY,
             fontFamily: SOLWAY,
             fontWeight: 400,
-            fontSize: titleSize,
+            fontSize: fs(titleSize),
             lineHeight: `${titleLineHeight}px`,
             whiteSpace: "nowrap",
             margin: 0,
@@ -509,7 +510,7 @@ function CaseStudyHeaderDesktop({
             color: subtitleColor,
             fontFamily: SOLWAY,
             fontWeight: progress > 0.5 ? 500 : 400,
-            fontSize: subtitleSize,
+            fontSize: fs(subtitleSize),
             lineHeight: `${subtitleLineHeight}px`,
             letterSpacing: `${lerp(0, 0.5, progress)}px`,
             whiteSpace: "nowrap",
@@ -654,7 +655,7 @@ function MobileDetailItem({ label, value }: CaseStudyDetailItem) {
           color: NAVY,
           fontFamily: SOLWAY,
           fontWeight: 700,
-          fontSize: 12,
+          fontSize: fs(12),
           lineHeight: "16px",
           letterSpacing: "0.5px",
           margin: 0,
@@ -668,7 +669,7 @@ function MobileDetailItem({ label, value }: CaseStudyDetailItem) {
           color: NAVY,
           fontFamily: SOLWAY,
           fontWeight: 400,
-          fontSize: 12,
+          fontSize: fs(12),
           lineHeight: "16px",
           letterSpacing: "0.5px",
           margin: 0,
@@ -712,7 +713,7 @@ function MobileCTAButton({
           color: NAVY,
           fontFamily: SOLWAY,
           fontWeight: 400,
-          fontSize: 12,
+          fontSize: fs(12),
           lineHeight: "18px",
           textTransform: uppercase ? "uppercase" : undefined,
         }}
@@ -851,7 +852,7 @@ function CaseStudyHeaderMobile({
             color: NAVY,
             fontFamily: SOLWAY,
             fontWeight: 400,
-            fontSize: 16,
+            fontSize: fs(16),
             lineHeight: "20px",
             margin: 0,
             overflow: "hidden",
@@ -913,7 +914,7 @@ function CaseStudyHeaderMobile({
                 color: NAVY,
                 fontFamily: SOLWAY,
                 fontWeight: 400,
-                fontSize: 22,
+                fontSize: fs(22),
                 lineHeight: "28px",
                 margin: 0,
                 textAlign: "center",
@@ -936,7 +937,7 @@ function CaseStudyHeaderMobile({
               color: NAVY,
               fontFamily: SOLWAY,
               fontWeight: 400,
-              fontSize: 12,
+              fontSize: fs(12),
               lineHeight: "16px",
               letterSpacing: "0.4px",
               textAlign: "center",

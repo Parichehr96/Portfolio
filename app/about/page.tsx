@@ -3,7 +3,9 @@
 import { useEffect, useRef, useState } from "react";
 import CTAButton from "../_components/CTAButton";
 import LinkExternalIcon from "../_components/LinkExternalIcon";
+import TopRightButtons from "../_components/TopRightButtons";
 import { useIsMobile } from "../_components/useIsMobile";
+import { fs } from "../_lib/typography";
 import {
   ACADEMIC,
   CERTIFICATES,
@@ -44,7 +46,7 @@ function EducationRow({ item }: { item: Item }) {
   // anchor means anywhere on the row triggers the inner pill state.
   const inner = (
     <div
-      className="w-full flex items-end justify-center gap-[8px] rounded-[122px] group-hover:bg-[#F9F5EB] group-hover:px-[24px] group-hover:py-[8px]"
+      className="w-full flex items-end justify-center gap-[8px] rounded-[122px] group-hover:bg-[var(--color-experience-pill-bg)] group-hover:px-[24px] group-hover:py-[8px]"
       style={{
         transition:
           "background-color 300ms ease-out, padding 300ms cubic-bezier(0.34, 1.5, 0.64, 1), border-radius 300ms cubic-bezier(0.34, 1.5, 0.64, 1)",
@@ -52,9 +54,9 @@ function EducationRow({ item }: { item: Item }) {
     >
       <div className="flex-1 min-w-0 flex items-center gap-[8px]">
         <p
-          className="text-[#1B2249] whitespace-nowrap shrink-0"
+          className="text-[var(--color-text-primary)] whitespace-nowrap shrink-0"
           style={{
-            fontSize: 16,
+            fontSize: fs(16),
             lineHeight: "24px",
             letterSpacing: "0.15px",
           }}
@@ -63,9 +65,9 @@ function EducationRow({ item }: { item: Item }) {
         </p>
         <div className="flex items-center shrink-0">
           <p
-            className="text-[#7E7F85] whitespace-nowrap shrink-0"
+            className="text-[var(--color-text-muted)] whitespace-nowrap shrink-0"
             style={{
-              fontSize: 16,
+              fontSize: fs(16),
               lineHeight: "24px",
               letterSpacing: "0.15px",
             }}
@@ -75,9 +77,9 @@ function EducationRow({ item }: { item: Item }) {
           {item.url && <LinkExternalIcon />}
         </div>
         <span
-          className="flex-1 min-w-0 overflow-hidden whitespace-nowrap text-[#7E7F85]"
+          className="flex-1 min-w-0 overflow-hidden whitespace-nowrap text-[var(--color-text-muted)]"
           style={{
-            fontSize: 16,
+            fontSize: fs(16),
             lineHeight: "24px",
             letterSpacing: "0.15px",
           }}
@@ -87,8 +89,8 @@ function EducationRow({ item }: { item: Item }) {
         </span>
       </div>
       <p
-        className="text-[#1B2249] whitespace-nowrap shrink-0"
-        style={{ fontSize: 16, lineHeight: "24px", letterSpacing: "0.15px" }}
+        className="text-[var(--color-text-primary)] whitespace-nowrap shrink-0"
+        style={{ fontSize: fs(16), lineHeight: "24px", letterSpacing: "0.15px" }}
       >
         {item.date}
       </p>
@@ -114,10 +116,10 @@ function EducationRow({ item }: { item: Item }) {
 function SectionTitle({ children }: { children: React.ReactNode }) {
   return (
     <p
-      className="w-full text-[#5A5D70]"
+      className="w-full text-[var(--color-text-secondary)]"
       style={{
         fontWeight: 500,
-        fontSize: 20,
+        fontSize: fs(20),
         lineHeight: "26px",
         letterSpacing: "0.5px",
       }}
@@ -130,8 +132,8 @@ function SectionTitle({ children }: { children: React.ReactNode }) {
 function SkillsColumnHeader({ children }: { children: React.ReactNode }) {
   return (
     <p
-      className="text-[#7E7F85] shrink-0"
-      style={{ fontSize: 16, lineHeight: "24px", letterSpacing: "0.15px" }}
+      className="text-[var(--color-text-muted)] shrink-0"
+      style={{ fontSize: fs(16), lineHeight: "24px", letterSpacing: "0.15px" }}
     >
       {children}
     </p>
@@ -141,8 +143,8 @@ function SkillsColumnHeader({ children }: { children: React.ReactNode }) {
 function SkillBullet({ children }: { children: React.ReactNode }) {
   return (
     <p
-      className="text-[#1B2249] shrink-0"
-      style={{ fontSize: 16, lineHeight: "24px", letterSpacing: "0.15px" }}
+      className="text-[var(--color-text-primary)] shrink-0"
+      style={{ fontSize: fs(16), lineHeight: "24px", letterSpacing: "0.15px" }}
     >
       · {children}
     </p>
@@ -153,9 +155,9 @@ function SkillBullet({ children }: { children: React.ReactNode }) {
    one-by-one (stages baseStage..baseStage+4) instead of as a single block. */
 function BioText({ baseStage }: { baseStage: number }) {
   const paragraphClass =
-    "w-full text-[#5A5D70] shrink-0 anim-bubbly-grow";
+    "w-full text-[var(--color-text-secondary)] shrink-0 anim-bubbly-grow";
   const paragraphStyle = {
-    fontSize: 16,
+    fontSize: fs(16),
     lineHeight: "24px",
     letterSpacing: "0.5px",
     transformOrigin: "left top",
@@ -284,17 +286,22 @@ function CustomScrollbar({
   return (
     <div
       ref={trackRef}
-      className="bg-[#EDEAE4] rounded-[4px] relative shrink-0"
-      style={{ width: 2, height: fillHeight ? "100%" : trackHeight }}
+      className="rounded-[4px] relative shrink-0"
+      style={{
+        width: 2,
+        height: fillHeight ? "100%" : trackHeight,
+        backgroundColor: "var(--color-scroll-track)",
+      }}
     >
       {/* Bubbly thumb — overshoot easing gives the indicator a slight
           spring as it tracks the scroll position. */}
       <div
-        className="absolute bg-[#28315F] rounded-[4px] -translate-x-1/2 left-1/2"
+        className="absolute rounded-[4px] -translate-x-1/2 left-1/2"
         style={{
           width: 4,
           height: thumb.height,
           top: thumb.top,
+          backgroundColor: "var(--color-scroll-thumb)",
           transition:
             "top 280ms cubic-bezier(0.34, 1.56, 0.64, 1), height 280ms cubic-bezier(0.34, 1.56, 0.64, 1)",
           willChange: "top, height",
@@ -352,6 +359,7 @@ function AboutDesktop() {
           width: 816,
           height: 816,
           viewTransitionName: "hero-illustration",
+          opacity: "var(--hero-illustration-opacity)",
         }}
       >
         <img
@@ -361,35 +369,40 @@ function AboutDesktop() {
         />
       </div>
 
-      {/* Bio Section header — stage 0 (TL) + stage 1 */}
+      {/* Bio Section header — stage 0 (TL) + stage 1, with the stacked
+          secondary buttons (theme + 1x) pinned to the right edge of the
+          1272-wide row (Figma 501:3754 / 501:3755). */}
       <div
-        className="absolute left-[120px] top-[80px] flex flex-col items-start gap-[12px]"
+        className="absolute left-[120px] top-[80px] flex items-start gap-[20px]"
         style={{ width: 1272 }}
       >
-        <p
-          className="w-full text-[#1F2753] anim-bubbly-grow"
-          style={{
-            fontSize: 60,
-            lineHeight: "66px",
-            letterSpacing: "2px",
-            transformOrigin: "left center",
-            ["--stage" as string]: 0,
-          }}
-        >
-          You can call me Pari,
-        </p>
-        <p
-          className="w-full text-[#1F2753] anim-bubbly-grow"
-          style={{
-            fontSize: 32,
-            lineHeight: "40px",
-            letterSpacing: "2px",
-            transformOrigin: "left center",
-            ["--stage" as string]: 1,
-          }}
-        >
-          Nice to meet you!
-        </p>
+        <div className="flex-1 min-w-0 flex flex-col items-start gap-[12px]">
+          <p
+            className="w-full text-[var(--color-text-primary)] anim-bubbly-grow"
+            style={{
+              fontSize: fs(60),
+              lineHeight: "66px",
+              letterSpacing: "2px",
+              transformOrigin: "left center",
+              ["--stage" as string]: 0,
+            }}
+          >
+            You can call me Pari,
+          </p>
+          <p
+            className="w-full text-[var(--color-text-primary)] anim-bubbly-grow"
+            style={{
+              fontSize: fs(32),
+              lineHeight: "40px",
+              letterSpacing: "2px",
+              transformOrigin: "left center",
+              ["--stage" as string]: 1,
+            }}
+          >
+            Nice to meet you!
+          </p>
+        </div>
+        <TopRightButtons stage={0.5} />
       </div>
 
       {/* Bio Container — illustration on the left is the matching layer
@@ -501,7 +514,7 @@ function AboutDesktop() {
                   }}
                 >
                   <span
-                    className="relative shrink-0 inline-block"
+                    className="themed-icon relative shrink-0 inline-block"
                     style={{ width: 32, height: 32 }}
                     aria-hidden
                   >
@@ -516,10 +529,10 @@ function AboutDesktop() {
                     style={{
                       fontFamily: SOLWAY,
                       fontWeight: 400,
-                      fontSize: 10,
+                      fontSize: fs(10),
                       lineHeight: "16px",
                       letterSpacing: "0.5px",
-                      color: "#7E7F85",
+                      color: "var(--color-text-muted)",
                     }}
                   >
                     {interest.label}
@@ -585,9 +598,9 @@ function ListSection({
    Same 5 paragraphs as desktop but rendered with the mobile leading
    (16/26) and bullet-by-bullet stagger so each appears individually. */
 function MobileBioText({ baseStage }: { baseStage: number }) {
-  const paragraphClass = "w-full text-[#5A5D70] shrink-0 anim-bubbly-grow";
+  const paragraphClass = "w-full text-[var(--color-text-secondary)] shrink-0 anim-bubbly-grow";
   const paragraphStyle = {
-    fontSize: 16,
+    fontSize: fs(16),
     lineHeight: "26px",
     letterSpacing: "0.5px",
     transformOrigin: "left top",
@@ -661,9 +674,9 @@ function MobileEducationRow({ item }: { item: Item }) {
     <div className="w-full flex flex-col items-start">
       <div className="w-full flex gap-[8px] items-center">
         <p
-          className="text-[#1B2249] whitespace-nowrap shrink-0"
+          className="text-[var(--color-text-primary)] whitespace-nowrap shrink-0"
           style={{
-            fontSize: 16,
+            fontSize: fs(16),
             lineHeight: "24px",
             letterSpacing: "0.15px",
           }}
@@ -672,9 +685,9 @@ function MobileEducationRow({ item }: { item: Item }) {
         </p>
         <div className="flex items-center shrink-0">
           <p
-            className="text-[#7E7F85] whitespace-nowrap shrink-0"
+            className="text-[var(--color-text-muted)] whitespace-nowrap shrink-0"
             style={{
-              fontSize: 14,
+              fontSize: fs(14),
               lineHeight: "24px",
               letterSpacing: "0.15px",
             }}
@@ -685,8 +698,8 @@ function MobileEducationRow({ item }: { item: Item }) {
         </div>
       </div>
       <p
-        className="text-[#1B2249] whitespace-nowrap shrink-0"
-        style={{ fontSize: 14, lineHeight: "20px", letterSpacing: "0.15px" }}
+        className="text-[var(--color-text-primary)] whitespace-nowrap shrink-0"
+        style={{ fontSize: fs(14), lineHeight: "20px", letterSpacing: "0.15px" }}
       >
         {item.date}
       </p>
@@ -818,9 +831,9 @@ function AboutMobile() {
       {/* Bio Section header — "You can call me Pari," + "Nice to meet you!" */}
       <div className="relative w-full flex flex-col items-start gap-[8px]">
         <p
-          className="w-full text-[#1F2753] anim-bubbly-grow"
+          className="w-full text-[var(--color-text-primary)] anim-bubbly-grow"
           style={{
-            fontSize: 32,
+            fontSize: fs(32),
             lineHeight: "40px",
             letterSpacing: "1px",
             transformOrigin: "left center",
@@ -830,9 +843,9 @@ function AboutMobile() {
           You can call me Pari,
         </p>
         <p
-          className="w-full text-[#1F2753] anim-bubbly-grow"
+          className="w-full text-[var(--color-text-primary)] anim-bubbly-grow"
           style={{
-            fontSize: 16,
+            fontSize: fs(16),
             lineHeight: "24px",
             transformOrigin: "left center",
             ["--stage" as string]: 1,
@@ -950,7 +963,7 @@ function AboutMobile() {
                         }}
                       >
                         <span
-                          className="relative shrink-0 inline-block"
+                          className="themed-icon relative shrink-0 inline-block"
                           style={{ width: 25.6, height: 25.6 }}
                           aria-hidden
                         >
@@ -965,10 +978,10 @@ function AboutMobile() {
                           style={{
                             fontFamily: SOLWAY,
                             fontWeight: 400,
-                            fontSize: 8,
+                            fontSize: fs(8),
                             lineHeight: "12.8px",
                             letterSpacing: "0.4px",
-                            color: "#7E7F85",
+                            color: "var(--color-text-muted)",
                           }}
                         >
                           {interest.label}

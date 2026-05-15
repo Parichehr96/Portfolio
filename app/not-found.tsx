@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { fs } from "./_lib/typography";
 
 export default function NotFound() {
   return (
@@ -9,7 +10,7 @@ export default function NotFound() {
       <p
         style={{
           fontFamily: "var(--font-solway), serif",
-          fontSize: 60,
+          fontSize: fs(60),
           lineHeight: "66px",
           letterSpacing: "2px",
         }}
@@ -20,7 +21,7 @@ export default function NotFound() {
         style={{
           fontFamily: "var(--font-solway), serif",
           fontWeight: 300,
-          fontSize: 18,
+          fontSize: fs(18),
           lineHeight: "28px",
           maxWidth: 480,
         }}
@@ -31,7 +32,7 @@ export default function NotFound() {
         href="/"
         style={{
           fontFamily: "var(--font-solway), serif",
-          fontSize: 16,
+          fontSize: fs(16),
           lineHeight: "28px",
           textDecoration: "underline",
           color: "var(--color-navy)",

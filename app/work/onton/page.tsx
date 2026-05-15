@@ -1,4 +1,5 @@
 import CaseStudyHeader from "../../_components/CaseStudyHeader";
+import { fs } from "../../_lib/typography";
 import {
   BodyBlock,
   BodyText,
@@ -202,7 +203,7 @@ export default function OntonCaseStudy() {
                   color: CREAM,
                   fontFamily: SOLWAY,
                   fontWeight: 700,
-                  fontSize: 24,
+                  fontSize: fs(24),
                   lineHeight: "32px",
                   letterSpacing: "0.15px",
                   margin: 0,
@@ -465,7 +466,7 @@ export default function OntonCaseStudy() {
               gap: 12,
               fontFamily: SOLWAY,
               color: NAVY,
-              fontSize: 16,
+              fontSize: fs(16),
               lineHeight: "24px",
               letterSpacing: "0.5px",
             }}
@@ -526,7 +527,7 @@ export default function OntonCaseStudy() {
               gap: 12,
               fontFamily: SOLWAY,
               color: NAVY,
-              fontSize: 16,
+              fontSize: fs(16),
               lineHeight: "24px",
               letterSpacing: "0.5px",
             }}

@@ -1,4 +1,5 @@
 import CaseStudyHeader from "../../_components/CaseStudyHeader";
+import { fs } from "../../_lib/typography";
 import {
   BodyBlock,
   BodyText,
@@ -233,7 +234,7 @@ export default function MindfulMeetCaseStudy() {
                     color: NAVY,
                     fontFamily: SOLWAY,
                     fontWeight: 700,
-                    fontSize: 16,
+                    fontSize: fs(16),
                     lineHeight: "24px",
                     letterSpacing: "0.5px",
                     margin: 0,
@@ -319,7 +320,7 @@ export default function MindfulMeetCaseStudy() {
                     color: NAVY,
                     fontFamily: SOLWAY,
                     fontWeight: 700,
-                    fontSize: 16,
+                    fontSize: fs(16),
                     lineHeight: "24px",
                     letterSpacing: "0.5px",
                     margin: 0,
@@ -467,7 +468,7 @@ export default function MindfulMeetCaseStudy() {
                     color: NAVY,
                     fontFamily: SOLWAY,
                     fontWeight: 700,
-                    fontSize: 16,
+                    fontSize: fs(16),
                     lineHeight: "24px",
                     letterSpacing: "0.5px",
                     margin: 0,
@@ -517,7 +518,7 @@ export default function MindfulMeetCaseStudy() {
                     color: NAVY,
                     fontFamily: SOLWAY,
                     fontWeight: 700,
-                    fontSize: 16,
+                    fontSize: fs(16),
                     lineHeight: "24px",
                     letterSpacing: "0.5px",
                     margin: 0,
@@ -542,7 +543,7 @@ export default function MindfulMeetCaseStudy() {
               gap: 12,
               fontFamily: SOLWAY,
               color: NAVY,
-              fontSize: 16,
+              fontSize: fs(16),
               lineHeight: "24px",
               letterSpacing: "0.5px",
             }}

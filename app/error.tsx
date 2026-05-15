@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { useEffect } from "react";
+import { fs } from "./_lib/typography";
 
 /* Route-level error boundary. Next.js mounts this when a page-tree
    render throws, so the rest of the app keeps working and the user
@@ -28,7 +29,7 @@ export default function Error({
       <p
         style={{
           fontFamily: "var(--font-solway), serif",
-          fontSize: 60,
+          fontSize: fs(60),
           lineHeight: "66px",
           letterSpacing: "2px",
         }}
@@ -39,7 +40,7 @@ export default function Error({
         style={{
           fontFamily: "var(--font-solway), serif",
           fontWeight: 300,
-          fontSize: 18,
+          fontSize: fs(18),
           lineHeight: "28px",
           maxWidth: 520,
         }}
@@ -54,7 +55,7 @@ export default function Error({
           className="cursor-pointer hover:opacity-70 transition-opacity duration-200"
           style={{
             fontFamily: "var(--font-solway), serif",
-            fontSize: 16,
+            fontSize: fs(16),
             lineHeight: "28px",
             textDecoration: "underline",
             color: "var(--color-navy)",
@@ -66,7 +67,7 @@ export default function Error({
           href="/"
           style={{
             fontFamily: "var(--font-solway), serif",
-            fontSize: 16,
+            fontSize: fs(16),
             lineHeight: "28px",
             textDecoration: "underline",
             color: "var(--color-navy)",
@@ -79,7 +80,7 @@ export default function Error({
         <p
           style={{
             fontFamily: "var(--font-space-grotesk), sans-serif",
-            fontSize: 12,
+            fontSize: fs(12),
             lineHeight: "16px",
             color: "var(--color-gray-soft)",
           }}

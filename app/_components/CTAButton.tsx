@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { font } from "../_lib/tokens";
 import { useViewTransitionRouter } from "../_lib/useViewTransitionRouter";
+import { fs } from "../_lib/typography";
 
 /* === Shared CTA pill ===
    Used on the four main routes (Home/About/Work/Contact). Variant:
@@ -35,17 +36,31 @@ function isExternalHref(href: string) {
 const baseClass =
   "flex-1 min-w-0 flex items-center justify-center gap-[12px] px-[16px] py-[12px] rounded-[120px] transition-colors duration-200";
 const primaryClass = "bg-[var(--color-cream)] hover:bg-[var(--color-cream-dark)] cursor-pointer";
+// Transparent bg lets the secondary pill read as an outlined button on
+// both themes (white card on light, navy card on dark) — only the
+// border + hover overlay change color via the theme variable.
 const secondaryClass =
-  "bg-white border-2 border-solid border-[var(--color-cream-dark)] hover:bg-[var(--color-cream)] cursor-pointer";
+  "bg-transparent border-2 border-solid border-[var(--color-cream-dark)] hover:bg-[rgba(249,245,235,0.12)] cursor-pointer";
 
 function ButtonInner({
   iconSrc,
   label,
   uppercase,
-}: Pick<CTAButtonProps, "iconSrc" | "label" | "uppercase">) {
+  variant,
+}: Pick<CTAButtonProps, "iconSrc" | "label" | "uppercase" | "variant">) {
+  // Primary pill keeps its cream bg in both themes, so the label stays
+  // navy for readable contrast on cream. Secondary is transparent and
+  // sits on the page bg, so it follows the theme's primary text colour
+  // (navy in light, white in dark).
+  const labelColor =
+    variant === "primary" ? "var(--color-navy)" : "var(--color-text-primary)";
   return (
     <>
-      <span className="relative shrink-0 inline-block w-[24px] h-[24px]">
+      <span
+        className={`relative shrink-0 inline-block w-[24px] h-[24px] ${
+          variant === "secondary" ? "themed-icon" : ""
+        }`}
+      >
         <img
           src={iconSrc}
           alt=""
@@ -55,10 +70,10 @@ function ButtonInner({
       <span
         className="whitespace-nowrap"
         style={{
-          color: "var(--color-navy)",
+          color: labelColor,
           fontFamily: font.solway,
           fontWeight: 400,
-          fontSize: 14,
+          fontSize: fs(14),
           lineHeight: "18px",
           textTransform: uppercase ? "uppercase" : undefined,
         }}
@@ -81,7 +96,12 @@ export default function CTAButton({
   const variantClass = variant === "primary" ? primaryClass : secondaryClass;
 
   const inner = (
-    <ButtonInner iconSrc={iconSrc} label={label} uppercase={uppercase} />
+    <ButtonInner
+      iconSrc={iconSrc}
+      label={label}
+      uppercase={uppercase}
+      variant={variant}
+    />
   );
 
   if (!href) {

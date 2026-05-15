@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useLayoutEffect, useRef, useState } from "react";
+import { fs } from "../../_lib/typography";
 
 /* === Research user-journey diagram (Figma 336:7727) =====================
    SVG-quality reconstruction. Renders the menu hierarchy + bullet
@@ -234,7 +235,7 @@ export default function ResearchDiagram() {
                 color: "#F5F5F5",
                 fontFamily: SOLWAY,
                 fontWeight: 500,
-                fontSize: 14,
+                fontSize: fs(14),
                 lineHeight: "20px",
                 letterSpacing: "0.1px",
                 whiteSpace: "nowrap",
@@ -272,7 +273,7 @@ export default function ResearchDiagram() {
                 color: NAVY_DARK,
                 fontFamily: SOLWAY,
                 fontWeight: 500,
-                fontSize: 14,
+                fontSize: fs(14),
                 lineHeight: "20px",
                 letterSpacing: "0.1px",
                 whiteSpace: "nowrap",
@@ -293,7 +294,7 @@ export default function ResearchDiagram() {
             color: GRAY_NAVY,
             fontFamily: SOLWAY,
             fontWeight: 500,
-            fontSize: 11,
+            fontSize: fs(11),
             lineHeight: "16px",
             letterSpacing: "0.5px",
             whiteSpace: "nowrap",
@@ -317,7 +318,7 @@ export default function ResearchDiagram() {
               color: GRAY_NAVY,
               fontFamily: SOLWAY,
               fontWeight: 500,
-              fontSize: 11,
+              fontSize: fs(11),
               lineHeight: "16px",
               letterSpacing: "0.5px",
               margin: 0,
