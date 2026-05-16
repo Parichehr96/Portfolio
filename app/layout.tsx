@@ -25,6 +25,30 @@ export const metadata: Metadata = {
   title: "Parichehr Talebzadeh — Product Designer",
   description:
     "Designing digital products, containing interaction, experience, interface, design system, and content, within various product teams for modern businesses.",
+  // Theme-aware favicon: browsers in light mode pull `fav-icon-light.png`
+  // (a navy glyph that reads on a light tab bar) and dark-mode browsers
+  // get `fav-icon-dark.png` (a cream glyph for the dark tab bar). The
+  // `media` attribute on the link is honoured by Chromium, Firefox and
+  // Safari; fallback browsers without prefers-color-scheme support use
+  // the first entry. The legacy `app/favicon.ico` was removed so this
+  // metadata-driven config isn't overridden by Next.js's file
+  // convention.
+  icons: {
+    icon: [
+      {
+        url: "/fav-icon-light.png",
+        media: "(prefers-color-scheme: light)",
+        type: "image/png",
+      },
+      {
+        url: "/fav-icon-dark.png",
+        media: "(prefers-color-scheme: dark)",
+        type: "image/png",
+      },
+    ],
+    shortcut: "/fav-icon-light.png",
+    apple: "/fav-icon-light.png",
+  },
 };
 
 // Explicit viewport so phones report their actual logical width
