@@ -383,6 +383,41 @@ body {
   animation-timing-function: cubic-bezier(0.76, 0, 0.24, 1);
 }
 
+/* === Persistent overlays — FloatingNav + TopRightButtons ===
+   Each one is wrapped at the ScaledShell level with its own
+   `viewTransitionName` so it becomes a matched layer instead of
+   being part of the root group's cross-fade. With the matched-layer
+   animation duration set to 0 s and the new snapshot pinned at full
+   opacity, the transition completes instantly — the live React DOM
+   stays painted across the navigation, so the nav and the secondary
+   buttons never flicker even while the dev server is still
+   compiling the next route's chunk. The shared `name`s rely on
+   each overlay sitting in the exact same spot before and after
+   navigation, which they do (the wrappers are absolute-positioned
+   in the persistent shell). */
+::view-transition-group(persistent-nav),
+::view-transition-image-pair(persistent-nav),
+::view-transition-old(persistent-nav),
+::view-transition-new(persistent-nav),
+::view-transition-group(persistent-top-right),
+::view-transition-image-pair(persistent-top-right),
+::view-transition-old(persistent-top-right),
+::view-transition-new(persistent-top-right) {
+  animation-duration: 0s;
+}
+
+::view-transition-new(persistent-nav),
+::view-transition-new(persistent-top-right) {
+  animation: none;
+  opacity: 1;
+}
+
+::view-transition-old(persistent-nav),
+::view-transition-old(persistent-top-right) {
+  animation: none;
+  opacity: 0;
+}
+
 /* Hide native scrollbar entirely. The About bio area uses a custom
    2 px / 4 px indicator rendered as a sibling element instead. */
 .no-scrollbar {

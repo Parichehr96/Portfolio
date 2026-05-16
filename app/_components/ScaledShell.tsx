@@ -163,12 +163,20 @@ export default function ScaledShell({
                 picker). Mounted in the shell so they survive route
                 changes — no remount, no animation replay between
                 pages, and the scale dropdown can stay open across a
-                navigation. Position mirrors the mobile pt-24/px-16
-                page padding. z-30 keeps them above the FloatingNav
-                hover overlays. */}
+                navigation. The `viewTransitionName` excludes this
+                wrapper from the root cross-fade so the live DOM
+                stays painted across the navigation; without it,
+                the View Transitions API would fade the buttons out
+                with the rest of the page. */}
             <div
               className={`absolute ${topRightAnimClass}`}
-              style={{ top: 24, right: 16, zIndex: 30, ...topRightAnimStyle }}
+              style={{
+                top: 24,
+                right: 16,
+                zIndex: 30,
+                viewTransitionName: "persistent-top-right",
+                ...topRightAnimStyle,
+              }}
             >
               <TopRightButtons />
             </div>
@@ -177,10 +185,16 @@ export default function ScaledShell({
                 (left=4 so it sits 4 px from each edge of the 390-wide
                 canvas, bottom=32 mirroring the desktop spacing). z-20
                 so it stays in front of any illustration that extends
-                behind it. */}
+                behind it. Same view-transition-name trick as the
+                top-right buttons keeps it visible across navigation. */}
             <div
               className="absolute"
-              style={{ left: 4, bottom: 32, zIndex: 20 }}
+              style={{
+                left: 4,
+                bottom: 32,
+                zIndex: 20,
+                viewTransitionName: "persistent-nav",
+              }}
             >
               <FloatingNav startDelay={navStartDelay} />
             </div>
@@ -215,16 +229,39 @@ export default function ScaledShell({
               Home/About/Work/Contact never unmounts them. Position
               matches the design's pt-80/px-120 padding (top=80,
               right=120, button column 48-wide). z-30 sits above any
-              page content / hover overlays. */}
+              page content / hover overlays. The `viewTransitionName`
+              breaks this wrapper out of the root snapshot group so
+              the View Transitions API doesn't cross-fade it on
+              navigation — paired with the `animation-duration: 0s`
+              rule in globals.css, the matched-layer transition
+              completes instantly and the live React component
+              continues rendering throughout. */}
           <div
             className={`absolute ${topRightAnimClass}`}
-            style={{ top: 80, right: 120, zIndex: 30, ...topRightAnimStyle }}
+            style={{
+              top: 80,
+              right: 120,
+              zIndex: 30,
+              viewTransitionName: "persistent-top-right",
+              ...topRightAnimStyle,
+            }}
           >
             <TopRightButtons />
           </div>
 
-          {/* Persistent floating nav at the canvas-relative position */}
-          <div className="absolute" style={{ left: 565, top: 854 }}>
+          {/* Persistent floating nav at the canvas-relative position.
+              Same view-transition-name treatment as the top-right
+              buttons so the nav backdrop / icons / active pill stay
+              painted across the route change instead of cross-fading
+              out with the rest of the page. */}
+          <div
+            className="absolute"
+            style={{
+              left: 565,
+              top: 854,
+              viewTransitionName: "persistent-nav",
+            }}
+          >
             <FloatingNav startDelay={navStartDelay} />
           </div>
         </div>
