@@ -1,5 +1,6 @@
 "use client";
 
+import CTAButton from "../_components/CTAButton";
 import { useIsMobile } from "../_components/useIsMobile";
 import { fs } from "../_lib/typography";
 import {
@@ -35,8 +36,6 @@ import {
      - "BOOK A TIME SLOT?" CTA (underlined Solway Light 16/28 navy)
    Floating nav: rendered by ScaledShell (Contact active).
 ============================================================= */
-
-const SOLWAY = "var(--font-solway), serif";
 
 function ExternalChevronIcon() {
   return (
@@ -188,7 +187,12 @@ function ContactDesktop() {
           className="w-full flex flex-col items-start"
           style={{
             height: 665,
-            paddingRight: 634,
+            // Refreshed Figma 300:2284 (2026-05) narrows the content
+            // area so the new "Set a Meeting" pill and the 4
+            // fixed-width social pills (4 × 86.4 + 3 × 32 = 441.6)
+            // share the same width — previously pr=634 left the CTA
+            // ~640 wide while the pills only spanned 441.
+            paddingRight: 831,
             paddingBottom: 160,
             gap: 40,
           }}
@@ -313,27 +317,27 @@ function ContactDesktop() {
             </div>
           </div>
 
-          {/* BOOK A TIME SLOT? CTA — stage 7 (last). Opens the Google
-              Calendar appointment page in a new tab. */}
-          <a
-            href={CALENDAR_URL}
-            target="_blank"
-            rel="noopener noreferrer"
-            aria-label="Book a time slot"
-            className="w-full text-[var(--color-text-primary)] shrink-0 block cursor-pointer hover:opacity-70 transition-opacity duration-200 anim-bubbly-grow"
-            style={{
-              fontFamily: SOLWAY,
-              fontWeight: 300,
-              fontSize: fs(16),
-              lineHeight: "28px",
-              textDecorationLine: "underline",
-              textDecorationStyle: "solid",
-              transformOrigin: "left center",
-              ["--stage" as string]: 7,
-            }}
-          >
-            BOOK A TIME SLOT?
-          </a>
+          {/* "Set a Meeting" CTA — Figma 535:11128 (replaces the
+              previous "BOOK A TIME SLOT?" underlined link). Primary
+              cream pill, no icon, full-width per Figma's `w-full`.
+              External `href` opens the Google Calendar appointment
+              page in a new tab; `CTAButton` auto-detects the https://
+              protocol and skips the View Transition wrapping. */}
+          <div className="w-full flex items-start shrink-0">
+            <span
+              className="anim-bubbly-grow flex-1 flex"
+              style={{
+                transformOrigin: "left center",
+                ["--stage" as string]: 7,
+              }}
+            >
+              <CTAButton
+                href={CALENDAR_URL}
+                label="Set a Meeting"
+                variant="primary"
+              />
+            </span>
+          </div>
         </div>
       </div>
     </>
@@ -577,26 +581,23 @@ function ContactMobile() {
           </div>
         </div>
 
-        {/* BOOK A TIME SLOT? */}
-        <a
-          href={CALENDAR_URL}
-          target="_blank"
-          rel="noopener noreferrer"
-          aria-label="Book a time slot"
-          className="w-full text-[var(--color-text-primary)] cursor-pointer hover:opacity-70 transition-opacity duration-200 anim-bubbly-grow"
-          style={{
-            fontFamily: SOLWAY,
-            fontWeight: 300,
-            fontSize: fs(16),
-            lineHeight: "28px",
-            textDecorationLine: "underline",
-            textDecorationStyle: "solid",
-            transformOrigin: "left center",
-            ["--stage" as string]: 7,
-          }}
-        >
-          BOOK A TIME SLOT?
-        </a>
+        {/* "Set a Meeting" CTA — mobile mirror of Figma 535:11128.
+            Primary cream pill, no icon, full-width. */}
+        <div className="w-full flex items-start shrink-0">
+          <span
+            className="anim-bubbly-grow flex-1 flex"
+            style={{
+              transformOrigin: "left center",
+              ["--stage" as string]: 7,
+            }}
+          >
+            <CTAButton
+              href={CALENDAR_URL}
+              label="Set a Meeting"
+              variant="primary"
+            />
+          </span>
+        </div>
       </div>
     </div>
   );

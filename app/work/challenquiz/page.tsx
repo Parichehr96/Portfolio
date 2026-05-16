@@ -27,7 +27,7 @@ const FIGMA_FILE_URL =
 
 export default function ChallenquizCaseStudy() {
   return (
-    <div className="bg-white relative w-full">
+    <div className="bg-[var(--color-bg-page)] relative w-full">
       <CaseStudyHeader
         title="Challenquiz"
         subtitle="Redesigning a Gamified Quiz App on Telegram"

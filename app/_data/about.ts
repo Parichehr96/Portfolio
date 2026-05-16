@@ -31,6 +31,11 @@ export const CERTIFICATES: AcademicItem[] = [
     url: "https://app.uxcel.com/certificates/5AKU06K2NRCJ",
   },
   {
+    name: "GenAI for UX Designers",
+    short: "Coursera",
+    date: "2025",
+  },
+  {
     name: "Google UX Design",
     short: "Coursera",
     date: "2024",
@@ -41,6 +46,25 @@ export const CERTIFICATES: AcademicItem[] = [
     short: "Coursera",
     date: "2022",
     url: "https://www.coursera.org/account/accomplishments/certificate/LJGFKFZA52AL",
+  },
+];
+
+/** Public-facing contributions — LinkedIn posts about plugins / portfolio
+ *  work. Renders between Academic Background and Certificates per Figma
+ *  544:11180 (added 2026-05). Same row template as ACADEMIC / CERTIFICATES
+ *  so the dashed-leader + external-link arrow style matches. */
+export const CONTRIBUTIONS: AcademicItem[] = [
+  {
+    name: "Human Decision Making",
+    short: "Poytek",
+    date: "2025",
+    url: "https://www.linkedin.com/posts/parichehr-talebzadeh_humandecisionmaking-plugin-uxdesign-activity-7347249113219891201-wsOG",
+  },
+  {
+    name: "Portfolio Design",
+    short: "Poytek",
+    date: "2024",
+    url: "https://www.linkedin.com/posts/parichehr-talebzadeh_portfoliodesign-personalbranding-storytelling-activity-7274693957870120960-eBGn",
   },
 ];
 

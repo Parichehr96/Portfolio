@@ -8,6 +8,7 @@ import { fs } from "../_lib/typography";
 import {
   ACADEMIC,
   CERTIFICATES,
+  CONTRIBUTIONS,
   INTERESTS,
   METHODES,
   SOFT_SKILLS,
@@ -161,75 +162,39 @@ function BioText({ baseStage }: { baseStage: number }) {
     letterSpacing: "0.5px",
     transformOrigin: "left top",
   } as const;
+  // 2026-05 Figma rewrite (389:5415): bio collapsed from 5 long
+  // paragraphs to 3 shorter ones, gap reduced from 24 → 12, no more
+  // Medium-weight emphasis spans (all Solway Regular).
   return (
-    <div className="w-full flex flex-col gap-[24px] shrink-0">
+    <div className="w-full flex flex-col gap-[12px] shrink-0">
       <p
         className={paragraphClass}
         style={{ ...paragraphStyle, ["--stage" as string]: baseStage }}
       >
-        I&rsquo;m a product designer with{" "}
-        <span style={{ fontWeight: 500 }}>+5 years of experience</span>{" "}
-        designing digital products across consumer apps, enterprise platforms,
-        and Web3 ecosystems. I&rsquo;m currently based in{" "}
-        <span style={{ fontWeight: 500 }}>Amsterdam</span>, completing my{" "}
-        <span style={{ fontWeight: 500 }}>
-          Master&rsquo;s in Interaction Design
-        </span>{" "}
-        at HvA.
+        I think in systems.
       </p>
       <p
         className={paragraphClass}
         style={{ ...paragraphStyle, ["--stage" as string]: baseStage + 1 }}
       >
-        Most of my work has happened as the only designer in the room.
-        I&rsquo;ve designed solo for a{" "}
-        <span style={{ fontWeight: 500 }}>Web3 product</span> that grew from 87
-        to 1,500 daily active users, led the redesign of a{" "}
-        <span style={{ fontWeight: 500 }}>gamified quiz app</span>, shaped the{" "}
-        <span style={{ fontWeight: 500 }}>digital ecosystem</span> of one of
-        Iran&rsquo;s largest auto parts manufacturers, and contributed to{" "}
-        <span style={{ fontWeight: 500 }}>enterprise ERP</span> work for the
-        oil and gas industry. Each project taught me something different, but
-        they share a common thread: figuring out how to make complex systems
-        feel simple, and how to keep users at the centre when the structure
-        around me doesn&rsquo;t always make that easy.
+        That&rsquo;s how I&rsquo;ve spent the last five years quietly
+        approaching every project — figuring out where user journeys overlap,
+        how roles hand off to each other, how trust travels through a product
+        without exposing private data. The visible part of design is getting
+        faster every month; AI can generate components, layouts, even full
+        flows in seconds. What still requires craft is the system underneath,
+        and that&rsquo;s where I want to keep working.
       </p>
       <p
         className={paragraphClass}
         style={{ ...paragraphStyle, ["--stage" as string]: baseStage + 2 }}
       >
-        I care about evidence. I care about honesty in the process — including
-        naming what didn&rsquo;t work and why. And I care about building
-        things that actually reach people, because the deepest lesson
-        I&rsquo;ve taken from my career so far is that design is only
-        meaningful when it&rsquo;s used.
-      </p>
-      <p
-        className={paragraphClass}
-        style={{ ...paragraphStyle, ["--stage" as string]: baseStage + 3 }}
-      >
-        Outside of client work, I think a lot about ethics; particularly how
-        products shape behavior without users noticing. My recent academic
-        work on Mindful Meet, an eco-conscious meeting tool, and ViaVia, a
-        community based ride-sharing app, came directly from that interest.
-        <br />
-        I also have experienced building different things with AI recently
-        and have been enjoying it and getting good at it actually!
-      </p>
-      <p
-        className={paragraphClass}
-        style={{ ...paragraphStyle, ["--stage" as string]: baseStage + 4 }}
-      >
-        If you&rsquo;re working on something{" "}
-        <span style={{ fontWeight: 500 }}>complex</span>,{" "}
-        <span style={{ fontWeight: 500 }}>multi-audience</span>, or{" "}
-        <span style={{ fontWeight: 500 }}>strategically ambitious</span> — or
-        if you need a designer who can{" "}
-        <span style={{ fontWeight: 500 }}>
-          hold the whole system in their head while still caring about the
-          details
-        </span>{" "}
-        — I&rsquo;d love to talk.
+        I&rsquo;m a product designer based in Amsterdam, currently completing
+        my Master&rsquo;s at HvA. I&rsquo;ve shipped end-to-end across
+        consumer apps, B2B platforms, and enterprise systems — usually as the
+        only designer in the room. Looking for product teams in the
+        Netherlands building complex things that need someone who can hold the
+        whole picture in their head while still caring about the details.
       </p>
     </div>
   );
@@ -425,28 +390,36 @@ function AboutDesktop() {
             overscrollBehavior: "contain",
           }}
         >
-          {/* Bio paragraphs — stages 2..6 (one per paragraph) */}
+          {/* Bio paragraphs — stages 2..4 (3 paragraphs after the
+              2026-05 Figma rewrite). Section titles drop the previous
+              "My" prefix to match Figma 319:2633 / 544:11181 /
+              319:2654 / 319:2693 / 429:3595. */}
           <BioText baseStage={2} />
           <ListSection
-            title="My Academic Background"
+            title="Academic Background"
             items={ACADEMIC}
-            stage={7}
+            stage={5}
           />
           <ListSection
-            title="My Certificates"
+            title="Contributions"
+            items={CONTRIBUTIONS}
+            stage={6}
+          />
+          <ListSection
+            title="Certificates"
             items={CERTIFICATES}
-            stage={8}
+            stage={7}
           />
 
-          {/* My Skills — Methodes | (Soft Skills + Tools) — stage 9 */}
+          {/* Skills — Methodes | (Soft Skills + Tools) — stage 8 */}
           <div
             className="w-full flex flex-col items-start gap-[20px] shrink-0 anim-bubbly-grow"
             style={{
               transformOrigin: "left top",
-              ["--stage" as string]: 9,
+              ["--stage" as string]: 8,
             }}
           >
-            <SectionTitle>My Skills</SectionTitle>
+            <SectionTitle>Skills</SectionTitle>
             <div className="w-full flex items-start rounded-[24px] whitespace-nowrap">
               <div className="flex-1 min-w-0 flex flex-col items-start justify-center gap-[8px]">
                 <SkillsColumnHeader>Methodes</SkillsColumnHeader>
@@ -492,10 +465,10 @@ function AboutDesktop() {
             className="w-full flex flex-col items-start gap-[20px] shrink-0 anim-bubbly-grow"
             style={{
               transformOrigin: "left top",
-              ["--stage" as string]: 10,
+              ["--stage" as string]: 9,
             }}
           >
-            <SectionTitle>My Interests</SectionTitle>
+            <SectionTitle>Interests</SectionTitle>
             <div
               className="flex items-center justify-center"
               style={{ gap: 12 }}
@@ -507,7 +480,7 @@ function AboutDesktop() {
                   style={{
                     width: 54,
                     gap: 4,
-                    ["--stage" as string]: 10 + i * 0.25,
+                    ["--stage" as string]: 9 + i * 0.25,
                   }}
                 >
                   <span
@@ -539,20 +512,20 @@ function AboutDesktop() {
             </div>
           </div>
 
-          {/* CTA — single secondary "MY EXPERIENCES" pill per Figma
-              319:2782 (desktop) / 478:4457 (mobile). Stretches full
-              width like the original two-button row so the bottom
-              spacing of the scroll area stays the same. */}
+          {/* CTA — primary "My Works" cream pill (Figma 535:8396).
+              Stretches full width so the bottom spacing of the
+              scrollable bio area stays the same. Stage 11 lands the
+              CTA last in the bubbly-grow sequence. */}
           <div className="w-full flex items-start shrink-0">
             <span
               className="anim-bubbly-grow flex-1 flex"
-              style={{ ["--stage" as string]: 12 }}
+              style={{ ["--stage" as string]: 11 }}
             >
               <CTAButton
-                href="/work"
-                iconSrc="/assets/icon-cta-work.svg"
-                label="MY EXPERIENCES"
-                variant="secondary"
+                href="/contact"
+                iconSrc="/assets/icon-cta-chat.svg"
+                label="Let's talk"
+                variant="primary"
               />
             </span>
           </div>
@@ -595,69 +568,48 @@ function ListSection({
    Same 5 paragraphs as desktop but rendered with the mobile leading
    (16/26) and bullet-by-bullet stagger so each appears individually. */
 function MobileBioText({ baseStage }: { baseStage: number }) {
-  const paragraphClass = "w-full text-[var(--color-text-secondary)] shrink-0 anim-bubbly-grow";
+  const paragraphClass =
+    "w-full text-[var(--color-text-secondary)] shrink-0 anim-bubbly-grow";
   const paragraphStyle = {
     fontSize: fs(16),
     lineHeight: "26px",
     letterSpacing: "0.5px",
     transformOrigin: "left top",
   } as const;
+  // Mobile mirror of the desktop bio rewrite — same 3 paragraphs, just
+  // rendered with the mobile leading (16/26) and a tighter gap-12.
   return (
-    <div className="w-full flex flex-col gap-[24px] shrink-0">
+    <div className="w-full flex flex-col gap-[12px] shrink-0">
       <p
         className={paragraphClass}
         style={{ ...paragraphStyle, ["--stage" as string]: baseStage }}
       >
-        I&rsquo;m a product designer with +5 years of experience designing
-        digital products across consumer apps, enterprise platforms, and
-        Web3 ecosystems. I&rsquo;m currently based in Amsterdam, completing
-        my Master&rsquo;s in Interaction Design at HvA.
+        I think in systems.
       </p>
       <p
         className={paragraphClass}
         style={{ ...paragraphStyle, ["--stage" as string]: baseStage + 1 }}
       >
-        Most of my work has happened as the only designer in the room.
-        I&rsquo;ve designed solo for a Web3 product that grew from 87 to
-        1,500 daily active users, led the redesign of a gamified quiz app,
-        shaped the digital ecosystem of one of Iran&rsquo;s largest auto
-        parts manufacturers, and contributed to enterprise ERP work for the
-        oil and gas industry. Each project taught me something different,
-        but they share a common thread: figuring out how to make complex
-        systems feel simple, and how to keep users at the centre when the
-        structure around me doesn&rsquo;t always make that easy.
+        That&rsquo;s how I&rsquo;ve spent the last five years quietly
+        approaching every project — figuring out where user journeys
+        overlap, how roles hand off to each other, how trust travels
+        through a product without exposing private data. The visible part
+        of design is getting faster every month; AI can generate
+        components, layouts, even full flows in seconds. What still
+        requires craft is the system underneath, and that&rsquo;s where
+        I want to keep working.
       </p>
       <p
         className={paragraphClass}
         style={{ ...paragraphStyle, ["--stage" as string]: baseStage + 2 }}
       >
-        I care about evidence. I care about honesty in the process —
-        including naming what didn&rsquo;t work and why. And I care about
-        building things that actually reach people, because the deepest
-        lesson I&rsquo;ve taken from my career so far is that design is
-        only meaningful when it&rsquo;s used.
-      </p>
-      <p
-        className={paragraphClass}
-        style={{ ...paragraphStyle, ["--stage" as string]: baseStage + 3 }}
-      >
-        Outside of client work, I think a lot about ethics; particularly
-        how products shape behavior without users noticing. My recent
-        academic work on Mindful Meet, an eco-conscious meeting tool, and
-        ViaVia, a community based ride-sharing app, came directly from
-        that interest.
-        <br />
-        I also have experienced building different things with AI recently
-        and have been enjoying it and getting good at it actually!
-      </p>
-      <p
-        className={paragraphClass}
-        style={{ ...paragraphStyle, ["--stage" as string]: baseStage + 4 }}
-      >
-        If you&rsquo;re working on something complex, multi-audience, or
-        strategically ambitious — or if you need a designer who can hold
-        the whole system in their head while still caring about the
-        details — I&rsquo;d love to talk.
+        I&rsquo;m a product designer based in Amsterdam, currently
+        completing my Master&rsquo;s at HvA. I&rsquo;ve shipped end-to-end
+        across consumer apps, B2B platforms, and enterprise systems —
+        usually as the only designer in the room. Looking for product
+        teams in the Netherlands building complex things that need
+        someone who can hold the whole picture in their head while still
+        caring about the details.
       </p>
     </div>
   );
@@ -869,26 +821,31 @@ function AboutMobile() {
         >
           <MobileBioText baseStage={2} />
           <MobileListSection
-            title="My Academic Background"
+            title="Academic Background"
             items={ACADEMIC}
-            stage={7}
+            stage={5}
           />
           <MobileListSection
-            title="My Certificates"
+            title="Contributions"
+            items={CONTRIBUTIONS}
+            stage={6}
+          />
+          <MobileListSection
+            title="Certificates"
             items={CERTIFICATES}
-            stage={8}
+            stage={7}
           />
 
-          {/* My Skills — single column on mobile (stacked Methodes,
+          {/* Skills — single column on mobile (stacked Methodes,
               Soft Skills, Tools). */}
           <div
             className="w-full flex flex-col items-start gap-[20px] shrink-0 anim-bubbly-grow"
             style={{
               transformOrigin: "left top",
-              ["--stage" as string]: 9,
+              ["--stage" as string]: 8,
             }}
           >
-            <SectionTitle>My Skills</SectionTitle>
+            <SectionTitle>Skills</SectionTitle>
             <div className="w-full flex flex-col items-start gap-[24px] rounded-[24px]">
               <div className="w-full flex flex-col items-start gap-[8px]">
                 <SkillsColumnHeader>Methodes</SkillsColumnHeader>
@@ -923,7 +880,7 @@ function AboutMobile() {
             </div>
           </div>
 
-          {/* My Interests (Figma 478:4385 mobile) — two centred rows:
+          {/* Interests (Figma 478:4385 mobile) — two centred rows:
               first row 5 items with 31.2 px gaps, second row 4 items
               with 30.4 px gaps. Each item is 25.6 px wide with a
               25.6 × 25.6 icon and a Solway Regular 8/12.8 label in
@@ -933,10 +890,10 @@ function AboutMobile() {
             className="w-full flex flex-col items-start gap-[20px] shrink-0 anim-bubbly-grow"
             style={{
               transformOrigin: "left top",
-              ["--stage" as string]: 10,
+              ["--stage" as string]: 9,
             }}
           >
-            <SectionTitle>My Interests</SectionTitle>
+            <SectionTitle>Interests</SectionTitle>
             <div
               className="w-full flex flex-col items-center"
               style={{ gap: 12 }}
@@ -956,7 +913,7 @@ function AboutMobile() {
                           width: 25.6,
                           gap: 3.2,
                           ["--stage" as string]:
-                            10 + (rowIdx * 5 + i) * 0.25,
+                            9 + (rowIdx * 5 + i) * 0.25,
                         }}
                       >
                         <span
@@ -991,19 +948,20 @@ function AboutMobile() {
             </div>
           </div>
 
-          {/* CTA — single secondary "MY EXPERIENCES" pill per Figma
-              478:4457 (mobile). Same component used on desktop so the
-              styling stays aligned across breakpoints. */}
+          {/* CTA — primary "My Works" cream pill (Figma 535:8396).
+              Same component used on desktop so the styling stays
+              aligned across breakpoints. Stage 11 lands the CTA last
+              in the bubbly-grow sequence. */}
           <div className="w-full flex items-start shrink-0">
             <span
               className="anim-bubbly-grow flex-1 flex"
-              style={{ ["--stage" as string]: 12 }}
+              style={{ ["--stage" as string]: 11 }}
             >
               <CTAButton
-                href="/work"
-                iconSrc="/assets/icon-cta-work.svg"
-                label="MY EXPERIENCES"
-                variant="secondary"
+                href="/contact"
+                iconSrc="/assets/icon-cta-chat.svg"
+                label="Let's talk"
+                variant="primary"
               />
             </span>
           </div>

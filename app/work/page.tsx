@@ -409,13 +409,52 @@ function WorkDesktop() {
                 minHeight: 0,
               }}
             >
-              <img
-                key={selectedIdx}
-                src={currentPreview}
-                alt=""
-                className="absolute inset-0 w-full h-full object-cover block anim-fade"
-                style={{ animationDuration: "400ms" }}
-              />
+              {currentExperience?.previewVideo ? (
+                /* Looping muted preview (ONTON portrait WebM, Mindful
+                   Meet landscape WebM). A flex wrapper insets the
+                   clip 16 px from each side of the thumbnail frame;
+                   the video itself either fills the height (default,
+                   for portrait sources like ONTON) or the width (for
+                   landscape sources like Mindful Meet), with the
+                   other dimension following the native aspect ratio
+                   so nothing gets letterboxed. The parent's
+                   `overflow-hidden` clips any overshoot on the
+                   non-constrained axis. `rounded-[16px]` softens the
+                   corners; the video re-mounts via `key` when the
+                   user picks another row (which stops the previous
+                   clip and re-runs the anim-fade entrance);
+                   `autoPlay loop muted playsInline` is the combo
+                   browsers need to start playback inline without a
+                   user gesture. */
+                <div
+                  className="absolute flex items-center justify-center"
+                  style={{ inset: 16 }}
+                >
+                  <video
+                    key={`vid-${currentExperience.previewVideo}`}
+                    src={currentExperience.previewVideo}
+                    autoPlay
+                    loop
+                    muted
+                    playsInline
+                    preload="auto"
+                    className={
+                      currentExperience.previewVideoFit === "width"
+                        ? "block w-full h-auto max-h-none rounded-[16px] anim-fade"
+                        : "block h-full w-auto max-w-none rounded-[16px] anim-fade"
+                    }
+                    style={{ animationDuration: "400ms" }}
+                  />
+                </div>
+              ) : (
+                <img
+                  key={`img-${selectedIdx}`}
+                  src={currentPreview}
+                  alt=""
+                  className="absolute inset-0 w-full h-full object-cover block anim-fade"
+                  style={{ animationDuration: "400ms" }}
+                />
+              )}
             </div>
             {currentExperience && (
               <>
@@ -869,15 +908,45 @@ function WorkMobile() {
             viewTransitionName: "hero-illustration",
           }}
         >
-          <Image
-            key={currentPreview}
-            src={currentPreview}
-            alt=""
-            fill
-            sizes="358px"
-            className="object-cover block anim-fade"
-            style={{ animationDuration: "400ms" }}
-          />
+          {currentExperience?.previewVideo ? (
+            /* Mobile mirror of the desktop video. Same 16 px inset
+               around a flex wrapper; the video either fills the
+               frame's height (portrait sources like ONTON) or its
+               width (landscape sources like Mindful Meet), per
+               `previewVideoFit`. Rounded corners + `key`-on-src
+               re-mount so the previous clip stops when the user
+               swipes/taps another experience. */
+            <div
+              className="absolute flex items-center justify-center"
+              style={{ inset: 16 }}
+            >
+              <video
+                key={`vid-${currentExperience.previewVideo}`}
+                src={currentExperience.previewVideo}
+                autoPlay
+                loop
+                muted
+                playsInline
+                preload="auto"
+                className={
+                  currentExperience.previewVideoFit === "width"
+                    ? "block w-full h-auto max-h-none rounded-[16px] anim-fade"
+                    : "block h-full w-auto max-w-none rounded-[16px] anim-fade"
+                }
+                style={{ animationDuration: "400ms" }}
+              />
+            </div>
+          ) : (
+            <Image
+              key={currentPreview}
+              src={currentPreview}
+              alt=""
+              fill
+              sizes="358px"
+              className="object-cover block anim-fade"
+              style={{ animationDuration: "400ms" }}
+            />
+          )}
         </div>
 
         {/* Text and Experiences Container — flex-1 absorbs whatever

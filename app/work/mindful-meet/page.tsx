@@ -24,7 +24,7 @@ const PROTOTYPE_URL = "https://linear-give-41714666.figma.site/";
 
 export default function MindfulMeetCaseStudy() {
   return (
-    <div className="bg-white relative w-full">
+    <div className="bg-[var(--color-bg-page)] relative w-full">
       <CaseStudyHeader
         title="Mindful Meet"
         subtitle="Eco-Conscious Meeting Lifecycle Design"

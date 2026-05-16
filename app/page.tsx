@@ -45,7 +45,7 @@ function BioParagraph() {
 
 function HomeDesktop() {
   const { handleClick } = useViewTransitionRouter();
-  const handleAboutClick = handleClick("/about");
+  const handleWorkClick = handleClick("/work");
 
   return (
     <>
@@ -143,21 +143,25 @@ function HomeDesktop() {
         </div>
 
         {/* Bio Container — bottom row, items-end. LEFT: 303-wide
-            column with bio paragraph + "Know Me?" underlined link.
-            RIGHT (flex-1): tagline at bottom-right. */}
+            column with the bio paragraph (Figma 309:1441). RIGHT
+            (flex-1): tagline stacked above the new "My Works"
+            cream pill (Figma 300:2354 + 535:11119). */}
         <div
           className="w-full flex items-end justify-center shrink-0"
           style={{ color: "var(--color-text-primary)" }}
         >
-          {/* Left column — bio + Know Me? link */}
+          {/* Left column — bio only. Inner paragraph is 273-wide per
+              Figma 288:1725; the outer column reserves 303 so the
+              right column starts at the same x as before. */}
           <div
-            className="flex flex-col items-start justify-center gap-[20px] shrink-0"
+            className="flex flex-col items-start justify-center shrink-0"
             style={{ width: 303, fontWeight: 300 }}
           >
             {/* Bio — stage 3 */}
             <p
-              className="w-full anim-bubbly-grow"
+              className="anim-bubbly-grow"
               style={{
+                width: 273,
                 fontSize: fs(16),
                 lineHeight: "24px",
                 transformOrigin: "left center",
@@ -166,56 +170,80 @@ function HomeDesktop() {
             >
               <BioParagraph />
             </p>
-            {/* "Know Me?" link — Figma 497:3545. Underlined Solway
-                Regular 16/24, no pill background; left-aligned to sit
-                under the bio paragraph rather than centered. Stage 4. */}
-            <Link
-              href="/about"
-              onClick={handleAboutClick}
-              className="text-left anim-bubbly-grow cursor-pointer hover:opacity-70 transition-opacity duration-200"
-              style={{
-                color: "var(--color-text-primary)",
-                fontFamily: "var(--font-solway), serif",
-                fontWeight: 400,
-                fontSize: fs(16),
-                lineHeight: "24px",
-                letterSpacing: "0.15px",
-                textDecorationLine: "underline",
-                textDecorationStyle: "solid",
-                paddingTop: 4,
-                paddingBottom: 4,
-                transformOrigin: "left center",
-                ...STAGE(4),
-              }}
-              aria-label="Know Me? — learn more about me"
-            >
-              Know Me?
-            </Link>
           </div>
 
-          {/* Right column — pushed to the right by flex-1, content
-              bottom-aligned and right-aligned. */}
+          {/* Right column — tagline stacked above the cream pill
+              "My Works" CTA, both right-aligned and pinned to the
+              bottom of the row via items-end + justify-end. */}
           <div className="flex-1 min-w-0 self-stretch flex flex-row items-end">
-            <div className="flex-1 min-w-0 h-full flex flex-col items-end justify-end">
-              {/* Complexity tagline — stage 5 (bottom-right). Uses
-                  `--color-text-tagline` so it stays navy on light and
-                  switches to cream-lighter (#FEFBF5) on dark per
-                  Figma 488:4630. */}
+            <div className="flex-1 min-w-0 h-full flex flex-col items-end justify-end gap-[20px]">
+              {/* Complexity tagline — stage 4. Figma 300:2357 spaces
+                  the words for visual rhythm (literal extra spaces)
+                  and tracks the two emphasis words by 2 px; the
+                  whole line uses leading-32 instead of the previous
+                  24. `whitespace-pre-wrap` preserves the inline
+                  spacing without converting it to a single space.
+                  Colour reads from `--color-text-tagline` so it
+                  stays navy on light and switches to cream-lighter
+                  on dark per Figma 488:4630. */}
               <p
                 className="anim-bubbly-grow"
                 style={{
                   fontWeight: 300,
                   fontSize: fs(16),
-                  lineHeight: "24px",
+                  lineHeight: "32px",
                   width: 251,
                   textAlign: "right",
+                  whiteSpace: "pre-wrap",
                   color: "var(--color-text-tagline)",
+                  transformOrigin: "right center",
+                  ...STAGE(4),
+                }}
+              >
+                Complexity   is   {""}
+                <span style={{ letterSpacing: "2px" }}>inevitable</span>
+                , Confusion      is      {""}
+                <span style={{ letterSpacing: "2px" }}>optional</span>.
+              </p>
+
+              {/* "My Works" primary pill — Figma 535:11119 (light) /
+                  549:11218 (dark), refreshed 2026-05. Fixed 224 px
+                  wide, label-only (the previous work-from-home icon
+                  was dropped). Bg + label colour read from the
+                  shared `--color-cta-primary-*` tokens so the pill
+                  is cream + navy-dark in light, navy-light + white
+                  in dark. Routes to /work via the View Transition
+                  router so the hero illustration morphs into the
+                  project preview frame on /work. Stage 5. */}
+              <Link
+                href="/work"
+                onClick={handleWorkClick}
+                className="anim-bubbly-grow shrink-0 flex items-center justify-center rounded-[122px] bg-[var(--color-cta-primary-bg)] hover:bg-[var(--color-cta-primary-hover)] transition-colors duration-200 cursor-pointer"
+                style={{
+                  width: 224,
+                  paddingLeft: 24,
+                  paddingRight: 24,
+                  paddingTop: 12,
+                  paddingBottom: 12,
                   transformOrigin: "right center",
                   ...STAGE(5),
                 }}
+                aria-label="My Works — see my projects"
               >
-                Complexity is inevitable, Confusion is optional.
-              </p>
+                <span
+                  className="whitespace-nowrap"
+                  style={{
+                    color: "var(--color-cta-primary-text)",
+                    fontFamily: "var(--font-solway), serif",
+                    fontWeight: 400,
+                    fontSize: fs(16),
+                    lineHeight: "24px",
+                    letterSpacing: "0.15px",
+                  }}
+                >
+                  My Works
+                </span>
+              </Link>
             </div>
           </div>
         </div>

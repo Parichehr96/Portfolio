@@ -21,7 +21,7 @@ const COMPANY_LINKEDIN_URL =
 
 export default function EzamPartCaseStudy() {
   return (
-    <div className="bg-white relative w-full">
+    <div className="bg-[var(--color-bg-page)] relative w-full">
       <CaseStudyHeader
         title="Ezam Part"
         subtitle="Unifying an Auto Parts Manufacturer’s Digital Ecosystem"

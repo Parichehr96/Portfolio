@@ -12,6 +12,18 @@ export type Experience = {
   /** Optional per-project preview image. Falls back to profile-image
    *  while the user hasn't supplied real previews yet. */
   preview?: string;
+  /** Optional looping preview video (WebM/MP4). When set, the Work
+   *  preview frame renders a `<video>` instead of an `<img>`; the
+   *  video plays muted on loop while this experience is selected and
+   *  unmounts (so playback stops) when the user picks another row. */
+  previewVideo?: string;
+  /** How the video fits inside the thumbnail frame:
+   *  - "height" (default, used by ONTON's vertical clip) — fills the
+   *    available height, width follows from the native aspect ratio.
+   *  - "width" — fills the available width (used by Mindful Meet's
+   *    landscape clip so the whole frame is visible).
+   *  Either way the parent reserves a 16 px cream margin on every side. */
+  previewVideoFit?: "height" | "width";
   /** When set, the experience name links to a case-study route. The
    *  whole row stays a hover target for the highlight; only the name
    *  cluster is clickable so the surrounding date/dashed leader don't
@@ -35,8 +47,10 @@ export const EXPERIENCES: Experience[] = [
     date: "Oct 2025 - Dec 2025",
     industry: "SaaS · Productivity Tool",
     description:
-      "A Calendar integration that makes the digital carbon cost and mental load of online meetings visible — uplifting mental health and productivity.",
+      "A Calendar integration that makes the digital carbon cost and mental load of online meetings visible by integrating a daily meeting budget; uplifting mental health and productivity.",
     caseStudy: "/work/mindful-meet",
+    previewVideo: "/assets/mindful-meet/mindfulmeet_thumbnail.webm",
+    previewVideoFit: "width",
   },
   {
     name: "ONTON",
@@ -44,8 +58,9 @@ export const EXPERIENCES: Experience[] = [
     date: "May 2024 - June 2025",
     industry: "Mobile App · Consumer · Web3",
     description:
-      "A Telegram Mini App connecting crypto communities to on-chain event verification, letting organisers issue and participants collect proof-of-attendance badges in-chat.",
+      "A Telegram Mini App connecting crypto communities to on-chain event verification, letting organisers issue and participants collect proof-of-attendance badges in-app.",
     caseStudy: "/work/onton",
+    previewVideo: "/assets/onton/onton_thumbnail.webm",
   },
   {
     name: "Ezam Part",

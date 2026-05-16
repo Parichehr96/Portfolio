@@ -46,8 +46,19 @@
      white pill (matches the cream Union backdrop) + navy-themed icon. */
   --color-nav-active-bg: #1F2753;
   --color-nav-inactive-bg: #FFFFFF;
-  --color-nav-pill-bg: #F9F5EB;
+  /* Union nav backdrop — the cream-dark swoosh sits between the
+     inactive white pills in light mode (Figma 288:1727 → I283:1658
+     refreshed 2026-05). Dark mode swaps to a mid-navy so the nav
+     silhouette stays visible against the new navy-dark page bg. */
+  --color-nav-pill-bg: #EDEAE4;
   --color-nav-hover-overlay: rgba(31, 39, 83, 0.1);
+  /* Primary cream-pill CTA (Home "My Works", About "Let's talk", etc.)
+     — cream-on-navy-dark in light. Dark theme swaps to navy-light fill
+     + white label per Figma 549:11218 so the CTA still pops against
+     the new #1B2249 page bg. */
+  --color-cta-primary-bg: #F9F5EB;
+  --color-cta-primary-text: #1B2249;
+  --color-cta-primary-hover: #EDEAE4;
   /* Selected experience-row pill on /work — cream in light, navy
      darker in dark so the pill still reads as "lifted" from the page. */
   --color-experience-pill-bg: #F9F5EB;
@@ -112,7 +123,11 @@ body {
 }
 
 [data-theme="dark"] {
-  --color-bg-page: #1F2753;
+  /* Page bg refreshed 2026-05 (Figma 488:4616) — navy-dark #1B2249
+     replaces the previous navy #1F2753 so the page reads slightly
+     deeper and the new mid-navy Union backdrop has somewhere to
+     contrast. */
+  --color-bg-page: #1B2249;
   --color-text-primary: #FFFFFF;
   --color-text-secondary: #DDE0F1;
   --color-text-muted: #DDE0F1;
@@ -120,20 +135,31 @@ body {
   --color-border-soft: #EDEAE4;
   --color-secondary-button-text: #FFFFFF;
   --color-nav-active-bg: #F9F5EB;
+  /* Inactive pill blends into the new page bg — only the cream
+     active pill stands out from the Union curve. */
   --color-nav-inactive-bg: #1B2249;
-  --color-nav-pill-bg: #1B2249;
+  /* Union backdrop bumps to mid-navy #495285 (Figma 2026-05) so the
+     nav silhouette stays visible after the page bg dropped to the
+     matching navy-dark. */
+  --color-nav-pill-bg: #495285;
   --color-nav-hover-overlay: rgba(255, 255, 255, 0.08);
+  /* Primary CTA in dark — navy-light #28315F fill + white label per
+     Figma 549:11218; matches the experience-pill bg so the cream
+     pill family stays cohesive between themes. */
+  --color-cta-primary-bg: #28315F;
+  --color-cta-primary-text: #FFFFFF;
+  --color-cta-primary-hover: #1F2753;
   --color-experience-pill-bg: #28315F;
   --color-experience-pill-text: #FFFFFF;
   --color-scroll-track: #28315F;
   --color-scroll-thumb: #F9F5EB;
   --color-cream-hover-overlay: rgba(249, 245, 235, 0.12);
   --hero-illustration-opacity: 0.9;
-  /* Override the nav-pill.svg's internal --fill-0 so its single path
-     repaints to the dark navy. The asset already declares
-     `fill="var(--fill-0, #F9F5EB)"`, so this value cascades into the
-     SVG and recolours the Union without swapping the asset. */
-  --fill-0: #1B2249;
+  /* Override the inline nav-pill SVG's `--fill-0` so the Union path
+     repaints to the mid-navy. The SVG asset (and the inline copy in
+     FloatingNav.tsx) declares `fill="var(--fill-0, fallback)"`, so
+     this value cascades into the path without swapping the asset. */
+  --fill-0: #495285;
 }
 
 /* === Custom cursor (Figma 457:8739) ===
@@ -479,3 +505,5 @@ body {
     padding: 80px 120px;
   }
 }
+
+

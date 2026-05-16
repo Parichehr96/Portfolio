@@ -23,7 +23,7 @@ const TELEGRAM_CHANNEL_URL = "https://t.me/ontonlive";
 
 export default function OntonCaseStudy() {
   return (
-    <div className="bg-white relative w-full">
+    <div className="bg-[var(--color-bg-page)] relative w-full">
       <CaseStudyHeader
         title="ONTON"
         subtitle={'Designing the "Social-Chain" Bridge'}

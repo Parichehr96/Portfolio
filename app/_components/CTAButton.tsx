@@ -19,7 +19,10 @@ export type CTAButtonVariant = "primary" | "secondary";
 
 export type CTAButtonProps = {
   href?: string;
-  iconSrc: string;
+  /** Optional — Contact's "Set a Meeting" pill has no icon (Figma
+   *  535:11128). When omitted, the inner span is skipped entirely so
+   *  the label centres on its own. */
+  iconSrc?: string;
   label: string;
   variant: CTAButtonVariant;
   uppercase?: boolean;
@@ -33,14 +36,22 @@ function isExternalHref(href: string) {
   return /^(https?:|mailto:|tel:)/.test(href);
 }
 
+// Pill spec tightened in the 2026-05 Figma refresh (About 535:8396,
+// Contact 535:11128, Work 535:8371): gap 12 → 8, px 16 → 24, rounded
+// 120 → 122, secondary border 2 → 1.6, label 14 → 16.
 const baseClass =
-  "flex-1 min-w-0 flex items-center justify-center gap-[12px] px-[16px] py-[12px] rounded-[120px] transition-colors duration-200";
-const primaryClass = "bg-[var(--color-cream)] hover:bg-[var(--color-cream-dark)] cursor-pointer";
+  "flex-1 min-w-0 flex items-center justify-center gap-[8px] px-[24px] py-[12px] rounded-[122px] transition-colors duration-200";
+// Primary CTA bg + hover read from theme tokens (cream → cream-dark
+// in light, navy-light → navy in dark) per Figma 549:11218 so the
+// pill repaints to navy-light with a white label when dark mode is
+// active without each call site needing to know.
+const primaryClass =
+  "bg-[var(--color-cta-primary-bg)] hover:bg-[var(--color-cta-primary-hover)] cursor-pointer";
 // Transparent bg lets the secondary pill read as an outlined button on
 // both themes (white card on light, navy card on dark) — only the
 // border + hover overlay change color via the theme variable.
 const secondaryClass =
-  "bg-transparent border-2 border-solid border-[var(--color-cream-dark)] hover:bg-[rgba(249,245,235,0.12)] cursor-pointer";
+  "bg-transparent border-[1.6px] border-solid border-[var(--color-cream-dark)] hover:bg-[rgba(249,245,235,0.12)] cursor-pointer";
 
 function ButtonInner({
   iconSrc,
@@ -48,33 +59,39 @@ function ButtonInner({
   uppercase,
   variant,
 }: Pick<CTAButtonProps, "iconSrc" | "label" | "uppercase" | "variant">) {
-  // Primary pill keeps its cream bg in both themes, so the label stays
-  // navy for readable contrast on cream. Secondary is transparent and
-  // sits on the page bg, so it follows the theme's primary text colour
-  // (navy in light, white in dark).
+  // Primary pill's bg + text both swap with theme (cream / navy-dark
+  // in light → navy-light / white in dark) via the
+  // `--color-cta-primary-*` tokens. Secondary is transparent and
+  // sits on the page bg, so it follows the theme's primary text
+  // colour (navy in light, white in dark).
   const labelColor =
-    variant === "primary" ? "var(--color-navy)" : "var(--color-text-primary)";
+    variant === "primary"
+      ? "var(--color-cta-primary-text)"
+      : "var(--color-text-primary)";
   return (
     <>
-      <span
-        className={`relative shrink-0 inline-block w-[24px] h-[24px] ${
-          variant === "secondary" ? "themed-icon" : ""
-        }`}
-      >
-        <img
-          src={iconSrc}
-          alt=""
-          className="absolute inset-0 w-full h-full block"
-        />
-      </span>
+      {iconSrc && (
+        <span
+          className={`relative shrink-0 inline-block w-[24px] h-[24px] ${
+            variant === "secondary" ? "themed-icon" : ""
+          }`}
+        >
+          <img
+            src={iconSrc}
+            alt=""
+            className="absolute inset-0 w-full h-full block"
+          />
+        </span>
+      )}
       <span
         className="whitespace-nowrap"
         style={{
           color: labelColor,
           fontFamily: font.solway,
           fontWeight: 400,
-          fontSize: fs(14),
-          lineHeight: "18px",
+          fontSize: fs(16),
+          lineHeight: "24px",
+          letterSpacing: "0.15px",
           textTransform: uppercase ? "uppercase" : undefined,
         }}
       >

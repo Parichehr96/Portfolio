@@ -34,7 +34,7 @@ const DS_CASE_STUDY_URL =
 
 export default function WowCaseStudy() {
   return (
-    <div className="bg-white relative w-full">
+    <div className="bg-[var(--color-bg-page)] relative w-full">
       <CaseStudyHeader
         title="WOW Global Solution"
         subtitle="Enterprise Resource Planning for Oil & Gas Projects"
