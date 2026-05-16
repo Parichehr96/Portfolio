@@ -68,7 +68,7 @@ export const EXPERIENCES: Experience[] = [
     date: "Nov 2022 - June 2023",
     industry: "E-commerce · B2B",
     description:
-      "A unified digital ecosystem (consumer site, agent dashboard, repairman app) for one of Iran’s largest auto parts manufacturers.",
+      "A unified digital ecosystem (consumer site redesign, agent dashboard, repairman app), for a large auto parts manufacturers.",
     caseStudy: "/work/ezam-part",
   },
   {
@@ -103,7 +103,7 @@ export const EXPERIENCES: Experience[] = [
     date: "Jan 2021 - June 2022",
     industry: "ERP · EdTech · Web App",
     description:
-      "A redesign of Iran’s national university ERP used by students nationwide — simplifying enrolment, grades, and academic workflows.",
+      "A redesign of national university ERP used by students nationwide; simplifying enrolment, grades, and academic workflows.",
     externalUrl:
       "https://www.behance.net/gallery/157018767/Golestan-Educational-ERP-for-universities-(Redesign)",
   },

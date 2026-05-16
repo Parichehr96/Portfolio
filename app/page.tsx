@@ -96,8 +96,9 @@ function HomeDesktop() {
             Parichehr
           </p>
 
-          {/* Profile info row (Figma 511:8022). Inline group:
-              "Talebzadeh · Product Designer", all Solway Light 20/36
+          {/* Profile info row (Figma 288:1721, refreshed 2026-05 to
+              show location instead of surname). Inline group:
+              "Netherlands · Product Designer", all Solway Light 20/36
               tracking-2px, separated by a Regular 22/28 dot. */}
           <div className="w-full flex items-center gap-[12px] whitespace-nowrap">
             <p
@@ -111,7 +112,7 @@ function HomeDesktop() {
                 ...STAGE(1),
               }}
             >
-              Talebzadeh
+              Netherlands
             </p>
             <p
               className="shrink-0 anim-bubbly-grow"
@@ -179,19 +180,18 @@ function HomeDesktop() {
             <div className="flex-1 min-w-0 h-full flex flex-col items-end justify-end gap-[20px]">
               {/* Complexity tagline — stage 4. Figma 300:2357 spaces
                   the words for visual rhythm (literal extra spaces)
-                  and tracks the two emphasis words by 2 px; the
-                  whole line uses leading-32 instead of the previous
-                  24. `whitespace-pre-wrap` preserves the inline
-                  spacing without converting it to a single space.
-                  Colour reads from `--color-text-tagline` so it
-                  stays navy on light and switches to cream-lighter
-                  on dark per Figma 488:4630. */}
+                  and tracks the two emphasis words by 2 px.
+                  `whitespace-pre-wrap` preserves the inline spacing
+                  without converting it to a single space. Colour
+                  reads from `--color-text-tagline` so it stays navy
+                  on light and switches to cream-lighter on dark per
+                  Figma 488:4630. */}
               <p
                 className="anim-bubbly-grow"
                 style={{
                   fontWeight: 300,
                   fontSize: fs(16),
-                  lineHeight: "32px",
+                  lineHeight: "24px",
                   width: 251,
                   textAlign: "right",
                   whiteSpace: "pre-wrap",
@@ -260,7 +260,7 @@ function HomeDesktop() {
 
    Type scales:
      - "Parichehr"            Solway Regular 60/64 tracking-8
-     - "Talebzadeh" + role    Solway Light 14/24 tracking-2
+     - "Netherlands" + role   Solway Light 14/24 tracking-2
      - Quote                  Solway Light 14/18
      - Bio paragraph          Solway Light 14/20 (Regular for emphasis)
      - "Me?" CTA              Solway Regular 14/20 cream pill */
@@ -326,7 +326,7 @@ function HomeMobile() {
               className="flex-1 min-w-0 anim-bubbly-grow"
               style={{ transformOrigin: "left center", ...STAGE(1) }}
             >
-              Talebzadeh
+              Netherlands
             </p>
             <p
               className="whitespace-nowrap shrink-0 anim-bubbly-grow"

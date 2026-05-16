@@ -20,7 +20,7 @@ import {
 /* === FIGMA DESIGN TOKENS (Work, node 300:2201) ===
    Rendered inside ScaledShell (which handles the 1512 × 982 scale).
    Bio Section header (gap-12, w=1272):
-     - "I'm experienced in a range,"      Solway Regular 44/52 navy
+     - "My experiences,"                  Solway Regular 44/52 navy
      - "confidently adapt to the context." Solway Regular 20/24 tracking-2 navy
    Bio Container (h=665, gap-40, pb-80):
      - Project preview frame on the LEFT (h-full aspect-square,
@@ -362,7 +362,7 @@ function WorkDesktop() {
               ["--stage" as string]: 0,
             }}
           >
-            I&rsquo;m experienced in a range,
+            My experiences,
           </p>
           <p
             className="w-full anim-bubbly-grow"
@@ -823,7 +823,7 @@ function WorkMobile() {
             ["--stage" as string]: 0,
           }}
         >
-          I&rsquo;m experienced in a range,
+          My experiences,
         </p>
         <p
           className="w-full anim-bubbly-grow"

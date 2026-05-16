@@ -71,11 +71,14 @@ function ButtonInner({
   return (
     <>
       {iconSrc && (
-        <span
-          className={`relative shrink-0 inline-block w-[24px] h-[24px] ${
-            variant === "secondary" ? "themed-icon" : ""
-          }`}
-        >
+        // `themed-icon` is a no-op in light mode (the filter only
+        // applies under `[data-theme="dark"]`), so applying it to
+        // both variants is safe: it keeps the navy artwork on light
+        // cream / light page bg, and shifts the icon to the white +
+        // light-blue palette in dark mode where the primary pill bg
+        // becomes navy-light (otherwise the dark-navy glyph
+        // disappears into the pill).
+        <span className="themed-icon relative shrink-0 inline-block w-[24px] h-[24px]">
           <img
             src={iconSrc}
             alt=""

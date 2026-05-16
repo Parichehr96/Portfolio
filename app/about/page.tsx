@@ -20,7 +20,7 @@ import {
    Rendered inside ScaledShell (which handles the 1512 × 982 scale).
    Outer flex-col gap-80, pt-80 pb-40 px-120 items-center.
    Bio Section (top, w=1272):
-     - "You can call me Pari," Solway Regular 60/66 tracking-2
+     - "Call me Pari," Solway Regular 60/66 tracking-2
      - "Nice to meet you!"     Solway Regular 32/40 tracking-2
    Illustration (face crop): 816×816 absolute, x=-33, top=167.
      `viewTransitionName: "hero-illustration"` → cross-page morph.
@@ -351,7 +351,7 @@ function AboutDesktop() {
             ["--stage" as string]: 0,
           }}
         >
-          You can call me Pari,
+          Call me Pari,
         </p>
         <p
           className="w-full text-[var(--color-text-primary)] anim-bubbly-grow"
@@ -777,7 +777,7 @@ function AboutMobile() {
         </div>
       </div>
 
-      {/* Bio Section header — "You can call me Pari," + "Nice to meet you!" */}
+      {/* Bio Section header — "Call me Pari," + "Nice to meet you!" */}
       <div className="relative w-full flex flex-col items-start gap-[8px]">
         <p
           className="w-full text-[var(--color-text-primary)] anim-bubbly-grow"
@@ -789,7 +789,7 @@ function AboutMobile() {
             ["--stage" as string]: 0,
           }}
         >
-          You can call me Pari,
+          Call me Pari,
         </p>
         <p
           className="w-full text-[var(--color-text-primary)] anim-bubbly-grow"
