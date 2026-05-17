@@ -73,12 +73,14 @@ export const METHODES = [
   "Design Thinking",
   "Interaction Design",
   "Information Architecture",
+  "Interface Design",
   "User Research",
   "Usability testing",
   "Journey Mapping",
   "Prototyping",
   "Design Systems",
   "Agile / Scrum",
+  "Using AI Properly",
 ];
 
 export const SOFT_SKILLS = [

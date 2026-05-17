@@ -10,13 +10,6 @@ import { useShouldAnimate } from "./useShouldAnimate";
 const DESIGN_W = 1512;
 const DESIGN_H = 982;
 
-// Mobile design canvas (Figma mobile artboards). The whole mobile UI is
-// laid out at this fixed size and scaled to fit the viewport, just like
-// the desktop canvas — the result is pixel-perfect on every phone, and
-// every element on every page is guaranteed to be on screen at once.
-export const DESIGN_W_MOBILE = 390;
-export const DESIGN_H_MOBILE = 844;
-
 // Viewports at or below this width are treated as tablets and scaled an
 // extra 0.9× on top of the natural fit, so the layout has a touch more
 // breathing room on iPad-class devices.
@@ -55,7 +48,10 @@ export default function ScaledShell({
   // layout effect immediately recalculates on the client before paint.
   const [scale, setScale] = useState(1);
   const [isMobile, setIsMobile] = useState(initialIsMobile);
-  const [mobileScale, setMobileScale] = useState(1);
+  // Mobile FloatingNav scale — caps at 0.8 (the design's intended
+  // mobile reduction) and shrinks further when the viewport is too
+  // narrow to fit the 382 px nav with a 16 px gutter on each side.
+  const [navScale, setNavScale] = useState(0.8);
   const pathname = usePathname();
 
   // Case-study routes (e.g. /work/wow-global-solutions) are long-form
@@ -90,16 +86,22 @@ export default function ScaledShell({
       // is the only signal, so a desktop browser at any window size
       // ≥ 768 px shows the desktop canvas (and any browser narrower
       // than that — phones, narrowed desktop windows, DevTools mobile
-      // emulators — shows the mobile canvas).
+      // emulators — shows the responsive mobile layout).
       const mobile = w < MOBILE_BREAKPOINT;
       setIsMobile(mobile);
 
+      // Mobile content is fully responsive — pages flow naturally
+      // inside the viewport with a 16 px gutter. The only thing the
+      // layout effect computes for mobile is the FloatingNav scale:
+      // default 0.8 (the spec'd mobile reduction), then capped to
+      // whatever fits the available viewport width minus a 16 px
+      // gutter on each side so the nav never pokes past the page
+      // padding on narrow phones.
       if (mobile) {
-        // Scale the mobile canvas to whichever axis is the tighter fit
-        // — usually width on tall phones, height on landscape.
-        setMobileScale(
-          Math.min(w / DESIGN_W_MOBILE, h / DESIGN_H_MOBILE)
-        );
+        const NAV_DESIGN_WIDTH = 382;
+        const GUTTER = 32; // 16 left + 16 right
+        const fit = (w - GUTTER) / NAV_DESIGN_WIDTH;
+        setNavScale(Math.min(0.8, fit));
         return;
       }
 
@@ -139,65 +141,58 @@ export default function ScaledShell({
     : {};
 
   if (isMobile) {
+    // Mobile is now fully responsive — the 390 × 844 design canvas was
+    // dropped on 2026-05 in favour of letting content flow naturally
+    // inside the actual viewport. Pages stretch to whatever
+    // width/height the device offers and use a fixed 16 px gutter so
+    // the layout reads the same on a 360-wide budget phone and a
+    // 414-wide flagship. The FloatingNav stays at its design size
+    // (it shouldn't stretch with the viewport) and is centred along
+    // the bottom edge with the same 32 px gap from the viewport's
+    // bottom that the desktop canvas uses.
     return (
       <IsMobileContext.Provider value={isMobile}>
         <div
           className="fixed inset-0 overflow-hidden"
-          style={{ backgroundColor: "var(--color-bg-page)" }}
+          style={{
+            backgroundColor: "var(--color-bg-page)",
+            fontFamily: "var(--font-solway), serif",
+          }}
         >
+          {children}
+
+          {/* TopRightButtons (theme + scale) are hidden on mobile per
+              the 2026-05 Figma refresh — every mobile page now shows
+              a placeholder 3-dot MobileMenuButton in its own title
+              row instead. The menu button doesn't open anything yet;
+              once it does, theme + scale will live behind it. Until
+              then the controls stay accessible via the desktop
+              breakpoint. */}
+
+          {/* FloatingNav floats over content, centred horizontally
+              with a 16 px gap from the viewport bottom. Scaled by
+              `navScale` — defaults to 0.8 (mobile reduction spec'd
+              2026-05) and shrinks further when the viewport is too
+              narrow to fit even the reduced nav, so it never pokes
+              past the 16 px page gutter on small phones.
+              `transformOrigin: 50% 100%` keeps the bottom-centre
+              anchor pinned during the scale so the 16 px bottom
+              gutter stays visually exact. z-20 keeps the nav above
+              any illustration that extends behind it;
+              `viewTransitionName` keeps it visible across
+              navigation. */}
           <div
             className="absolute"
             style={{
-              width: DESIGN_W_MOBILE,
-              height: DESIGN_H_MOBILE,
               left: "50%",
-              top: "50%",
-              transform: `translate(-50%, -50%) scale(${mobileScale})`,
-              transformOrigin: "center center",
-              fontFamily: "var(--font-solway), serif",
+              bottom: 16,
+              transform: `translateX(-50%) scale(${navScale})`,
+              transformOrigin: "50% 100%",
+              zIndex: 20,
+              viewTransitionName: "persistent-nav",
             }}
           >
-            {children}
-
-            {/* Persistent top-right secondary buttons (theme + scale
-                picker). Mounted in the shell so they survive route
-                changes — no remount, no animation replay between
-                pages, and the scale dropdown can stay open across a
-                navigation. The `viewTransitionName` excludes this
-                wrapper from the root cross-fade so the live DOM
-                stays painted across the navigation; without it,
-                the View Transitions API would fade the buttons out
-                with the rest of the page. */}
-            <div
-              className={`absolute ${topRightAnimClass}`}
-              style={{
-                top: 24,
-                right: 16,
-                zIndex: 30,
-                viewTransitionName: "persistent-top-right",
-                ...topRightAnimStyle,
-              }}
-            >
-              <TopRightButtons />
-            </div>
-
-            {/* FloatingNav inside the canvas at the figma position
-                (left=4 so it sits 4 px from each edge of the 390-wide
-                canvas, bottom=32 mirroring the desktop spacing). z-20
-                so it stays in front of any illustration that extends
-                behind it. Same view-transition-name trick as the
-                top-right buttons keeps it visible across navigation. */}
-            <div
-              className="absolute"
-              style={{
-                left: 4,
-                bottom: 32,
-                zIndex: 20,
-                viewTransitionName: "persistent-nav",
-              }}
-            >
-              <FloatingNav startDelay={navStartDelay} />
-            </div>
+            <FloatingNav startDelay={navStartDelay} />
           </div>
         </div>
       </IsMobileContext.Provider>

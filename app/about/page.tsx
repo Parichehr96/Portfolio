@@ -1,9 +1,12 @@
 "use client";
 
+import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
 import CTAButton from "../_components/CTAButton";
 import LinkExternalIcon from "../_components/LinkExternalIcon";
+import MobileMenuButton from "../_components/MobileMenuButton";
 import { useIsMobile } from "../_components/useIsMobile";
+import { useViewTransitionRouter } from "../_lib/useViewTransitionRouter";
 import { fs } from "../_lib/typography";
 import {
   ACADEMIC,
@@ -564,15 +567,16 @@ function ListSection({
   );
 }
 
-/* === Mobile bio paragraphs (Figma 312:1758) ===
-   Same 5 paragraphs as desktop but rendered with the mobile leading
-   (16/26) and bullet-by-bullet stagger so each appears individually. */
+/* === Mobile bio paragraphs (Figma 478:4294) ===
+   Same 3 paragraphs as desktop, rendered with the mobile leading
+   (16/24 tracking-0.5 per the latest Figma) and bullet-by-bullet
+   stagger so each appears individually. */
 function MobileBioText({ baseStage }: { baseStage: number }) {
   const paragraphClass =
     "w-full text-[var(--color-text-secondary)] shrink-0 anim-bubbly-grow";
   const paragraphStyle = {
     fontSize: fs(16),
-    lineHeight: "26px",
+    lineHeight: "24px",
     letterSpacing: "0.5px",
     transformOrigin: "left top",
   } as const;
@@ -699,6 +703,8 @@ function MobileListSection({
 }
 
 function AboutMobile() {
+  const { handleClick } = useViewTransitionRouter();
+  const handleContactClick = handleClick("/contact");
   const scrollRef = useRef<HTMLDivElement | null>(null);
   // Scroll-driven illustration opacity. At the top of the bio the
   // illustration sits at full strength behind the content; as the
@@ -737,7 +743,7 @@ function AboutMobile() {
   const illustrationOpacity = 1 - scrollProgress;
 
   return (
-    <div className="absolute inset-0 flex flex-col items-center pt-[64px] pb-[120px] px-[16px] gap-[24px]">
+    <div className="absolute inset-0 flex flex-col items-center pt-[20px] pb-[108px] px-[16px] gap-[24px]">
       {/* Background illustration — bottom-right. z-10 so it sits in
           front of the scrolling bio text where they overlap (image
           stays visible on top). FloatingNav (z-20 in ScaledShell) is
@@ -777,31 +783,44 @@ function AboutMobile() {
         </div>
       </div>
 
-      {/* Bio Section header — "Call me Pari," + "Nice to meet you!" */}
-      <div className="relative w-full flex flex-col items-start gap-[8px]">
-        <p
-          className="w-full text-[var(--color-text-primary)] anim-bubbly-grow"
+      {/* Bio Section header (Figma 557:11244) — flex row with title
+          cluster on the left and the 3-dot MobileMenuButton placeholder
+          on the right. gap-10 items-start. The title cluster keeps its
+          own 8 px column gap. */}
+      <div className="relative w-full flex items-start gap-[10px]">
+        <div className="flex-1 min-w-0 flex flex-col items-start gap-[8px]">
+          <p
+            className="w-full text-[var(--color-text-primary)] anim-bubbly-grow"
+            style={{
+              fontSize: fs(32),
+              lineHeight: "40px",
+              transformOrigin: "left center",
+              ["--stage" as string]: 0,
+            }}
+          >
+            Call me Pari,
+          </p>
+          <p
+            className="w-full text-[var(--color-text-primary)] anim-bubbly-grow"
+            style={{
+              fontSize: fs(16),
+              lineHeight: "24px",
+              transformOrigin: "left center",
+              ["--stage" as string]: 1,
+            }}
+          >
+            Nice to meet you!
+          </p>
+        </div>
+        <span
+          className="shrink-0 anim-bubbly-grow"
           style={{
-            fontSize: fs(32),
-            lineHeight: "40px",
-            letterSpacing: "1px",
-            transformOrigin: "left center",
-            ["--stage" as string]: 0,
+            transformOrigin: "right center",
+            ["--stage" as string]: 1.5,
           }}
         >
-          Call me Pari,
-        </p>
-        <p
-          className="w-full text-[var(--color-text-primary)] anim-bubbly-grow"
-          style={{
-            fontSize: fs(16),
-            lineHeight: "24px",
-            transformOrigin: "left center",
-            ["--stage" as string]: 1,
-          }}
-        >
-          Nice to meet you!
-        </p>
+          <MobileMenuButton />
+        </span>
       </div>
 
       {/* Bio Container — 2 px scrollbar on the LEFT (Figma 312:2138) +
@@ -948,23 +967,34 @@ function AboutMobile() {
             </div>
           </div>
 
-          {/* CTA — primary "My Works" cream pill (Figma 535:8396).
-              Same component used on desktop so the styling stays
-              aligned across breakpoints. Stage 11 lands the CTA last
-              in the bubbly-grow sequence. */}
-          <div className="w-full flex items-start shrink-0">
-            <span
-              className="anim-bubbly-grow flex-1 flex"
-              style={{ ["--stage" as string]: 11 }}
-            >
-              <CTAButton
-                href="/contact"
-                iconSrc="/assets/icon-cta-chat.svg"
-                label="Let's talk"
-                variant="primary"
-              />
-            </span>
-          </div>
+          {/* CTA — primary "Let's talk" cream pill (Figma 557:11254).
+              Inline on mobile (rather than via CTAButton) because the
+              mobile spec adds an explicit `h-40` cap and drops the
+              icon; desktop About still uses CTAButton with its
+              natural 48-tall sizing. Stage 11 lands the CTA last in
+              the bubbly-grow sequence. */}
+          <Link
+            href="/contact"
+            onClick={handleContactClick}
+            className="w-full anim-bubbly-grow flex items-center justify-center gap-[8px] rounded-[122px] bg-[var(--color-cta-primary-bg)] hover:bg-[var(--color-cta-primary-hover)] transition-colors duration-200 shrink-0"
+            style={{
+              height: 40,
+              paddingLeft: 24,
+              paddingRight: 24,
+              color: "var(--color-cta-primary-text)",
+              fontFamily: SOLWAY,
+              fontWeight: 400,
+              fontSize: fs(16),
+              lineHeight: "24px",
+              letterSpacing: "0.15px",
+              textAlign: "center",
+              transformOrigin: "left center",
+              ["--stage" as string]: 11,
+            }}
+            aria-label="Let's talk — open contact"
+          >
+            Let&rsquo;s talk
+          </Link>
         </div>
       </div>
     </div>

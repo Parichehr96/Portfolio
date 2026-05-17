@@ -8,6 +8,7 @@ import {
   useState,
 } from "react";
 import CTAButton from "../_components/CTAButton";
+import MobileMenuButton from "../_components/MobileMenuButton";
 import { useIsMobile } from "../_components/useIsMobile";
 import { fs } from "../_lib/typography";
 import {
@@ -713,7 +714,6 @@ function WorkMobile() {
   // valid so currentExperience never becomes undefined.
   const safeSelectedIdx = ((selectedIdx % itemCount) + itemCount) % itemCount;
   const currentExperience = sectionItems[safeSelectedIdx];
-  const currentPreview = currentExperience?.preview ?? FALLBACK_PREVIEW;
 
   // Rotated list: selected first, then the rest in original order with
   // wraparound. The visible tail is capped at 2 items so the frame
@@ -795,51 +795,64 @@ function WorkMobile() {
         backgroundColor: "var(--color-bg-page)",
         paddingLeft: 16,
         paddingRight: 16,
-        paddingTop: 32,
-        // 128 = 32 (nav bottom margin) + 88 (nav height) + 8 (gap
-        // between MY CV CTA and the nav). Larger values push the
-        // experience list shorter and clip the second unselected row,
-        // so 8 px is the smallest readable gap that keeps the row
-        // visible.
-        paddingBottom: 128,
-        gap: 16,
+        paddingTop: 20,
+        // 108 = 16 (nav bottom gutter) + 88×0.8 (scaled nav visual
+        // height, rounded up to 72) + 20 (gap between content frame
+        // and the nav top) so the MY CV pill sits exactly 20 px
+        // above the (now 0.8×-scaled) FloatingNav.
+        paddingBottom: 108,
+        gap: 24,
         touchAction: "pan-y",
       }}
       onTouchStart={onTouchStart}
       onTouchEnd={onTouchEnd}
       onWheel={onWheel}
     >
-      {/* Bio Section header — title + subtitle (Figma 439:3668) */}
-      <div className="w-full flex flex-col items-start shrink-0">
-        <p
-          className="w-full anim-bubbly-grow"
+      {/* Bio Section header (Figma 558:11292) — title cluster on the
+          left, 3-dot MobileMenuButton placeholder on the right.
+          gap-10 items-start. Title cluster has no inner gap per Figma
+          439:3668. */}
+      <div className="w-full flex items-start gap-[10px] shrink-0">
+        <div className="flex-1 min-w-0 flex flex-col items-start">
+          <p
+            className="w-full anim-bubbly-grow"
+            style={{
+              fontFamily: SOLWAY,
+              fontWeight: 400,
+              fontSize: fs(22),
+              lineHeight: "28px",
+              color: "var(--color-text-primary)",
+              transformOrigin: "left center",
+              ["--stage" as string]: 0,
+            }}
+          >
+            My experiences,
+          </p>
+          <p
+            className="w-full anim-bubbly-grow"
+            style={{
+              fontFamily: SOLWAY,
+              fontWeight: 400,
+              fontSize: fs(14),
+              lineHeight: "20px",
+              letterSpacing: "0.25px",
+              color: "var(--color-text-primary)",
+              transformOrigin: "left center",
+              ["--stage" as string]: 0.4,
+            }}
+          >
+            confidently adapt to the context.
+          </p>
+        </div>
+        <span
+          className="shrink-0 anim-bubbly-grow"
           style={{
-            fontFamily: SOLWAY,
-            fontWeight: 400,
-            fontSize: fs(22),
-            lineHeight: "28px",
-            color: "var(--color-text-primary)",
-            transformOrigin: "left center",
-            ["--stage" as string]: 0,
+            transformOrigin: "right center",
+            ["--stage" as string]: 0.6,
           }}
         >
-          My experiences,
-        </p>
-        <p
-          className="w-full anim-bubbly-grow"
-          style={{
-            fontFamily: SOLWAY,
-            fontWeight: 400,
-            fontSize: fs(14),
-            lineHeight: "20px",
-            letterSpacing: "0.25px",
-            color: "var(--color-text-primary)",
-            transformOrigin: "left center",
-            ["--stage" as string]: 0.4,
-          }}
-        >
-          confidently adapt to the context.
-        </p>
+          <MobileMenuButton />
+        </span>
       </div>
 
       {/* Bio Container — flex-1 fills remaining vertical space */}
@@ -893,61 +906,10 @@ function WorkMobile() {
           </button>
         </div>
 
-        {/* Profile image — h-282, shared `hero-illustration` view-transition
-            target so the picture morphs cleanly between /work and the
-            hero illustrations on /, /about, /contact (and back to the
-            desktop preview frame, which carries the same name). The
-            Image is keyed by its *src* so it only re-mounts (and fades)
-            when the actual preview asset changes — when consecutive
-            selections share the FALLBACK_PREVIEW the DOM is reused and
-            there's no flicker. */}
-        <div
-          className="w-full relative overflow-hidden shrink-0"
-          style={{
-            height: 282,
-            viewTransitionName: "hero-illustration",
-          }}
-        >
-          {currentExperience?.previewVideo ? (
-            /* Mobile mirror of the desktop video. Same 16 px inset
-               around a flex wrapper; the video either fills the
-               frame's height (portrait sources like ONTON) or its
-               width (landscape sources like Mindful Meet), per
-               `previewVideoFit`. Rounded corners + `key`-on-src
-               re-mount so the previous clip stops when the user
-               swipes/taps another experience. */
-            <div
-              className="absolute flex items-center justify-center"
-              style={{ inset: 16 }}
-            >
-              <video
-                key={`vid-${currentExperience.previewVideo}`}
-                src={currentExperience.previewVideo}
-                autoPlay
-                loop
-                muted
-                playsInline
-                preload="auto"
-                className={
-                  currentExperience.previewVideoFit === "width"
-                    ? "block w-full h-auto max-h-none rounded-[16px] anim-fade"
-                    : "block h-full w-auto max-w-none rounded-[16px] anim-fade"
-                }
-                style={{ animationDuration: "400ms" }}
-              />
-            </div>
-          ) : (
-            <Image
-              key={currentPreview}
-              src={currentPreview}
-              alt=""
-              fill
-              sizes="358px"
-              className="object-cover block anim-fade"
-              style={{ animationDuration: "400ms" }}
-            />
-          )}
-        </div>
+        {/* Preview image now lives inside SelectedPill — it's part of
+            the cream card per Figma 439:3682 so the cream bg wraps
+            the image + content as a single rounded surface. The
+            `hero-illustration` view-transition target moves with it. */}
 
         {/* Text and Experiences Container — flex-1 absorbs whatever
             vertical space is left between the image and the CTA so
@@ -958,7 +920,7 @@ function WorkMobile() {
           style={{ gap: 8 }}
         >
           <div
-            className="flex-1 min-w-0 h-full overflow-hidden flex flex-col items-center"
+            className="no-scrollbar flex-1 min-w-0 h-full overflow-y-auto flex flex-col items-center"
             style={{ gap: 12 }}
           >
             {/* Selected pill — cream bg, 18/24 name + 12/16 industry +
@@ -1086,19 +1048,57 @@ function WorkMobile() {
           )}
         </div>
 
-        {/* MY CV — only CTA on mobile, matching the desktop work page */}
-        <div className="w-full flex items-start shrink-0">
+      </div>
+
+      {/* MY CV CTA — Figma 439:3722 (mobile). Outlined secondary pill
+          scaled to ~0.8 × of the desktop spec: border-1.6, px-12.8
+          py-9.6, rounded-96, gap-9.6, icon 19.2 × 19.2, label
+          11.2/14.4. Inlined here so the mobile version can diverge
+          from the shared CTAButton (used elsewhere at the full
+          desktop spec). Sits outside the bio container so the 24 px
+          outer gap separates it from the experience list. */}
+      <div className="w-full flex items-start shrink-0">
+        <span
+          className="anim-bubbly-grow flex-1 flex"
+          style={{ ["--stage" as string]: 1.6 }}
+        >
           <span
-            className="anim-bubbly-grow flex-1 flex"
-            style={{ ["--stage" as string]: 1.6 }}
+            className="flex-1 min-w-0 flex items-center justify-center gap-[9.6px] rounded-[96px] border-[1.6px] border-solid border-[var(--color-cream-dark)] bg-transparent transition-colors duration-200"
+            style={{
+              paddingLeft: 12.8,
+              paddingRight: 12.8,
+              paddingTop: 9.6,
+              paddingBottom: 9.6,
+            }}
+            aria-label="MY CV"
           >
-            <CTAButton
-              iconSrc="/assets/icon-cta-cv.svg"
-              label="MY CV"
-              variant="secondary"
-            />
+            <span
+              className="themed-icon relative shrink-0 inline-flex items-center justify-center"
+              style={{ width: 19.2, height: 19.2 }}
+              aria-hidden
+            >
+              <img
+                src="/assets/icon-cta-cv.svg"
+                alt=""
+                width={19.2}
+                height={19.2}
+                className="block w-full h-full"
+              />
+            </span>
+            <span
+              className="whitespace-nowrap"
+              style={{
+                color: "var(--color-text-primary)",
+                fontFamily: SOLWAY,
+                fontWeight: 400,
+                fontSize: 11.2,
+                lineHeight: "14.4px",
+              }}
+            >
+              MY CV
+            </span>
           </span>
-        </div>
+        </span>
       </div>
     </div>
   );
@@ -1162,6 +1162,8 @@ function SelectedPill({ experience }: { experience: Experience | undefined }) {
   // re-mounts the incoming layer with the bubbly slide-up.
   const incomingAnim = incomingTick > 0 ? "anim-pill-name-in" : "";
 
+  const previewSrc = experience.preview ?? FALLBACK_PREVIEW;
+
   const inner = (
     <div
       className="w-full flex flex-col items-start"
@@ -1175,6 +1177,60 @@ function SelectedPill({ experience }: { experience: Experience | undefined }) {
         gap: 8,
       }}
     >
+      {/* Preview image — sits inside the cream card per Figma
+          439:3682. Height clamps to `clamp(140px, 24vh, 220px)` so
+          on tall viewports it tops out short of Figma's 282 px (the
+          full 282 left no room for the unselected tail), and on
+          shorter ones it shrinks proportionally without squeezing
+          the description out of the pill. Shared `hero-illustration`
+          view-transition target so the preview morphs cleanly
+          between /work and the illustrations on /, /about, /contact
+          (and back to the desktop preview frame). The image / video
+          is keyed by its src so it only re-mounts (and fades) when
+          the asset actually changes — consecutive selections sharing
+          the FALLBACK_PREVIEW reuse the DOM and there's no
+          flicker. */}
+      <div
+        className="w-full relative overflow-hidden shrink-0 rounded-[4px]"
+        style={{
+          height: "clamp(140px, 24vh, 220px)",
+          viewTransitionName: "hero-illustration",
+        }}
+      >
+        {experience.previewVideo ? (
+          <div
+            className="absolute flex items-center justify-center"
+            style={{ inset: 16 }}
+          >
+            <video
+              key={`vid-${experience.previewVideo}`}
+              src={experience.previewVideo}
+              autoPlay
+              loop
+              muted
+              playsInline
+              preload="auto"
+              className={
+                experience.previewVideoFit === "width"
+                  ? "block w-full h-auto max-h-none rounded-[16px] anim-fade"
+                  : "block h-full w-auto max-w-none rounded-[16px] anim-fade"
+              }
+              style={{ animationDuration: "400ms" }}
+            />
+          </div>
+        ) : (
+          <Image
+            key={previewSrc}
+            src={previewSrc}
+            alt=""
+            fill
+            sizes="358px"
+            className="object-cover block anim-fade"
+            style={{ animationDuration: "400ms" }}
+          />
+        )}
+      </div>
+
       {/* Name + date — animated layer. Fixed-height row with two
           absolute layers (outgoing + incoming) so the previous title
           can slide up out of frame while the new title slides up into

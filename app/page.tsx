@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import MobileMenuButton from "./_components/MobileMenuButton";
 import { useIsMobile } from "./_components/useIsMobile";
 import { useViewTransitionRouter } from "./_lib/useViewTransitionRouter";
 import { fs } from "./_lib/typography";
@@ -253,38 +254,48 @@ function HomeDesktop() {
 }
 
 /* === Mobile layout (Figma 312:1661) ===
-   Width: 100% of viewport, content padded 16 px. Vertical stack with
-   24 px gap. Illustration absolutely positioned at bottom-centre as
-   background; foreground text/CTAs sit above it. The FloatingNav is
-   rendered by ScaledShell at fixed bottom-centre.
+   390 × 844 canvas, content padded `pt-40 pb-20 px-16` with a 24 px
+   column gap. Illustration is 564 × 564 absolutely positioned at
+   bottom-centre; foreground text/CTA sits in front. FloatingNav is
+   rendered by ScaledShell at the canvas bottom.
 
-   Type scales:
-     - "Parichehr"            Solway Regular 60/64 tracking-8
-     - "Netherlands" + role   Solway Light 14/24 tracking-2
-     - Quote                  Solway Light 14/18
-     - Bio paragraph          Solway Light 14/20 (Regular for emphasis)
-     - "Me?" CTA              Solway Regular 14/20 cream pill */
+   Bio Section (top, gap-16):
+     - Name row (gap-16 items-start):
+         · "Parichehr"  Solway Regular 44/48
+         · MobileMenuButton (3-dot placeholder, no functionality yet)
+     - Profile Info row (gap-8 items-center):
+         · "Netherlands" + · + "Product Designer"  Solway Light 14/24
+           tracking-2px (dot is Solway Regular 14/20)
+
+   Bio Container (flex-1, gap-24):
+     - Bio paragraph     Solway Light 14/24 (Medium for emphasis)
+     - Complexity quote  Solway Light 14/18
+     - "My Works" CTA    Solway Regular 16/24 cream pill, full-width,
+                         routes to /work to mirror desktop. */
 function HomeMobile() {
   const { handleClick } = useViewTransitionRouter();
-  const handleAboutClick = handleClick("/about");
+  const handleWorkClick = handleClick("/work");
 
   return (
     <>
-      {/* Illustration — bottom-centred. z-10 puts it in front of the
-          page text where they overlap (per request) while still
-          letting the FloatingNav (rendered by ScaledShell at z-20)
-          sit above it. Fades in as stage 6, after the 6 text/CTA
-          elements (stages 0–5) finish their bubbly entrance. */}
+      {/* Illustration — bottom-centred, square hero portrait that
+          fits the actual viewport (responsive width with a sane cap)
+          rather than a fixed design canvas. z-0 keeps it BEHIND the
+          page text/CTA so the title, bio, quote, and "My Works" pill
+          always read on top; the FloatingNav (z-20 in ScaledShell)
+          still floats over both. Fades in as stage 6 after the
+          name/profile/bio/quote/CTA all finish their bubbly
+          entrance. */}
       <div
         className="absolute pointer-events-none anim-fade-stage"
         style={{
           left: "50%",
           bottom: 0,
-          width: 541,
-          height: 541,
+          width: "min(100%, 420px)",
+          aspectRatio: "1 / 1",
           transform: "translateX(-50%)",
           viewTransitionName: "hero-illustration",
-          zIndex: 10,
+          zIndex: 0,
           ...STAGE(6),
         }}
       >
@@ -296,104 +307,144 @@ function HomeMobile() {
       </div>
 
       <div
-        className="absolute inset-0 flex flex-col items-stretch pt-[24px] pb-[120px] px-[16px] gap-[24px]"
+        className="absolute inset-0 flex flex-col items-stretch pt-[20px] pb-[16px] px-[16px] gap-[24px]"
         style={{ zIndex: 0 }}
       >
-        {/* Bio Section header (Parichehr + name/role row). */}
+        {/* Bio Section header — title row + profile info, gap-16. */}
         <div className="w-full flex flex-col items-start gap-[16px] text-[var(--color-text-primary)] shrink-0">
-          <p
-            className="w-full font-normal anim-bubbly-grow"
-            style={{
-              fontSize: fs(60),
-              lineHeight: "64px",
-              letterSpacing: "8px",
-              transformOrigin: "left center",
-              ...STAGE(0),
-            }}
-          >
-            Parichehr
-          </p>
+          {/* Name row — "Parichehr" + 3-dot menu placeholder. The
+              title takes flex-1 so the menu pill stays pinned to the
+              right edge while the title grows to fill the rest. */}
+          <div className="w-full flex items-start gap-[16px]">
+            <p
+              className="flex-1 min-w-0 font-normal anim-bubbly-grow"
+              style={{
+                fontSize: fs(44),
+                lineHeight: "48px",
+                transformOrigin: "left center",
+                ...STAGE(0),
+              }}
+            >
+              Parichehr
+            </p>
+            <span
+              className="shrink-0 anim-bubbly-grow"
+              style={{ transformOrigin: "right center", ...STAGE(0.5) }}
+            >
+              <MobileMenuButton />
+            </span>
+          </div>
+
+          {/* Profile info — "Netherlands · Product Designer" with a
+              literal dot separator (Solway Regular 14/20) between the
+              two Light 14/24 tracking-2px labels. */}
           <div
-            className="w-full flex items-start"
-            style={{
-              fontWeight: 300,
-              fontSize: fs(14),
-              lineHeight: "24px",
-              letterSpacing: "2px",
-            }}
+            className="w-full flex items-center gap-[8px] whitespace-nowrap"
+            style={{ fontWeight: 300 }}
           >
             <p
-              className="flex-1 min-w-0 anim-bubbly-grow"
-              style={{ transformOrigin: "left center", ...STAGE(1) }}
+              className="shrink-0 anim-bubbly-grow"
+              style={{
+                fontSize: fs(14),
+                lineHeight: "24px",
+                letterSpacing: "2px",
+                transformOrigin: "left center",
+                ...STAGE(1),
+              }}
             >
               Netherlands
             </p>
             <p
-              className="whitespace-nowrap shrink-0 anim-bubbly-grow"
-              style={{ transformOrigin: "right center", ...STAGE(2) }}
+              className="shrink-0 anim-bubbly-grow"
+              style={{
+                fontWeight: 400,
+                fontSize: fs(14),
+                lineHeight: "20px",
+                letterSpacing: "0.1px",
+                transformOrigin: "center center",
+                ...STAGE(1.5),
+              }}
+              aria-hidden
+            >
+              ·
+            </p>
+            <p
+              className="shrink-0 anim-bubbly-grow"
+              style={{
+                fontSize: fs(14),
+                lineHeight: "24px",
+                letterSpacing: "2px",
+                transformOrigin: "left center",
+                ...STAGE(2),
+              }}
             >
               Product Designer
             </p>
           </div>
         </div>
 
-        {/* Bio Container — quote, bio paragraph, then "Me?" primary
-            CTA. Order matches Figma 312:1669 (with the EN /
-            brightness placeholder row removed). */}
+        {/* Bio Container — bio paragraph, complexity tagline, then the
+            cream "My Works" CTA. Flex-1 so it absorbs whatever space
+            sits between the header and the FloatingNav, leaving the
+            illustration to fill the void behind. */}
         <div
-          className="w-full flex flex-col items-stretch gap-[24px] text-[var(--color-text-primary)] shrink-0"
+          className="w-full flex-1 min-h-0 flex flex-col items-stretch gap-[24px] text-[var(--color-text-primary)]"
           style={{ fontWeight: 300 }}
         >
-          {/* Complexity tagline — stage 3 (compact line height per
-              Figma 312:1709). */}
+          {/* Bio paragraph — stage 3 (was 4). Now 14/24 to match Figma
+              312:1670 (the desktop bio uses 16/24). */}
+          <p
+            className="w-full anim-bubbly-grow"
+            style={{
+              fontSize: fs(14),
+              lineHeight: "24px",
+              transformOrigin: "left center",
+              ...STAGE(3),
+            }}
+          >
+            <BioParagraph />
+          </p>
+
+          {/* Complexity tagline — stage 4 (was 3). Sits below the bio
+              per Figma 312:1709 — tighter 14/18 line-height. */}
           <p
             className="w-full anim-bubbly-grow"
             style={{
               fontSize: fs(14),
               lineHeight: "18px",
               transformOrigin: "left center",
-              ...STAGE(3),
+              ...STAGE(4),
             }}
           >
             Complexity is inevitable, Confusion is optional.
           </p>
 
-          {/* Bio paragraph — stage 4. */}
-          <p
-            className="w-full anim-bubbly-grow"
-            style={{
-              fontSize: fs(14),
-              lineHeight: "20px",
-              transformOrigin: "left center",
-              ...STAGE(4),
-            }}
-          >
-            <BioParagraph />
-          </p>
-
-          {/* "Me?" primary CTA — cream pill, links to /about. Stage 5. */}
+          {/* "My Works" primary CTA — cream pill, full-width, capped
+              at h-40 per Figma 536:11150. Routes to /work via the
+              View Transition router so the hero illustration morphs
+              into the project preview frame on /work (matching the
+              desktop "My Works" pill). Stage 5. */}
           <Link
-            href="/about"
-            onClick={handleAboutClick}
-            className="w-full flex items-center justify-center rounded-[122px] anim-bubbly-grow bg-[#F9F5EB] hover:bg-[#EDEAE4] transition-colors duration-200"
+            href="/work"
+            onClick={handleWorkClick}
+            className="w-full flex items-center justify-center rounded-[122px] anim-bubbly-grow bg-[var(--color-cta-primary-bg)] hover:bg-[var(--color-cta-primary-hover)] transition-colors duration-200"
             style={{
+              height: 40,
               paddingLeft: 24,
               paddingRight: 24,
-              paddingTop: 12,
-              paddingBottom: 12,
-              color: "#1B2249",
+              color: "var(--color-cta-primary-text)",
               fontFamily: "var(--font-solway), serif",
               fontWeight: 400,
-              fontSize: fs(14),
-              lineHeight: "20px",
-              letterSpacing: "0.1px",
+              fontSize: fs(16),
+              lineHeight: "24px",
+              letterSpacing: "0.15px",
               textAlign: "center",
               transformOrigin: "left center",
               ...STAGE(5),
             }}
-            aria-label="Me? — learn more about me"
+            aria-label="My Works — see my projects"
           >
-            Me?
+            My Works
           </Link>
         </div>
       </div>

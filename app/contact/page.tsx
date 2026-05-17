@@ -1,6 +1,7 @@
 "use client";
 
 import CTAButton from "../_components/CTAButton";
+import MobileMenuButton from "../_components/MobileMenuButton";
 import { useIsMobile } from "../_components/useIsMobile";
 import { fs } from "../_lib/typography";
 import {
@@ -357,23 +358,23 @@ function ContactDesktop() {
      - Field value Solway Regular 16/24 navy tracking-0.5 (Body/large)
      - CTA         Solway Light 16/28 navy underline */
 function MobileSocialPill({ social }: { social: Social }) {
-  // Wrapping flex pill matching Figma 312:2693: bg-white,
-  // 0.72 px cream-dark border, flex-1 min-w-px so 4 pills share the
-  // row width with `gap-x: 16` and wrap to a second row when the
-  // viewport gets narrow. Inner icon is 24 × 24, scaled from the
-  // SVG's intrinsic 40 × 40 viewBox.
+  // Outlined pill matching Figma 520:8232 — 1.229 px cream-dark
+  // border, px-18.432 py-9.216, rounded-122, fixed h-49.152. Inner
+  // icon is 18.432 × 18.432 scaled from the SVG's intrinsic 40 × 40
+  // viewBox. The 4 pills sit in a 2 × 2 grid on the parent so each
+  // one fills half the row.
   const baseClass =
-    "flex-1 min-w-0 flex items-center justify-center bg-transparent transition-colors duration-200";
+    "w-full flex items-center justify-center bg-transparent transition-colors duration-200";
   const inner = (
     <span
       className="themed-icon relative shrink-0 inline-flex items-center justify-center"
-      style={{ width: 24, height: 24 }}
+      style={{ width: 18.432, height: 18.432 }}
     >
       <img
         src={social.src}
         alt=""
-        width={social.iconWidth * (24 / 40)}
-        height={social.iconHeight * (24 / 40)}
+        width={social.iconWidth * (18.432 / 40)}
+        height={social.iconHeight * (18.432 / 40)}
         className="block"
         style={
           social.verticalNudge
@@ -384,12 +385,13 @@ function MobileSocialPill({ social }: { social: Social }) {
     </span>
   );
   const style: React.CSSProperties = {
-    paddingLeft: 16,
-    paddingRight: 16,
-    paddingTop: 20,
-    paddingBottom: 20,
+    paddingLeft: 18.432,
+    paddingRight: 18.432,
+    paddingTop: 9.216,
+    paddingBottom: 9.216,
+    height: 49.152,
     borderRadius: 122,
-    border: "0.72px solid var(--color-border-soft)",
+    border: "1.229px solid var(--color-border-soft)",
   };
   if (!social.href) {
     return (
@@ -428,35 +430,55 @@ function ExternalChevronIconSmall() {
 
 function ContactMobile() {
   return (
-    <div className="absolute inset-0 flex flex-col items-center pt-[64px] pb-[120px] px-[16px] gap-[40px]">
-      {/* Title section */}
-      <div className="w-full flex flex-col items-start gap-[8px] shrink-0 text-[var(--color-text-primary)]">
-        <p
-          className="w-full anim-bubbly-grow"
+    <div className="absolute inset-0 flex flex-col items-center pt-[20px] pb-[108px] px-[16px] gap-[40px]">
+      {/* Title section (Figma 558:11302) — flex row with title cluster
+          on the left and the 3-dot MobileMenuButton placeholder on the
+          right. gap-20 items-start (latest Figma); the title cluster
+          keeps its own 8 px column gap. */}
+      <div className="w-full flex items-start gap-[20px] shrink-0 text-[var(--color-text-primary)]">
+        <div className="flex-1 min-w-0 flex flex-col items-start gap-[8px]">
+          <p
+            className="w-full anim-bubbly-grow"
+            style={{
+              fontSize: fs(32),
+              lineHeight: "40px",
+              transformOrigin: "left center",
+              ["--stage" as string]: 0,
+            }}
+          >
+            Have something in mind?
+          </p>
+          <p
+            className="w-full anim-bubbly-grow"
+            style={{
+              fontSize: fs(16),
+              lineHeight: "20px",
+              transformOrigin: "left center",
+              ["--stage" as string]: 1,
+            }}
+          >
+            Let&rsquo;s talk about it.
+          </p>
+        </div>
+        <span
+          className="shrink-0 anim-bubbly-grow"
           style={{
-            fontSize: fs(32),
-            lineHeight: "40px",
-            transformOrigin: "left center",
-            ["--stage" as string]: 0,
+            transformOrigin: "right center",
+            ["--stage" as string]: 1.5,
           }}
         >
-          Have something in mind?
-        </p>
-        <p
-          className="w-full anim-bubbly-grow"
-          style={{
-            fontSize: fs(16),
-            lineHeight: "20px",
-            transformOrigin: "left center",
-            ["--stage" as string]: 1,
-          }}
-        >
-          Let&rsquo;s talk about it.
-        </p>
+          <MobileMenuButton />
+        </span>
       </div>
 
-      {/* Bio Container */}
-      <div className="w-full flex-1 min-h-0 flex flex-col items-center gap-[40px] overflow-hidden">
+      {/* Bio Container — flex-1 so it fills the space between header
+          and the FloatingNav, with `overflow-y-auto` so the "Set a
+          Meeting" CTA stays visible when the viewport is shorter
+          than the content stack (instead of getting clipped by the
+          Figma-spec `overflow-clip`). `no-scrollbar` hides the
+          scrollbar visually so the layout still reads as a static
+          stack on tall viewports where nothing actually overflows. */}
+      <div className="no-scrollbar w-full flex-1 min-h-0 flex flex-col items-center gap-[40px] overflow-y-auto">
         {/* Mail block — label + email link with link-external icon
             (Figma 429:3480). */}
         <div
@@ -547,7 +569,9 @@ function ContactMobile() {
           </a>
         </div>
 
-        {/* Social Links — 4 wrapping pills (Figma 312:2692) */}
+        {/* Social Links — 4 pills in a 2 × 2 grid per Figma 558:11320 /
+            558:11329 (rows: LinkedIn + Dribbble, then Behance +
+            Medium). 20 px gap on both axes. */}
         <div
           className="w-full flex flex-col items-start gap-[16px] anim-bubbly-grow"
           style={{
@@ -566,13 +590,13 @@ function ContactMobile() {
             Stay with me
           </p>
           <div
-            className="w-full flex flex-wrap items-start"
-            style={{ rowGap: 24, columnGap: 16 }}
+            className="w-full grid grid-cols-2"
+            style={{ rowGap: 20, columnGap: 20 }}
           >
             {SOCIALS.map((s, i) => (
               <span
                 key={s.alt}
-                className="anim-bubbly-grow flex-1 min-w-0 flex"
+                className="anim-bubbly-grow min-w-0 flex"
                 style={{ ["--stage" as string]: 4 + (i + 1) * 0.3 }}
               >
                 <MobileSocialPill social={s} />
@@ -581,23 +605,33 @@ function ContactMobile() {
           </div>
         </div>
 
-        {/* "Set a Meeting" CTA — mobile mirror of Figma 535:11128.
-            Primary cream pill, no icon, full-width. */}
-        <div className="w-full flex items-start shrink-0">
-          <span
-            className="anim-bubbly-grow flex-1 flex"
-            style={{
-              transformOrigin: "left center",
-              ["--stage" as string]: 7,
-            }}
-          >
-            <CTAButton
-              href={CALENDAR_URL}
-              label="Set a Meeting"
-              variant="primary"
-            />
-          </span>
-        </div>
+        {/* "Set a Meeting" CTA — primary cream pill (Figma 535:11137).
+            Inline on mobile so we can apply the explicit `h-40` cap
+            the design system uses for mobile cream pills; desktop
+            keeps the natural-height CTAButton. External href opens
+            the Google Calendar appointment page in a new tab. */}
+        <a
+          href={CALENDAR_URL}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="w-full anim-bubbly-grow flex items-center justify-center gap-[8px] rounded-[122px] bg-[var(--color-cta-primary-bg)] hover:bg-[var(--color-cta-primary-hover)] transition-colors duration-200 shrink-0"
+          style={{
+            height: 40,
+            paddingLeft: 24,
+            paddingRight: 24,
+            color: "var(--color-cta-primary-text)",
+            fontFamily: "var(--font-solway), serif",
+            fontWeight: 400,
+            fontSize: fs(16),
+            lineHeight: "24px",
+            letterSpacing: "0.15px",
+            textAlign: "center",
+            transformOrigin: "left center",
+            ["--stage" as string]: 7,
+          }}
+        >
+          Set a Meeting
+        </a>
       </div>
     </div>
   );
