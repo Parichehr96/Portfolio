@@ -1,7 +1,6 @@
 "use client";
 
 import CTAButton from "../_components/CTAButton";
-import MobileMenuButton from "../_components/MobileMenuButton";
 import { useIsMobile } from "../_components/useIsMobile";
 import { fs } from "../_lib/typography";
 import {
@@ -432,9 +431,10 @@ function ContactMobile() {
   return (
     <div className="absolute inset-0 flex flex-col items-center pt-[20px] pb-[108px] px-[16px] gap-[40px]">
       {/* Title section (Figma 558:11302) — flex row with title cluster
-          on the left and the 3-dot MobileMenuButton placeholder on the
-          right. gap-20 items-start (latest Figma); the title cluster
-          keeps its own 8 px column gap. */}
+          on the left and an invisible spacer reserving the slot where
+          the persistent 3-dot MobileMenuButton (rendered by
+          ScaledShell) floats. gap-20 items-start (latest Figma); the
+          title cluster keeps its own 8 px column gap. */}
       <div className="w-full flex items-start gap-[20px] shrink-0 text-[var(--color-text-primary)]">
         <div className="flex-1 min-w-0 flex flex-col items-start gap-[8px]">
           <p
@@ -460,15 +460,11 @@ function ContactMobile() {
             Let&rsquo;s talk about it.
           </p>
         </div>
-        <span
-          className="shrink-0 anim-bubbly-grow"
-          style={{
-            transformOrigin: "right center",
-            ["--stage" as string]: 1.5,
-          }}
-        >
-          <MobileMenuButton />
-        </span>
+        <div
+          className="shrink-0"
+          aria-hidden
+          style={{ width: 60.16, height: 40.96 }}
+        />
       </div>
 
       {/* Bio Container — flex-1 so it fills the space between header
@@ -569,9 +565,11 @@ function ContactMobile() {
           </a>
         </div>
 
-        {/* Social Links — 4 pills in a 2 × 2 grid per Figma 558:11320 /
-            558:11329 (rows: LinkedIn + Dribbble, then Behance +
-            Medium). 20 px gap on both axes. */}
+        {/* Social Links — 4 pills in a single row per Figma 520:8231
+            (latest 2026-05 layout swaps the 2 × 2 grid for one
+            horizontal stripe: LinkedIn / Dribbble / Behance / Medium,
+            each `flex-1` so they share the available width with 20 px
+            gaps). */}
         <div
           className="w-full flex flex-col items-start gap-[16px] anim-bubbly-grow"
           style={{
@@ -590,13 +588,13 @@ function ContactMobile() {
             Stay with me
           </p>
           <div
-            className="w-full grid grid-cols-2"
-            style={{ rowGap: 20, columnGap: 20 }}
+            className="w-full flex items-start"
+            style={{ gap: 20 }}
           >
             {SOCIALS.map((s, i) => (
               <span
                 key={s.alt}
-                className="anim-bubbly-grow min-w-0 flex"
+                className="anim-bubbly-grow flex-1 min-w-0 flex"
                 style={{ ["--stage" as string]: 4 + (i + 1) * 0.3 }}
               >
                 <MobileSocialPill social={s} />

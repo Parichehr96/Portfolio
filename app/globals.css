@@ -428,18 +428,24 @@ body {
 ::view-transition-group(persistent-top-right),
 ::view-transition-image-pair(persistent-top-right),
 ::view-transition-old(persistent-top-right),
-::view-transition-new(persistent-top-right) {
+::view-transition-new(persistent-top-right),
+::view-transition-group(persistent-mobile-menu),
+::view-transition-image-pair(persistent-mobile-menu),
+::view-transition-old(persistent-mobile-menu),
+::view-transition-new(persistent-mobile-menu) {
   animation-duration: 0s;
 }
 
 ::view-transition-new(persistent-nav),
-::view-transition-new(persistent-top-right) {
+::view-transition-new(persistent-top-right),
+::view-transition-new(persistent-mobile-menu) {
   animation: none;
   opacity: 1;
 }
 
 ::view-transition-old(persistent-nav),
-::view-transition-old(persistent-top-right) {
+::view-transition-old(persistent-top-right),
+::view-transition-old(persistent-mobile-menu) {
   animation: none;
   opacity: 0;
 }

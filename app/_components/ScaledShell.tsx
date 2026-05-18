@@ -3,6 +3,7 @@
 import { useEffect, useLayoutEffect, useState } from "react";
 import { usePathname } from "next/navigation";
 import FloatingNav from "./FloatingNav";
+import MobileMenuButton from "./MobileMenuButton";
 import TopRightButtons from "./TopRightButtons";
 import { IsMobileContext, MOBILE_BREAKPOINT } from "./useIsMobile";
 import { useShouldAnimate } from "./useShouldAnimate";
@@ -161,13 +162,35 @@ export default function ScaledShell({
         >
           {children}
 
-          {/* TopRightButtons (theme + scale) are hidden on mobile per
-              the 2026-05 Figma refresh — every mobile page now shows
-              a placeholder 3-dot MobileMenuButton in its own title
-              row instead. The menu button doesn't open anything yet;
-              once it does, theme + scale will live behind it. Until
-              then the controls stay accessible via the desktop
-              breakpoint. */}
+          {/* Persistent 3-dot MobileMenuButton — TopRightButtons (theme
+              + scale) are hidden on mobile per the 2026-05 Figma
+              refresh; every mobile page shows this placeholder instead.
+              Lives in the shell (not per-page) so it doesn't unmount
+              across nav between Home/About/Work/Contact. Pinned at
+              top:20 / right:16 (matches each page's pt-[20] px-[16]
+              container so it visually sits exactly where the inline
+              version used to). z-20 keeps it above page content;
+              `viewTransitionName` keeps it stable across navigation
+              — paired with the `animation-duration: 0s` rule in
+              globals.css, the matched-layer transition completes
+              instantly and the live React component stays painted. */}
+          <div
+            className={`absolute ${shouldAnimate ? "anim-fade-down" : ""}`}
+            style={{
+              top: 20,
+              right: 16,
+              zIndex: 20,
+              viewTransitionName: "persistent-mobile-menu",
+              ...(shouldAnimate
+                ? {
+                    animationDelay: `${navStartDelay}s`,
+                    animationDuration: "0.4s",
+                  }
+                : {}),
+            }}
+          >
+            <MobileMenuButton />
+          </div>
 
           {/* FloatingNav floats over content, centred horizontally
               with a 16 px gap from the viewport bottom. Scaled by

@@ -81,10 +81,10 @@ export default async function RootLayout({
     <html
       lang="en"
       className={`${solway.variable} ${spaceGrotesk.variable}`}
-      // SSR always emits data-theme="light" + data-scale="1" so the
+      // SSR always emits data-theme="dark" + data-scale="1" so the
       // very first byte of HTML carries explicit attributes (no
       // missing-attr → present-attr hydration mismatch). When the
-      // user has persisted "dark" / a non-1 scale, the inline init
+      // user has persisted "light" / a non-1 scale, the inline init
       // scripts in <head> rewrite these before paint — that
       // overwrite happens after SSR's render but before React
       // hydrates, so without `suppressHydrationWarning` React would
@@ -92,7 +92,7 @@ export default async function RootLayout({
       // attributes affected by the scripts are on the html element,
       // so suppressing warnings at this level is safe and doesn't
       // mask other hydration bugs lower in the tree.
-      data-theme="light"
+      data-theme="dark"
       data-scale="1"
       suppressHydrationWarning
     >

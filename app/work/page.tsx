@@ -8,7 +8,6 @@ import {
   useState,
 } from "react";
 import CTAButton from "../_components/CTAButton";
-import MobileMenuButton from "../_components/MobileMenuButton";
 import { useIsMobile } from "../_components/useIsMobile";
 import { fs } from "../_lib/typography";
 import {
@@ -809,9 +808,10 @@ function WorkMobile() {
       onWheel={onWheel}
     >
       {/* Bio Section header (Figma 558:11292) — title cluster on the
-          left, 3-dot MobileMenuButton placeholder on the right.
-          gap-10 items-start. Title cluster has no inner gap per Figma
-          439:3668. */}
+          left, invisible spacer on the right reserving the slot where
+          the persistent 3-dot MobileMenuButton (rendered by
+          ScaledShell) floats. gap-10 items-start. Title cluster has
+          no inner gap per Figma 439:3668. */}
       <div className="w-full flex items-start gap-[10px] shrink-0">
         <div className="flex-1 min-w-0 flex flex-col items-start">
           <p
@@ -844,15 +844,11 @@ function WorkMobile() {
             confidently adapt to the context.
           </p>
         </div>
-        <span
-          className="shrink-0 anim-bubbly-grow"
-          style={{
-            transformOrigin: "right center",
-            ["--stage" as string]: 0.6,
-          }}
-        >
-          <MobileMenuButton />
-        </span>
+        <div
+          className="shrink-0"
+          aria-hidden
+          style={{ width: 60.16, height: 40.96 }}
+        />
       </div>
 
       {/* Bio Container — flex-1 fills remaining vertical space */}

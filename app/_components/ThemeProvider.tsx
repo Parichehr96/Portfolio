@@ -8,7 +8,7 @@ import {
 } from "react";
 
 /* === Theme system ===
-   Two themes: "light" (default) and "dark". The user's choice persists
+   Two themes: "dark" (default) and "light". The user's choice persists
    in localStorage under STORAGE_KEY and is applied by writing the
    chosen value to `document.documentElement.dataset.theme`. CSS picks
    it up via `[data-theme="dark"]` selectors in globals.css.
@@ -38,10 +38,10 @@ const ThemeContext = createContext<ThemeContextValue | null>(null);
 export const THEME_INIT_SCRIPT = `(() => {
   try {
     const stored = localStorage.getItem(${JSON.stringify(STORAGE_KEY)});
-    const theme = stored === "dark" ? "dark" : "light";
+    const theme = stored === "light" ? "light" : "dark";
     document.documentElement.dataset.theme = theme;
   } catch {
-    document.documentElement.dataset.theme = "light";
+    document.documentElement.dataset.theme = "dark";
   }
 })();`;
 
@@ -55,9 +55,9 @@ const themeListeners = new Set<() => void>();
 let attrObserver: MutationObserver | null = null;
 
 function readDOMTheme(): Theme {
-  if (typeof document === "undefined") return "light";
+  if (typeof document === "undefined") return "dark";
   const attr = document.documentElement.dataset.theme;
-  return attr === "dark" ? "dark" : "light";
+  return attr === "light" ? "light" : "dark";
 }
 
 function subscribe(listener: () => void): () => void {
@@ -80,10 +80,11 @@ function subscribe(listener: () => void): () => void {
 }
 
 function getServerSnapshot(): Theme {
-  // SSR always renders the light variant — the inline init script
-  // updates the DOM attribute before paint, and the client snapshot
-  // takes over on hydration.
-  return "light";
+  // SSR always renders the dark variant — the inline init script
+  // overrides this to "light" before paint for users who've explicitly
+  // chosen light mode, and the client snapshot takes over on
+  // hydration.
+  return "dark";
 }
 
 export function ThemeProvider({ children }: { children: React.ReactNode }) {

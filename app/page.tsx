@@ -1,7 +1,6 @@
 "use client";
 
 import Link from "next/link";
-import MobileMenuButton from "./_components/MobileMenuButton";
 import { useIsMobile } from "./_components/useIsMobile";
 import { useViewTransitionRouter } from "./_lib/useViewTransitionRouter";
 import { fs } from "./_lib/typography";
@@ -262,7 +261,8 @@ function HomeDesktop() {
    Bio Section (top, gap-16):
      - Name row (gap-16 items-start):
          · "Parichehr"  Solway Regular 44/48
-         · MobileMenuButton (3-dot placeholder, no functionality yet)
+         · invisible spacer reserving the slot where the persistent
+           3-dot MobileMenuButton (rendered by ScaledShell) floats
      - Profile Info row (gap-8 items-center):
          · "Netherlands" + · + "Product Designer"  Solway Light 14/24
            tracking-2px (dot is Solway Regular 14/20)
@@ -312,9 +312,12 @@ function HomeMobile() {
       >
         {/* Bio Section header — title row + profile info, gap-16. */}
         <div className="w-full flex flex-col items-start gap-[16px] text-[var(--color-text-primary)] shrink-0">
-          {/* Name row — "Parichehr" + 3-dot menu placeholder. The
-              title takes flex-1 so the menu pill stays pinned to the
-              right edge while the title grows to fill the rest. */}
+          {/* Name row — "Parichehr" + invisible spacer where the
+              persistent 3-dot menu floats. The actual button is
+              rendered by ScaledShell so it doesn't unmount on
+              navigation; this spacer just reserves the layout space
+              the title would otherwise grow into. The title takes
+              flex-1 so wider names still wrap correctly. */}
           <div className="w-full flex items-start gap-[16px]">
             <p
               className="flex-1 min-w-0 font-normal anim-bubbly-grow"
@@ -327,12 +330,11 @@ function HomeMobile() {
             >
               Parichehr
             </p>
-            <span
-              className="shrink-0 anim-bubbly-grow"
-              style={{ transformOrigin: "right center", ...STAGE(0.5) }}
-            >
-              <MobileMenuButton />
-            </span>
+            <div
+              className="shrink-0"
+              aria-hidden
+              style={{ width: 60.16, height: 40.96 }}
+            />
           </div>
 
           {/* Profile info — "Netherlands · Product Designer" with a

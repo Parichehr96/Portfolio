@@ -4,7 +4,6 @@ import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
 import CTAButton from "../_components/CTAButton";
 import LinkExternalIcon from "../_components/LinkExternalIcon";
-import MobileMenuButton from "../_components/MobileMenuButton";
 import { useIsMobile } from "../_components/useIsMobile";
 import { useViewTransitionRouter } from "../_lib/useViewTransitionRouter";
 import { fs } from "../_lib/typography";
@@ -784,9 +783,10 @@ function AboutMobile() {
       </div>
 
       {/* Bio Section header (Figma 557:11244) — flex row with title
-          cluster on the left and the 3-dot MobileMenuButton placeholder
-          on the right. gap-10 items-start. The title cluster keeps its
-          own 8 px column gap. */}
+          cluster on the left and an invisible spacer reserving the slot
+          where the persistent 3-dot MobileMenuButton (rendered by
+          ScaledShell) floats. gap-10 items-start; the title cluster
+          keeps its own 8 px column gap. */}
       <div className="relative w-full flex items-start gap-[10px]">
         <div className="flex-1 min-w-0 flex flex-col items-start gap-[8px]">
           <p
@@ -812,15 +812,11 @@ function AboutMobile() {
             Nice to meet you!
           </p>
         </div>
-        <span
-          className="shrink-0 anim-bubbly-grow"
-          style={{
-            transformOrigin: "right center",
-            ["--stage" as string]: 1.5,
-          }}
-        >
-          <MobileMenuButton />
-        </span>
+        <div
+          className="shrink-0"
+          aria-hidden
+          style={{ width: 60.16, height: 40.96 }}
+        />
       </div>
 
       {/* Bio Container — 2 px scrollbar on the LEFT (Figma 312:2138) +
