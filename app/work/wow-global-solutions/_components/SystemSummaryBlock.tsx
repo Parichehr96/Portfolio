@@ -1,18 +1,19 @@
 import Image from "next/image";
 import ScaleToFit from "../../../_components/case-study/ScaleToFit";
-import { color } from "../../../_lib/tokens";
 
 /* WOW Figma 313:2880-ish — 908×694 collage of Summary / Image Content /
-   Image Details / Guide images on a cream-tinted backdrop. */
+   Image Details / Guide images on a card-surface backdrop (cream in
+   light, navy in dark per Figma 580:5010-5020 — every tile uses the
+   same surface token so they read as one material). */
 
-const CREAM = color.cream;
+const SURFACE_CARD = "var(--color-surface-card)";
 
 const NATIVE_WIDTH = 908;
 const NATIVE_HEIGHT = 694;
 
 const cardCommon: React.CSSProperties = {
-  backgroundColor: CREAM,
-  border: `0.9px solid ${CREAM}`,
+  backgroundColor: SURFACE_CARD,
+  border: `0.9px solid ${SURFACE_CARD}`,
   borderRadius: 20,
   overflow: "hidden",
 };

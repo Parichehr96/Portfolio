@@ -1,13 +1,17 @@
 import Image from "next/image";
 import ScaleToFit from "../../../_components/case-study/ScaleToFit";
-import { color } from "../../../_lib/tokens";
 
 /* WOW Figma 313:2855 — designed at the desktop body width (~1272 wide,
    800 tall) with a 3-column collage of system images. Two columns are
-   on dark navy backgrounds. */
+   on dark navy backgrounds. Outer surface flips with theme via
+   --color-surface-card (cream in light, navy in dark per Figma
+   580:4991). The two inner navy-dark image holders stay at
+   --color-navy-dark in both themes so they remain visually distinct
+   from the surface in light, and slightly darker than the surface
+   in dark. */
 
-const NAVY_DARK = color.navyDark;
-const CREAM = color.cream;
+const SURFACE_CARD = "var(--color-surface-card)";
+const PANEL_DARK = "var(--color-navy-dark)";
 
 const NATIVE_WIDTH = 1272;
 const NATIVE_HEIGHT = 800;
@@ -20,7 +24,7 @@ export default function SystemBlock() {
         style={{
           width: NATIVE_WIDTH,
           height: NATIVE_HEIGHT,
-          backgroundColor: CREAM,
+          backgroundColor: SURFACE_CARD,
           borderRadius: 20,
         }}
       >
@@ -46,7 +50,7 @@ export default function SystemBlock() {
           >
             <div
               className="flex-1 flex items-start w-full overflow-hidden relative"
-              style={{ backgroundColor: NAVY_DARK, borderRadius: 8 }}
+              style={{ backgroundColor: PANEL_DARK, borderRadius: 8 }}
             >
               <Image
                 src="/assets/wow/system-details-1.png"
@@ -75,7 +79,7 @@ export default function SystemBlock() {
             <div
               className="flex-1 flex items-start overflow-hidden relative"
               style={{
-                backgroundColor: NAVY_DARK,
+                backgroundColor: PANEL_DARK,
                 borderRadius: 8,
                 width: 300,
               }}

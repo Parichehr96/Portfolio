@@ -31,11 +31,6 @@ export const CERTIFICATES: AcademicItem[] = [
     url: "https://app.uxcel.com/certificates/5AKU06K2NRCJ",
   },
   {
-    name: "GenAI for UX Designers",
-    short: "Coursera",
-    date: "2025",
-  },
-  {
     name: "Google UX Design",
     short: "Coursera",
     date: "2024",

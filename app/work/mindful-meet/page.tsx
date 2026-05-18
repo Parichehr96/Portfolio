@@ -15,8 +15,12 @@ import {
    are placeholders until the live URLs are supplied. */
 
 const SOLWAY = "var(--font-solway), serif";
-const NAVY = "#1F2753";
-const CREAM = "#F9F5EB";
+// Page-level NAVY / CREAM remap to CSS theme variables so every
+// existing usage (text colors, image-frame backgrounds, divider
+// borders) flips with [data-theme="dark"]: navy → white text, cream
+// → navy card surfaces per Figma 580:4860.
+const NAVY = "var(--color-text-primary)";
+const CREAM = "var(--color-surface-card)";
 
 const RESEARCH_REPORT_URL =
   "https://medium.com/@parichehr.t96/mindful-meet-c07bbc648ac3";

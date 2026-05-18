@@ -1,19 +1,27 @@
 import Image from "next/image";
 import ScaleToFit from "../../../_components/case-study/ScaleToFit";
-import { color, font } from "../../../_lib/tokens";
+import { font } from "../../../_lib/tokens";
 import { fs } from "../../../_lib/typography";
 
-/* WOW Figma 313:2841 — 908×800 cream-lighter container with two-column
+/* WOW Figma 313:2841 — 908×800 card container with two-column
    nested navy panels (Style Guide tab + Guides image left, two
-   Component images stacked right).
+   Component images stacked right). The outer card uses the
+   theme-aware --color-surface-card token so the panel reads cream
+   on light and navy on dark per Figma 580:4977 without per-theme
+   forks here.
 
    Composition is absolute-positioned at native pixel coordinates;
    ScaleToFit lets it render at native size on desktop and scale down
    gracefully on narrower viewports without rebuilding the layout. */
 
-const NAVY = color.navy;
-const NAVY_DARK = color.navyDark;
-const CREAM_LIGHTER = color.creamLight;
+// Outer card surface flips cream-light → navy via the theme token
+// per Figma 580:4977. Inner navy / navy-dark panels are decorative
+// imagery framing — they stay the same in both themes (Figma keeps
+// them at the same navy values on dark) so the design reads as a
+// single material with the imagery as the only differentiation.
+const SURFACE_CARD = "var(--color-surface-card)";
+const PANEL = "var(--color-navy)";
+const PANEL_DARK = "var(--color-navy-dark)";
 const SOLWAY = font.solway;
 
 const NATIVE_WIDTH = 908;
@@ -27,7 +35,7 @@ export default function PhaseImageBlock() {
         style={{
           width: NATIVE_WIDTH,
           height: NATIVE_HEIGHT,
-          backgroundColor: CREAM_LIGHTER,
+          backgroundColor: SURFACE_CARD,
           borderRadius: 8,
         }}
       >
@@ -51,7 +59,7 @@ export default function PhaseImageBlock() {
                   top: 0,
                   width: 164,
                   height: 96,
-                  backgroundColor: NAVY_DARK,
+                  backgroundColor: PANEL_DARK,
                   borderRadius: 20,
                 }}
               />
@@ -66,13 +74,13 @@ export default function PhaseImageBlock() {
                   lineHeight: "40px",
                 }}
               >
-                <span style={{ color: NAVY_DARK }}>Style </span>
+                <span style={{ color: PANEL_DARK }}>Style </span>
                 <span style={{ color: "#FFFFFF" }}>Guid</span>
               </p>
             </div>
             <div
               className="flex-1 flex items-center justify-center"
-              style={{ backgroundColor: NAVY, borderRadius: 20, width: 345 }}
+              style={{ backgroundColor: PANEL, borderRadius: 20, width: 345 }}
             >
               <Image
                 src="/assets/wow/guides.png"
@@ -87,7 +95,7 @@ export default function PhaseImageBlock() {
           <div className="flex flex-col items-center h-full" style={{ gap: 8 }}>
             <div
               className="flex-1 flex items-center justify-center"
-              style={{ backgroundColor: NAVY, borderRadius: 20, width: 491 }}
+              style={{ backgroundColor: PANEL, borderRadius: 20, width: 491 }}
             >
               <Image
                 src="/assets/wow/component-1.png"
@@ -101,7 +109,7 @@ export default function PhaseImageBlock() {
             <div
               className="flex items-center justify-center"
               style={{
-                backgroundColor: NAVY,
+                backgroundColor: PANEL,
                 borderRadius: 20,
                 width: 491,
                 height: 430,

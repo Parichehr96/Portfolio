@@ -197,7 +197,7 @@ export default function ResearchDiagram() {
         width: "100%",
         height: 800 * scale,
         overflow: "hidden",
-        backgroundColor: "#FEFBF5",
+        backgroundColor: "var(--color-surface-card)",
         borderRadius: 8,
       }}
     >

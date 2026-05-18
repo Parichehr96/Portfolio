@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import CTAButton from "./_components/CTAButton";
 import { useIsMobile } from "./_components/useIsMobile";
 import { useViewTransitionRouter } from "./_lib/useViewTransitionRouter";
 import { fs } from "./_lib/typography";
@@ -273,9 +274,6 @@ function HomeDesktop() {
      - "My Works" CTA    Solway Regular 16/24 cream pill, full-width,
                          routes to /work to mirror desktop. */
 function HomeMobile() {
-  const { handleClick } = useViewTransitionRouter();
-  const handleWorkClick = handleClick("/work");
-
   return (
     <>
       {/* Illustration — bottom-centred, square hero portrait that
@@ -421,33 +419,25 @@ function HomeMobile() {
             Complexity is inevitable, Confusion is optional.
           </p>
 
-          {/* "My Works" primary CTA — cream pill, full-width, capped
-              at h-40 per Figma 536:11150. Routes to /work via the
-              View Transition router so the hero illustration morphs
-              into the project preview frame on /work (matching the
-              desktop "My Works" pill). Stage 5. */}
-          <Link
-            href="/work"
-            onClick={handleWorkClick}
-            className="w-full flex items-center justify-center rounded-[122px] anim-bubbly-grow bg-[var(--color-cta-primary-bg)] hover:bg-[var(--color-cta-primary-hover)] transition-colors duration-200"
+          {/* "My Works" primary CTA — shared CTAButton in mobile spec
+              (h-40, text-12, no icon). Wrapper handles the anim-
+              bubbly-grow stage 5 entrance + left transform origin so
+              the pill grows from its left edge with the rest of the
+              text column. The CTAButton itself reads useIsMobile()
+              and renders the mobile font/icon sizes automatically. */}
+          <span
+            className="w-full flex anim-bubbly-grow"
             style={{
-              height: 40,
-              paddingLeft: 24,
-              paddingRight: 24,
-              color: "var(--color-cta-primary-text)",
-              fontFamily: "var(--font-solway), serif",
-              fontWeight: 400,
-              fontSize: fs(16),
-              lineHeight: "24px",
-              letterSpacing: "0.15px",
-              textAlign: "center",
               transformOrigin: "left center",
               ...STAGE(5),
             }}
-            aria-label="My Works — see my projects"
           >
-            My Works
-          </Link>
+            <CTAButton
+              href="/work"
+              label="My Works"
+              variant="primary"
+            />
+          </span>
         </div>
       </div>
     </>

@@ -16,8 +16,12 @@ import { fs } from "../../_lib/typography";
    /contact), Telegram Channel, Figma File. */
 
 const SOLWAY = "var(--font-solway), serif";
-const NAVY = "#1F2753";
-const CREAM = "#F9F5EB";
+// Page-level NAVY / CREAM remap to CSS theme variables so every
+// existing usage (text colors, image-frame backgrounds, "Show more"
+// underline) flips with [data-theme="dark"] per Figma 580:4860 —
+// navy → white text, cream → navy card surfaces.
+const NAVY = "var(--color-text-primary)";
+const CREAM = "var(--color-surface-card)";
 
 const TELEGRAM_URL = "https://t.me/Challenquiz";
 const FIGMA_FILE_URL =

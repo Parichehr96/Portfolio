@@ -59,6 +59,24 @@
   --color-cta-primary-bg: #F9F5EB;
   --color-cta-primary-text: #1B2249;
   --color-cta-primary-hover: #EDEAE4;
+  /* Case-study surfaces (Figma 580:4860). On light the morphing
+     header reads as a cream card and the inner image/data panels
+     read as a softer cream; on dark both collapse to navy #1F2753
+     against the navy-dark page bg per the Figma dark spec. */
+  --color-surface-header: #F9F5EB;
+  --color-surface-card: #FEFBF5;
+  /* CTA pill tokens used *on a case-study card surface*. The page-bg
+     primary CTA (cream on white in light, navy-light on navy-dark in
+     dark) would disappear on a cream card, so card primaries get a
+     white fill in light mode; dark mode keeps the navy-light fill
+     per Figma 580:5164. Secondary is outlined: white border on the
+     cream card in light, cream-dark border on the navy card in
+     dark per Figma 580:5156. */
+  --color-cta-card-primary-bg: #FFFFFF;
+  --color-cta-card-primary-text: #1F2753;
+  --color-cta-card-primary-hover: #EDEAE4;
+  --color-cta-card-secondary-border: #FFFFFF;
+  --color-cta-card-secondary-hover-bg: rgba(255, 255, 255, 0.6);
   /* Selected experience-row pill on /work — cream in light, navy
      darker in dark so the pill still reads as "lifted" from the page. */
   --color-experience-pill-bg: #F9F5EB;
@@ -149,6 +167,21 @@ body {
   --color-cta-primary-bg: #28315F;
   --color-cta-primary-text: #FFFFFF;
   --color-cta-primary-hover: #1F2753;
+  /* Case-study surfaces in dark — both the morphing header card and
+     the inner image panels collapse to navy #1F2753 against the
+     navy-dark page bg per Figma 580:4860 (one navy tone for every
+     card surface so they sit on the page as a single material). */
+  --color-surface-header: #1F2753;
+  --color-surface-card: #1F2753;
+  /* Card CTAs in dark — primary fills navy-light #28315F with white
+     text (Figma 580:5164); secondary outlines with cream-dark and
+     keeps the white label, hover lays a light cream wash so the
+     ghost button reads as interactive (Figma 580:5156). */
+  --color-cta-card-primary-bg: #28315F;
+  --color-cta-card-primary-text: #FFFFFF;
+  --color-cta-card-primary-hover: #1F2753;
+  --color-cta-card-secondary-border: #EDEAE4;
+  --color-cta-card-secondary-hover-bg: rgba(249, 245, 235, 0.12);
   --color-experience-pill-bg: #28315F;
   --color-experience-pill-text: #FFFFFF;
   --color-scroll-track: #28315F;

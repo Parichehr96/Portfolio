@@ -612,13 +612,19 @@ function WorkDesktop() {
             </div>
 
             {/* CTA — Figma 319:2261 now shows only "MY CV" full-width
-                across the row (no "Get in touch" pill). */}
+                across the row (no "Get in touch" pill). Wired to the
+                resume PDF in /public/cv so the browser downloads it
+                directly (the `download` prop on CTAButton forces a
+                plain `<a>` save instead of routing through the View
+                Transition router). */}
             <div className="w-full flex items-start shrink-0">
               <span
                 className="anim-bubbly-grow flex-1 flex"
                 style={{ ["--stage" as string]: 8 }}
               >
                 <CTAButton
+                  href="/cv/parichehr-talebzadeh-resume.pdf"
+                  download="Parichehr-Talebzadeh-CV.pdf"
                   iconSrc="/assets/icon-cta-cv.svg"
                   label="MY CV"
                   variant="secondary"
@@ -718,9 +724,10 @@ function WorkMobile() {
   // wraparound. The visible tail is capped at 2 items so the frame
   // always shows "1 selected + 2 unselected" — extra items (e.g. the
   // 4th in Featured) live in DOM only after the user advances the
-  // rotation past them. The scroll indicator (only visible when the
-  // section has > 3 items) hints that more rows exist beyond the
-  // visible two.
+  // rotation past them. The scroll indicator (visible whenever the
+  // section has > 2 items) doubles as a position marker, hinting at
+  // hidden rows in Featured and showing where the selection sits
+  // within Early Works.
   const rotated = sectionItems.map(
     (_, i) => sectionItems[(safeSelectedIdx + i) % itemCount],
   );
@@ -1015,10 +1022,14 @@ function WorkMobile() {
             </div>
           </div>
 
-          {/* Scroll indicator — only visible when there are more than 3
-              items (selected + 2 unselected fit on screen, anything
-              beyond needs the indicator to hint that more exist). */}
-          {itemCount > 3 && (
+          {/* Scroll indicator — visible whenever the section has more
+              than two items. Doubles as a position marker (the moving
+              thumb shows where the selected item sits within the tier)
+              so it's rendered in Early Works as well as Featured even
+              though all three Early Works rows fit on screen at once;
+              hidden in Supporting (only two items, no useful position
+              signal). */}
+          {itemCount > 2 && (
             <div
               className="self-stretch overflow-hidden relative shrink-0"
               style={{
@@ -1046,54 +1057,28 @@ function WorkMobile() {
 
       </div>
 
-      {/* MY CV CTA — Figma 439:3722 (mobile). Outlined secondary pill
-          scaled to ~0.8 × of the desktop spec: border-1.6, px-12.8
-          py-9.6, rounded-96, gap-9.6, icon 19.2 × 19.2, label
-          11.2/14.4. Inlined here so the mobile version can diverge
-          from the shared CTAButton (used elsewhere at the full
-          desktop spec). Sits outside the bio container so the 24 px
-          outer gap separates it from the experience list. */}
+      {/* MY CV CTA — outlined secondary pill rendered by the shared
+          CTAButton. The component reads useIsMobile() and auto-
+          applies the new mobile spec (h-40, text-12, icon 16) so all
+          mobile CTAs land on the same size; the wrapper carries the
+          stage-1.6 bubbly-grow entrance to keep the original
+          sequencing. Wired to the resume PDF in /public/cv so the
+          browser downloads it directly. Sits outside the bio
+          container so the 24 px outer gap separates it from the
+          experience list. */}
       <div className="w-full flex items-start shrink-0">
         <span
           className="anim-bubbly-grow flex-1 flex"
           style={{ ["--stage" as string]: 1.6 }}
         >
-          <span
-            className="flex-1 min-w-0 flex items-center justify-center gap-[9.6px] rounded-[96px] border-[1.6px] border-solid border-[var(--color-cream-dark)] bg-transparent transition-colors duration-200"
-            style={{
-              paddingLeft: 12.8,
-              paddingRight: 12.8,
-              paddingTop: 9.6,
-              paddingBottom: 9.6,
-            }}
-            aria-label="MY CV"
-          >
-            <span
-              className="themed-icon relative shrink-0 inline-flex items-center justify-center"
-              style={{ width: 19.2, height: 19.2 }}
-              aria-hidden
-            >
-              <img
-                src="/assets/icon-cta-cv.svg"
-                alt=""
-                width={19.2}
-                height={19.2}
-                className="block w-full h-full"
-              />
-            </span>
-            <span
-              className="whitespace-nowrap"
-              style={{
-                color: "var(--color-text-primary)",
-                fontFamily: SOLWAY,
-                fontWeight: 400,
-                fontSize: 11.2,
-                lineHeight: "14.4px",
-              }}
-            >
-              MY CV
-            </span>
-          </span>
+          <CTAButton
+            href="/cv/parichehr-talebzadeh-resume.pdf"
+            download="Parichehr-Talebzadeh-CV.pdf"
+            iconSrc="/assets/icon-cta-cv.svg"
+            label="MY CV"
+            variant="secondary"
+            uppercase
+          />
         </span>
       </div>
     </div>

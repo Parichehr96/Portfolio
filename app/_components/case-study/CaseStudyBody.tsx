@@ -1,6 +1,6 @@
 import Image from "next/image";
 import type React from "react";
-import { color, font } from "../../_lib/tokens";
+import { font } from "../../_lib/tokens";
 import { fs } from "../../_lib/typography";
 
 /* === Shared case-study body primitives ===
@@ -8,10 +8,14 @@ import { fs } from "../../_lib/typography";
    case-study page (under /work/<slug>). Each one is a thin wrapper
    around the Figma type tokens so case-study pages can stay focused
    on content layout instead of re-stating the brand/typography rules
-   on every paragraph. */
+   on every paragraph.
 
-const NAVY = color.navy;
-const NAVY_DARK = color.navyDark;
+   Colour values come from CSS variables so the same primitives read
+   navy-on-cream in light mode and white-on-navy in dark mode without
+   any per-call-site theming. The defaults match Figma 580:4860. */
+
+const TEXT_PRIMARY = "var(--color-text-primary)";
+const SURFACE_CARD = "var(--color-surface-card)";
 const SOLWAY = font.solway;
 
 export type SectionTitleSize = "xl" | "lg" | "md";
@@ -36,7 +40,7 @@ export function SectionTitle({
   return (
     <p
       className="w-full"
-      style={{ color: NAVY, fontFamily: SOLWAY, ...s }}
+      style={{ color: TEXT_PRIMARY, fontFamily: SOLWAY, ...s }}
     >
       {text}
     </p>
@@ -44,7 +48,7 @@ export function SectionTitle({
 }
 
 const BODY_STYLE: React.CSSProperties = {
-  color: NAVY,
+  color: TEXT_PRIMARY,
   fontFamily: SOLWAY,
   fontWeight: 400,
   fontSize: fs(16),
@@ -75,7 +79,7 @@ export function ImageCaption({ children }: { children: React.ReactNode }) {
     <p
       className="w-full"
       style={{
-        color: NAVY,
+        color: TEXT_PRIMARY,
         fontFamily: SOLWAY,
         fontWeight: 400,
         fontSize: fs(14),
@@ -115,7 +119,7 @@ export function ImageFrame({
   src,
   alt,
   height,
-  bg = color.creamLight,
+  bg = SURFACE_CARD,
   rounded = 20,
   padding = 0,
   imgStyle,
@@ -173,7 +177,7 @@ export function ReflectionBlock({
       <p
         className="w-full"
         style={{
-          color: NAVY_DARK,
+          color: TEXT_PRIMARY,
           fontFamily: SOLWAY,
           fontWeight: 400,
           fontSize: fs(22),

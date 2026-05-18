@@ -1,12 +1,18 @@
-import { color, font } from "../../../_lib/tokens";
+import { font } from "../../../_lib/tokens";
 import { fs } from "../../../_lib/typography";
 
 /* WOW HR module — competitor analysis block. Three product cards
-   (BambooHR, Personio, Bob) on a cream backdrop with a heading row. */
+   (BambooHR, Personio, Bob) on a card-surface backdrop with a
+   heading row. The outer wrapper flips with theme via
+   --color-surface-card; product-name pills stay navy (PANEL) in
+   both themes for a strong identity strip. Text follows the page
+   primary token so it stays navy in light and white in dark. */
 
-const NAVY = color.navy;
-const GRAY_NAVY = color.grayNavy;
-const CREAM_LIGHTER = color.creamLight;
+const TEXT_PRIMARY = "var(--color-text-primary)";
+const TEXT_MUTED = "var(--color-text-secondary)";
+const SURFACE_CARD = "var(--color-surface-card)";
+const PANEL = "var(--color-navy)";
+const PANEL_TEXT = "var(--color-cream-light)";
 const SOLWAY = font.solway;
 
 const COMPETITORS: CompetitorCardProps[] = [
@@ -61,7 +67,7 @@ function CompetitorCard({
       <div
         className="w-full flex items-center justify-center"
         style={{
-          backgroundColor: NAVY,
+          backgroundColor: PANEL,
           height: 78,
           borderRadius: 12,
           padding: 8,
@@ -70,7 +76,7 @@ function CompetitorCard({
         <p
           className="text-center"
           style={{
-            color: CREAM_LIGHTER,
+            color: PANEL_TEXT,
             fontFamily: SOLWAY,
             fontWeight: 400,
             fontSize: fs(28),
@@ -107,7 +113,7 @@ function CardField({
       <p
         className="w-full"
         style={{
-          color: GRAY_NAVY,
+          color: TEXT_MUTED,
           fontFamily: SOLWAY,
           fontWeight: 400,
           fontSize: fs(14),
@@ -122,7 +128,7 @@ function CardField({
           <p
             className="w-full"
             style={{
-              color: NAVY,
+              color: TEXT_PRIMARY,
               fontFamily: SOLWAY,
               fontWeight: 700,
               fontSize: fs(16),
@@ -136,7 +142,7 @@ function CardField({
         <p
           className="w-full"
           style={{
-            color: NAVY,
+            color: TEXT_PRIMARY,
             fontFamily: SOLWAY,
             fontWeight: 500,
             fontSize: fs(14),
@@ -166,7 +172,7 @@ export default function CompetitorBlock() {
     <div
       className="w-full overflow-hidden flex flex-col items-center relative px-[20px] py-[32px] md:px-[30px] md:py-[44px]"
       style={{
-        backgroundColor: CREAM_LIGHTER,
+        backgroundColor: SURFACE_CARD,
         borderRadius: 8,
         gap: 32,
       }}
@@ -177,7 +183,7 @@ export default function CompetitorBlock() {
       >
         <p
           style={{
-            color: NAVY,
+            color: TEXT_PRIMARY,
             fontFamily: SOLWAY,
             fontWeight: 400,
             fontSize: fs(24),
@@ -188,7 +194,7 @@ export default function CompetitorBlock() {
         </p>
         <p
           style={{
-            color: NAVY,
+            color: TEXT_PRIMARY,
             fontFamily: SOLWAY,
             fontWeight: 400,
             fontSize: fs(16),

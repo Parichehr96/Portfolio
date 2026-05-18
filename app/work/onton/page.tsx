@@ -15,8 +15,16 @@ import {
    Telegram bot, Telegram Channel. */
 
 const SOLWAY = "var(--font-solway), serif";
-const NAVY = "#1F2753";
-const CREAM = "#F9F5EB";
+// Page-level NAVY / CREAM remap to CSS theme variables: every standard
+// text colour and card surface flips with [data-theme="dark"] per
+// Figma 580:4860. A separate PANEL/PANEL_TEXT pair stays fixed for
+// the inverted "navy on cream-text" accent block (the early-prototype
+// callout + wallet-connect image frame) so it remains visually
+// distinct in both themes.
+const NAVY = "var(--color-text-primary)";
+const CREAM = "var(--color-surface-card)";
+const PANEL = "var(--color-navy)";
+const PANEL_TEXT = "var(--color-cream)";
 
 const TELEGRAM_BOT_URL = "https://t.me/theontonbot";
 const TELEGRAM_CHANNEL_URL = "https://t.me/ontonlive";
@@ -191,7 +199,7 @@ export default function OntonCaseStudy() {
             <div
               className="w-full flex flex-col items-center"
               style={{
-                backgroundColor: NAVY,
+                backgroundColor: PANEL,
                 borderRadius: 20,
                 padding: "40px 32px",
                 gap: 24,
@@ -200,7 +208,7 @@ export default function OntonCaseStudy() {
               <p
                 className="w-full text-center"
                 style={{
-                  color: CREAM,
+                  color: PANEL_TEXT,
                   fontFamily: SOLWAY,
                   fontWeight: 700,
                   fontSize: fs(24),
@@ -371,7 +379,7 @@ export default function OntonCaseStudy() {
             <ImageFrame
               src="/assets/onton/wallet-connect.png"
               alt={'Wallet connection flow: tap "Join" → native-feeling wallet prompt → verified'}
-              bg={NAVY}
+              bg={PANEL}
             />
             <ImageCaption>
               Wallet connection flow: tap &ldquo;Join&rdquo; → native-

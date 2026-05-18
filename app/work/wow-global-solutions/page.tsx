@@ -7,7 +7,7 @@ import {
   ReflectionBlock,
   SectionTitle,
 } from "../../_components/case-study/CaseStudyBody";
-import { color, font } from "../../_lib/tokens";
+import { font } from "../../_lib/tokens";
 import CompetitorBlock from "./_components/CompetitorBlock";
 import PhaseImageBlock from "./_components/PhaseImageBlock";
 import RequestImagesBlock from "./_components/RequestImagesBlock";
@@ -21,8 +21,13 @@ import { fs } from "../../_lib/typography";
    <CaseStudyHeader /> below. Every body section is shipped as static
    HTML with no JS payload. */
 
-const NAVY = color.navy;
-const CREAM_LIGHTER = color.creamLight;
+// Surface + text colours read from CSS variables so the body
+// repaints navy→white text and cream→navy card surfaces under
+// [data-theme="dark"] without per-block forks. The same tokens
+// flow through ImageFrame, SectionTitle/BodyText, and the wow
+// _components/* blocks.
+const TEXT_PRIMARY = "var(--color-text-primary)";
+const SURFACE_CARD = "var(--color-surface-card)";
 const SOLWAY = font.solway;
 
 const LINKEDIN_URL =
@@ -162,7 +167,7 @@ function RoleSection() {
       <div className="cs-section-row">
         <div
           className="shrink-0 overflow-hidden relative w-full md:w-[780px] aspect-[780/672] md:aspect-auto md:h-[672px]"
-          style={{ backgroundColor: CREAM_LIGHTER, borderRadius: 20 }}
+          style={{ backgroundColor: SURFACE_CARD, borderRadius: 20 }}
         >
           <Image
             src="/assets/wow/role.png"
@@ -223,7 +228,7 @@ function ConstraintSection() {
       <div
         className="shrink-0 overflow-hidden flex flex-col items-start w-full md:w-auto"
         style={{
-          backgroundColor: CREAM_LIGHTER,
+          backgroundColor: SURFACE_CARD,
           padding: 24,
           borderRadius: 20,
         }}
@@ -335,7 +340,7 @@ function Phase2HRModule() {
         <ul
           className="w-full"
           style={{
-            color: NAVY,
+            color: TEXT_PRIMARY,
             fontFamily: SOLWAY,
             fontWeight: 400,
             fontSize: fs(16),
@@ -448,7 +453,6 @@ function FeedSection() {
         src="/assets/wow/request-2.png"
         alt="Feed section"
         height={800}
-        bg={CREAM_LIGHTER}
         imgStyle={{ objectFit: "contain" }}
       />
     </section>

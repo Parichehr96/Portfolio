@@ -2,6 +2,7 @@
 
 import Image from "next/image";
 import { useEffect, useLayoutEffect, useRef, useState } from "react";
+import CTAButton from "./CTAButton";
 import { useIsMobile } from "./useIsMobile";
 import { fs } from "../_lib/typography";
 
@@ -23,9 +24,14 @@ import { fs } from "../_lib/typography";
 ======================================================================= */
 
 const SOLWAY = "var(--font-solway), serif";
-const NAVY = "#1F2753";
-const CREAM = "#F9F5EB";
-const GRAY_NAVY = "#5A5D70";
+// Surface + text colours read from CSS variables so the morphing card
+// flips cream→navy and navy text→white when [data-theme="dark"] is
+// active on <html>. The compact MC2 subtitle still needs a "muted"
+// shade that's distinct from the primary; we use --color-text-secondary
+// which is gray-navy in light and a light blue in dark.
+const TEXT_PRIMARY = "var(--color-text-primary)";
+const TEXT_MUTED = "var(--color-text-secondary)";
+const SURFACE = "var(--color-surface-header)";
 
 // Approximate natural height of MC1's content (Figma 313:2747 — header
 // + image+details + CTA row + paddings). Used as the "design" reference
@@ -110,7 +116,7 @@ function ChevronLeft({ size = 28 }: { size?: number }) {
     >
       <path
         d="M15 6L9 12L15 18"
-        stroke={NAVY}
+        stroke="currentColor"
         strokeWidth="2"
         strokeLinecap="round"
         strokeLinejoin="round"
@@ -127,7 +133,11 @@ function BackButton({ href = "/work" }: { href?: string }) {
       onClick={stop}
       aria-label="Back to work"
       className="shrink-0 inline-flex items-center justify-center cursor-pointer hover:opacity-70 transition-opacity duration-200"
-      style={{ width: BACK_BUTTON_SIZE, height: BACK_BUTTON_SIZE }}
+      style={{
+        width: BACK_BUTTON_SIZE,
+        height: BACK_BUTTON_SIZE,
+        color: TEXT_PRIMARY,
+      }}
     >
       <ChevronLeft />
     </a>
@@ -140,7 +150,7 @@ function DetailItem({ label, value }: CaseStudyDetailItem) {
       <p
         className="w-full"
         style={{
-          color: NAVY,
+          color: TEXT_PRIMARY,
           fontFamily: SOLWAY,
           fontWeight: 700,
           fontSize: fs(14),
@@ -153,7 +163,7 @@ function DetailItem({ label, value }: CaseStudyDetailItem) {
       <p
         className="w-full"
         style={{
-          color: NAVY,
+          color: TEXT_PRIMARY,
           fontFamily: SOLWAY,
           fontWeight: 400,
           fontSize: fs(16),
@@ -167,74 +177,12 @@ function DetailItem({ label, value }: CaseStudyDetailItem) {
   );
 }
 
-function CTAButton({
-  href,
-  iconSrc,
-  label,
-  variant,
-  internal,
-  uppercase,
-}: CaseStudyCTA) {
-  const stop = (e: React.MouseEvent) => e.stopPropagation();
-  const baseClass =
-    "flex-1 min-w-0 inline-flex items-center justify-center gap-[12px] p-[16px] rounded-[120px] transition-colors duration-200 cursor-pointer";
-  const variantClass =
-    variant === "primary"
-      ? "bg-white hover:bg-[#EDEAE4]"
-      : "bg-transparent border-[2.6px] border-solid border-white hover:bg-white";
-  const inner = (
-    <>
-      <span
-        className="relative shrink-0 inline-block"
-        style={{ width: 24, height: 24 }}
-      >
-        <img
-          src={iconSrc}
-          alt=""
-          className="absolute inset-0 w-full h-full block"
-        />
-      </span>
-      <span
-        className="whitespace-nowrap"
-        style={{
-          color: NAVY,
-          fontFamily: SOLWAY,
-          fontWeight: 400,
-          fontSize: fs(14),
-          lineHeight: "18px",
-          textTransform: uppercase ? "uppercase" : undefined,
-        }}
-      >
-        {label}
-      </span>
-    </>
-  );
-  if (internal) {
-    return (
-      <a href={href} onClick={stop} className={`${baseClass} ${variantClass}`}>
-        {inner}
-      </a>
-    );
-  }
-  return (
-    <a
-      href={href}
-      target="_blank"
-      rel="noopener noreferrer"
-      onClick={stop}
-      className={`${baseClass} ${variantClass}`}
-    >
-      {inner}
-    </a>
-  );
-}
-
 function CompactDivider() {
   return (
     <span
       aria-hidden
       className="self-stretch shrink-0"
-      style={{ width: 1, backgroundColor: NAVY }}
+      style={{ width: 1, backgroundColor: TEXT_PRIMARY }}
     />
   );
 }
@@ -252,7 +200,7 @@ function CompactLink({
   const className =
     "inline-flex items-center justify-center px-[16px] rounded-[120px] cursor-pointer hover:opacity-70 transition-opacity duration-200 whitespace-nowrap shrink-0";
   const style: React.CSSProperties = {
-    color: NAVY,
+    color: TEXT_PRIMARY,
     fontFamily: SOLWAY,
     fontWeight: 400,
     fontSize: fs(14),
@@ -377,7 +325,7 @@ function CaseStudyHeaderDesktop({
   const titleLineHeight = lerp(64, 32, progress);
   const subtitleSize = lerp(22, 11, progress);
   const subtitleLineHeight = lerp(28, 16, progress);
-  const subtitleColor = progress > 0.5 ? GRAY_NAVY : NAVY;
+  const subtitleColor = progress > 0.5 ? TEXT_MUTED : TEXT_PRIMARY;
 
   const paddingX = lerp(MC1_PADDING_X, MC2_PADDING_X, progress);
   const paddingTop = lerp(MC1_PADDING_Y, MC2_PADDING_Y, progress);
@@ -416,7 +364,7 @@ function CaseStudyHeaderDesktop({
         right: cardSide,
         height: cardHeight,
         zIndex: 50,
-        backgroundColor: CREAM,
+        backgroundColor: SURFACE,
         borderTopLeftRadius: cornerTop,
         borderTopRightRadius: cornerTop,
         borderBottomLeftRadius: CARD_CORNER,
@@ -494,7 +442,7 @@ function CaseStudyHeaderDesktop({
       >
         <p
           style={{
-            color: NAVY,
+            color: TEXT_PRIMARY,
             fontFamily: SOLWAY,
             fontWeight: 400,
             fontSize: fs(titleSize),
@@ -613,7 +561,15 @@ function CaseStudyHeaderDesktop({
         </div>
         <div className="w-full flex items-start gap-[20px]">
           {ctas.map((cta) => (
-            <CTAButton key={cta.label} {...cta} />
+            <CTAButton
+              key={cta.label}
+              href={cta.href}
+              iconSrc={cta.iconSrc}
+              label={cta.label}
+              variant={cta.variant}
+              surface="card"
+              uppercase={cta.uppercase}
+            />
           ))}
         </div>
       </div>
@@ -652,7 +608,7 @@ function MobileDetailItem({ label, value }: CaseStudyDetailItem) {
       <p
         className="w-full"
         style={{
-          color: NAVY,
+          color: TEXT_PRIMARY,
           fontFamily: SOLWAY,
           fontWeight: 700,
           fontSize: fs(12),
@@ -666,7 +622,7 @@ function MobileDetailItem({ label, value }: CaseStudyDetailItem) {
       <p
         className="w-full"
         style={{
-          color: NAVY,
+          color: TEXT_PRIMARY,
           fontFamily: SOLWAY,
           fontWeight: 400,
           fontSize: fs(12),
@@ -678,66 +634,6 @@ function MobileDetailItem({ label, value }: CaseStudyDetailItem) {
         {value}
       </p>
     </div>
-  );
-}
-
-function MobileCTAButton({
-  href,
-  iconSrc,
-  label,
-  variant,
-  internal,
-  uppercase,
-}: CaseStudyCTA) {
-  const baseClass =
-    "w-full inline-flex items-center justify-center gap-[12px] px-[16px] py-[12px] rounded-[120px] transition-colors duration-200 cursor-pointer";
-  const variantClass =
-    variant === "primary"
-      ? "bg-white hover:bg-[#EDEAE4]"
-      : "bg-transparent border-[2.6px] border-solid border-white hover:bg-white/30";
-  const inner = (
-    <>
-      <span
-        className="relative shrink-0 inline-block"
-        style={{ width: 24, height: 24 }}
-      >
-        <img
-          src={iconSrc}
-          alt=""
-          className="absolute inset-0 w-full h-full block"
-        />
-      </span>
-      <span
-        className="whitespace-nowrap"
-        style={{
-          color: NAVY,
-          fontFamily: SOLWAY,
-          fontWeight: 400,
-          fontSize: fs(12),
-          lineHeight: "18px",
-          textTransform: uppercase ? "uppercase" : undefined,
-        }}
-      >
-        {label}
-      </span>
-    </>
-  );
-  if (internal) {
-    return (
-      <a href={href} className={`${baseClass} ${variantClass}`}>
-        {inner}
-      </a>
-    );
-  }
-  return (
-    <a
-      href={href}
-      target="_blank"
-      rel="noopener noreferrer"
-      className={`${baseClass} ${variantClass}`}
-    >
-      {inner}
-    </a>
   );
 }
 
@@ -830,7 +726,7 @@ function CaseStudyHeaderMobile({
           left: 0,
           right: 0,
           height: MOBILE_MC2_HEIGHT,
-          backgroundColor: CREAM,
+          backgroundColor: SURFACE,
           borderBottomLeftRadius: MOBILE_CARD_CORNER,
           borderBottomRightRadius: MOBILE_CARD_CORNER,
           padding: `0 ${MOBILE_PAGE_PADDING}px`,
@@ -849,7 +745,7 @@ function CaseStudyHeaderMobile({
         <p
           className="flex-1 min-w-0"
           style={{
-            color: NAVY,
+            color: TEXT_PRIMARY,
             fontFamily: SOLWAY,
             fontWeight: 400,
             fontSize: fs(16),
@@ -883,7 +779,7 @@ function CaseStudyHeaderMobile({
         style={{
           margin: `${MOBILE_MC1_TOP}px ${MOBILE_PAGE_PADDING}px 0`,
           padding: MOBILE_CARD_PADDING,
-          backgroundColor: CREAM,
+          backgroundColor: SURFACE,
           borderRadius: MOBILE_CARD_CORNER,
           display: "flex",
           flexDirection: "column",
@@ -911,7 +807,7 @@ function CaseStudyHeaderMobile({
             <p
               className="flex-1 min-w-0"
               style={{
-                color: NAVY,
+                color: TEXT_PRIMARY,
                 fontFamily: SOLWAY,
                 fontWeight: 400,
                 fontSize: fs(22),
@@ -934,7 +830,7 @@ function CaseStudyHeaderMobile({
           <p
             className="w-full"
             style={{
-              color: NAVY,
+              color: TEXT_PRIMARY,
               fontFamily: SOLWAY,
               fontWeight: 400,
               fontSize: fs(12),
@@ -981,10 +877,21 @@ function CaseStudyHeaderMobile({
           </div>
         </div>
 
-        {/* CTA stack — full-width pills, 16 px gap per Figma 446:8155. */}
+        {/* CTA stack — full-width pills, 16 px gap per Figma 446:8155.
+            Uses the shared CTAButton with surface="card" so each pill
+            inherits the theme-aware tokens: white-on-cream in light
+            and navy-light-on-navy in dark per Figma 580:5164/5156. */}
         <div className="w-full flex flex-col" style={{ gap: 16 }}>
           {ctas.map((cta) => (
-            <MobileCTAButton key={cta.label} {...cta} />
+            <CTAButton
+              key={cta.label}
+              href={cta.href}
+              iconSrc={cta.iconSrc}
+              label={cta.label}
+              variant={cta.variant}
+              surface="card"
+              uppercase={cta.uppercase}
+            />
           ))}
         </div>
       </div>

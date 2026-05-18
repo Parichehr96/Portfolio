@@ -702,8 +702,6 @@ function MobileListSection({
 }
 
 function AboutMobile() {
-  const { handleClick } = useViewTransitionRouter();
-  const handleContactClick = handleClick("/contact");
   const scrollRef = useRef<HTMLDivElement | null>(null);
   // Scroll-driven illustration opacity. At the top of the bio the
   // illustration sits at full strength behind the content; as the
@@ -963,34 +961,22 @@ function AboutMobile() {
             </div>
           </div>
 
-          {/* CTA — primary "Let's talk" cream pill (Figma 557:11254).
-              Inline on mobile (rather than via CTAButton) because the
-              mobile spec adds an explicit `h-40` cap and drops the
-              icon; desktop About still uses CTAButton with its
-              natural 48-tall sizing. Stage 11 lands the CTA last in
-              the bubbly-grow sequence. */}
-          <Link
-            href="/contact"
-            onClick={handleContactClick}
-            className="w-full anim-bubbly-grow flex items-center justify-center gap-[8px] rounded-[122px] bg-[var(--color-cta-primary-bg)] hover:bg-[var(--color-cta-primary-hover)] transition-colors duration-200 shrink-0"
+          {/* CTA — primary "Let's talk" pill (Figma 557:11254) rendered
+              by the shared CTAButton, which reads useIsMobile() and
+              auto-applies the mobile spec (h-40, text 12, no icon
+              here because Let's talk is unilustrated on mobile per
+              the latest Figma). The wrapper supplies the stage-11
+              bubbly-grow entrance and the left transform origin so
+              the pill grows from its left edge alongside the bio. */}
+          <span
+            className="w-full flex anim-bubbly-grow shrink-0"
             style={{
-              height: 40,
-              paddingLeft: 24,
-              paddingRight: 24,
-              color: "var(--color-cta-primary-text)",
-              fontFamily: SOLWAY,
-              fontWeight: 400,
-              fontSize: fs(16),
-              lineHeight: "24px",
-              letterSpacing: "0.15px",
-              textAlign: "center",
               transformOrigin: "left center",
               ["--stage" as string]: 11,
             }}
-            aria-label="Let's talk — open contact"
           >
-            Let&rsquo;s talk
-          </Link>
+            <CTAButton href="/contact" label="Let's talk" variant="primary" />
+          </span>
         </div>
       </div>
     </div>

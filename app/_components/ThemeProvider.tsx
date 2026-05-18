@@ -21,7 +21,13 @@ import {
 
 export type Theme = "light" | "dark";
 
-const STORAGE_KEY = "portfolio:theme";
+// Bumped from "portfolio:theme" → "portfolio:theme:v2" on the
+// 2026-05 dark-default flip so any stale "light" value persisted
+// under the old key (from earlier visits when light was the
+// default) is silently dropped — returning users get the new dark
+// default on next load, and only an explicit toggle persists to the
+// new key.
+const STORAGE_KEY = "portfolio:theme:v2";
 
 type ThemeContextValue = {
   theme: Theme;

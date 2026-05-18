@@ -357,23 +357,26 @@ function ContactDesktop() {
      - Field value Solway Regular 16/24 navy tracking-0.5 (Body/large)
      - CTA         Solway Light 16/28 navy underline */
 function MobileSocialPill({ social }: { social: Social }) {
-  // Outlined pill matching Figma 520:8232 — 1.229 px cream-dark
-  // border, px-18.432 py-9.216, rounded-122, fixed h-49.152. Inner
-  // icon is 18.432 × 18.432 scaled from the SVG's intrinsic 40 × 40
-  // viewBox. The 4 pills sit in a 2 × 2 grid on the parent so each
-  // one fills half the row.
+  // Unified 2026-05 mobile button spec: h-40, 1.6 px cream-dark
+  // border, rounded-122. Icon-only outlined pill (no label) so the
+  // four social pills (LinkedIn / Dribbble / Behance / Medium) share
+  // the same height as every other mobile CTA. Icon shrinks to
+  // 16 × 16 to match the spec (down from the previous 18.432, which
+  // was a 0.8× scaling artefact). The 4 pills sit in a single
+  // horizontal row on the parent so each one fills 1/4 of the row.
+  const ICON = 16;
   const baseClass =
     "w-full flex items-center justify-center bg-transparent transition-colors duration-200";
   const inner = (
     <span
       className="themed-icon relative shrink-0 inline-flex items-center justify-center"
-      style={{ width: 18.432, height: 18.432 }}
+      style={{ width: ICON, height: ICON }}
     >
       <img
         src={social.src}
         alt=""
-        width={social.iconWidth * (18.432 / 40)}
-        height={social.iconHeight * (18.432 / 40)}
+        width={social.iconWidth * (ICON / 40)}
+        height={social.iconHeight * (ICON / 40)}
         className="block"
         style={
           social.verticalNudge
@@ -384,13 +387,13 @@ function MobileSocialPill({ social }: { social: Social }) {
     </span>
   );
   const style: React.CSSProperties = {
-    paddingLeft: 18.432,
-    paddingRight: 18.432,
-    paddingTop: 9.216,
-    paddingBottom: 9.216,
-    height: 49.152,
+    paddingLeft: 24,
+    paddingRight: 24,
+    paddingTop: 12,
+    paddingBottom: 12,
+    height: 40,
     borderRadius: 122,
-    border: "1.229px solid var(--color-border-soft)",
+    border: "1.6px solid var(--color-border-soft)",
   };
   if (!social.href) {
     return (
@@ -603,33 +606,25 @@ function ContactMobile() {
           </div>
         </div>
 
-        {/* "Set a Meeting" CTA — primary cream pill (Figma 535:11137).
-            Inline on mobile so we can apply the explicit `h-40` cap
-            the design system uses for mobile cream pills; desktop
-            keeps the natural-height CTAButton. External href opens
-            the Google Calendar appointment page in a new tab. */}
-        <a
-          href={CALENDAR_URL}
-          target="_blank"
-          rel="noopener noreferrer"
-          className="w-full anim-bubbly-grow flex items-center justify-center gap-[8px] rounded-[122px] bg-[var(--color-cta-primary-bg)] hover:bg-[var(--color-cta-primary-hover)] transition-colors duration-200 shrink-0"
+        {/* "Set a Meeting" CTA — shared CTAButton in mobile spec
+            (h-40, text-12, no icon to match Figma 535:11128). The
+            href is the Google Calendar appointment page, so the
+            component auto-detects the external protocol and renders
+            an `<a target="_blank">`. Wrapper handles stage-7
+            bubbly-grow entrance. */}
+        <span
+          className="w-full flex anim-bubbly-grow shrink-0"
           style={{
-            height: 40,
-            paddingLeft: 24,
-            paddingRight: 24,
-            color: "var(--color-cta-primary-text)",
-            fontFamily: "var(--font-solway), serif",
-            fontWeight: 400,
-            fontSize: fs(16),
-            lineHeight: "24px",
-            letterSpacing: "0.15px",
-            textAlign: "center",
             transformOrigin: "left center",
             ["--stage" as string]: 7,
           }}
         >
-          Set a Meeting
-        </a>
+          <CTAButton
+            href={CALENDAR_URL}
+            label="Set a Meeting"
+            variant="primary"
+          />
+        </span>
       </div>
     </div>
   );
