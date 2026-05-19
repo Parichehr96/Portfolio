@@ -23,10 +23,28 @@ const spaceGrotesk = Space_Grotesk({
   display: "swap",
 });
 
+const SITE_URL = "https://www.parichehr.design";
+const SITE_TITLE = "Parichehr Talebzadeh — Product Designer";
+const SITE_DESCRIPTION =
+  "Designing digital products, containing interaction, experience, interface, design system, and content, within various product teams for modern businesses.";
+
 export const metadata: Metadata = {
-  title: "Parichehr Talebzadeh — Product Designer",
-  description:
-    "Designing digital products, containing interaction, experience, interface, design system, and content, within various product teams for modern businesses.",
+  metadataBase: new URL(SITE_URL),
+  title: SITE_TITLE,
+  description: SITE_DESCRIPTION,
+  openGraph: {
+    type: "website",
+    url: SITE_URL,
+    siteName: "Parichehr Talebzadeh",
+    title: SITE_TITLE,
+    description: SITE_DESCRIPTION,
+    locale: "en_US",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: SITE_TITLE,
+    description: SITE_DESCRIPTION,
+  },
   // Theme-aware favicon: browsers in light mode pull `fav-icon-light.png`
   // (a navy glyph that reads on a light tab bar) and dark-mode browsers
   // get `fav-icon-dark.png` (a cream glyph for the dark tab bar). The
