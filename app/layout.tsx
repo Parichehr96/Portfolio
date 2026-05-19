@@ -2,6 +2,8 @@ import type { Metadata, Viewport } from "next";
 import { Solway, Space_Grotesk } from "next/font/google";
 import { headers } from "next/headers";
 import { userAgent } from "next/server";
+import { Analytics } from "@vercel/analytics/next";
+import { SpeedInsights } from "@vercel/speed-insights/next";
 import "./globals.css";
 import ScaledShell from "./_components/ScaledShell";
 import { ScaleProvider, SCALE_INIT_SCRIPT } from "./_components/ScaleProvider";
@@ -145,6 +147,8 @@ export default async function RootLayout({
             </ScaledShell>
           </ScaleProvider>
         </ThemeProvider>
+        <Analytics />
+        <SpeedInsights />
       </body>
     </html>
   );

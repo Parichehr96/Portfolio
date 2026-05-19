@@ -96,6 +96,7 @@ export const EXPERIENCES: Experience[] = [
     description:
       "A redesigned Telegram quiz app where users compete in real-time trivia challenges, earn tokens, and climb leaderboards.",
     caseStudy: "/work/challenquiz",
+    previewVideo: "/assets/challenquiz/challenquiz_thumbnail.webm",
   },
   {
     name: "Golestan",
