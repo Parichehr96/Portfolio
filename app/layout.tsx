@@ -149,7 +149,6 @@ export default async function RootLayout({
           as="image"
           href="/assets/illustration-contact.png"
         />
-        <link rel="preload" as="image" href="/assets/profile-image.png" />
       </head>
       <body
         className="antialiased font-[family-name:var(--font-solway)]"

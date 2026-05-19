@@ -13,7 +13,6 @@ import { fs } from "../_lib/typography";
 import {
   EXPERIENCES,
   EXPERIENCE_SECTIONS,
-  FALLBACK_PREVIEW,
   type Experience,
 } from "../_data/experiences";
 
@@ -159,6 +158,73 @@ function ExternalLinkIcon({
   );
 }
 
+/* "See more" chevron rendered at the trailing edge of the selected
+   experience pill (Figma 604:9126 desktop 24×24, 604:9128 mobile 20×20).
+   The asset (/assets/See more Icon.svg) ships with a fixed navy-dark
+   fill, so we use it as a CSS mask and let the bg color drive the
+   theme — navy-dark in light, cream in dark, via --color-pill-arrow. */
+function SeeMoreArrow({ size }: { size: number }) {
+  return (
+    <span
+      className="shrink-0 inline-block"
+      style={{
+        width: size,
+        height: size,
+        backgroundColor: "var(--color-pill-arrow)",
+        WebkitMaskImage: 'url("/assets/See more Icon.svg")',
+        maskImage: 'url("/assets/See more Icon.svg")',
+        WebkitMaskRepeat: "no-repeat",
+        maskRepeat: "no-repeat",
+        WebkitMaskPosition: "center",
+        maskPosition: "center",
+        WebkitMaskSize: "contain",
+        maskSize: "contain",
+      }}
+      aria-hidden
+    />
+  );
+}
+
+/* "Under construction!" placeholder shown inside the preview frame
+   when an experience has neither a `previewVideo` nor a `preview`
+   image (Figma 604:9139). The icon ships as navy + gray-navy artwork
+   for the light theme; the `themed-icon` wrapper applies
+   `invert + hue-rotate(180deg)` in dark mode so the strokes shift to
+   a light blue palette that reads on the navy-dark page bg, matching
+   the rest of the themed icons sitewide. No background — the
+   placeholder sits transparently inside whatever surface the parent
+   provides (page bg on desktop, cream / navy-light pill on mobile). */
+function PreviewPlaceholder() {
+  return (
+    <div className="absolute inset-0 flex flex-col items-center justify-center" style={{ gap: 12 }}>
+      <span
+        className="themed-icon shrink-0 inline-block relative"
+        style={{ width: 60, height: 60 }}
+        aria-hidden
+      >
+        <img
+          src="/assets/streamline-freehand-color_design-process-mouse-pen.svg"
+          alt=""
+          className="absolute inset-0 w-full h-full block"
+        />
+      </span>
+      <p
+        className="whitespace-nowrap text-center"
+        style={{
+          fontFamily: SOLWAY,
+          fontWeight: 400,
+          fontSize: fs(16),
+          lineHeight: "24px",
+          letterSpacing: "0.15px",
+          color: "var(--color-text-primary)",
+        }}
+      >
+        Under construction!
+      </p>
+    </div>
+  );
+}
+
 function ExperienceRow({
   item,
   selected,
@@ -262,6 +328,26 @@ function ExperienceRow({
       >
         {dateText}
       </p>
+      {/* "See more" chevron (Figma 604:9126) — only on the selected
+          cream pill when the experience has a case-study route. The
+          slot is always rendered for case-study rows so the row's
+          width transitions in/out of the pill smoothly (width +
+          opacity fade together, matching the dashed leader pattern);
+          unselected rows collapse the slot to 0 px and fade out. */}
+      {item.caseStudy && (
+        <span
+          className="shrink-0 flex items-center justify-center overflow-hidden"
+          style={{
+            width: selected ? 24 : 0,
+            height: 24,
+            opacity: selected ? 1 : 0,
+            transition: `width ${T}ms ${BUBBLY}, opacity ${T}ms ${SMOOTH}`,
+          }}
+          aria-hidden
+        >
+          <SeeMoreArrow size={24} />
+        </span>
+      )}
     </div>
   );
 }
@@ -342,7 +428,6 @@ function WorkDesktop() {
   const [selectedIdx, setSelectedIdx] = useState(1);
 
   const currentExperience = EXPERIENCES[selectedIdx];
-  const currentPreview = currentExperience?.preview ?? FALLBACK_PREVIEW;
 
   return (
     <>
@@ -446,14 +531,30 @@ function WorkDesktop() {
                     style={{ animationDuration: "400ms" }}
                   />
                 </div>
-              ) : (
+              ) : currentExperience?.preview ? (
                 <img
                   key={`img-${selectedIdx}`}
-                  src={currentPreview}
+                  src={currentExperience.preview}
                   alt=""
                   className="absolute inset-0 w-full h-full object-cover block anim-fade"
                   style={{ animationDuration: "400ms" }}
                 />
+              ) : (
+                /* "Under construction!" placeholder (Figma 604:9139) —
+                   shown for experiences without a previewVideo or
+                   preview image (ViaVia, Ezam Part, WOW, Golestan,
+                   Filala, Living Maples at the moment). Keyed by
+                   selectedIdx so the placeholder re-runs anim-fade
+                   when the user hovers between two placeholder-only
+                   rows, matching the cross-fade rhythm of the video
+                   thumbnails. */
+                <div
+                  key={`placeholder-${selectedIdx}`}
+                  className="absolute inset-0 anim-fade"
+                  style={{ animationDuration: "400ms" }}
+                >
+                  <PreviewPlaceholder />
+                </div>
               )}
             </div>
             {currentExperience && (
@@ -1143,8 +1244,6 @@ function SelectedPill({ experience }: { experience: Experience | undefined }) {
   // re-mounts the incoming layer with the bubbly slide-up.
   const incomingAnim = incomingTick > 0 ? "anim-pill-name-in" : "";
 
-  const previewSrc = experience.preview ?? FALLBACK_PREVIEW;
-
   const inner = (
     <div
       className="w-full flex flex-col items-start"
@@ -1166,11 +1265,11 @@ function SelectedPill({ experience }: { experience: Experience | undefined }) {
           the description out of the pill. Shared `hero-illustration`
           view-transition target so the preview morphs cleanly
           between /work and the illustrations on /, /about, /contact
-          (and back to the desktop preview frame). The image / video
-          is keyed by its src so it only re-mounts (and fades) when
-          the asset actually changes — consecutive selections sharing
-          the FALLBACK_PREVIEW reuse the DOM and there's no
-          flicker. */}
+          (and back to the desktop preview frame). Experiences without
+          a previewVideo or preview image render the "Under
+          construction!" placeholder (Figma 604:9139) — same
+          transparent treatment as desktop, just sitting on the cream /
+          navy-light pill bg instead of the page bg. */}
       <div
         className="w-full relative overflow-hidden shrink-0 rounded-[4px]"
         style={{
@@ -1199,106 +1298,131 @@ function SelectedPill({ experience }: { experience: Experience | undefined }) {
               style={{ animationDuration: "400ms" }}
             />
           </div>
-        ) : (
+        ) : experience.preview ? (
           <Image
-            key={previewSrc}
-            src={previewSrc}
+            key={experience.preview}
+            src={experience.preview}
             alt=""
             fill
             sizes="358px"
             className="object-cover block anim-fade"
             style={{ animationDuration: "400ms" }}
           />
+        ) : (
+          <div
+            key={`placeholder-${experience.name}`}
+            className="absolute inset-0 anim-fade"
+            style={{ animationDuration: "400ms" }}
+          >
+            <PreviewPlaceholder />
+          </div>
         )}
       </div>
 
-      {/* Name + date — animated layer. Fixed-height row with two
-          absolute layers (outgoing + incoming) so the previous title
-          can slide up out of frame while the new title slides up into
-          place, both clipped to the row's bounds by overflow:hidden. */}
+      {/* Name + industry + company on the left, "See more" chevron +
+          date on the right (Figma 439:3683). The chevron only renders
+          for experiences with a case-study route; the right column
+          uses `justify-between` so the date is pushed to the bottom
+          and the chevron pinned to the top, regardless of how tall
+          the left column grows. items-stretch so the right column
+          inherits the left column's height. */}
       <div
-        className="w-full relative"
-        style={{ height: 24, overflow: "hidden" }}
+        className="w-full flex items-stretch justify-between"
+        style={{ gap: 8 }}
       >
-        {outgoingExp && (
+        <div className="flex-1 min-w-0 flex flex-col items-start" style={{ gap: 8 }}>
+          {/* Name row — fixed-height clip with two absolute layers
+              (outgoing + incoming) so the previous title slides up
+              out of frame while the new title slides up into place. */}
           <div
-            key={`out-${incomingTick}`}
-            className="absolute inset-0 flex items-center justify-between anim-pill-name-out"
-            style={{ gap: 8 }}
+            className="w-full relative"
+            style={{ height: 24, overflow: "hidden" }}
           >
-            <div className="flex items-center min-w-0" style={{ gap: 6 }}>
+            {outgoingExp && (
+              <div
+                key={`out-${incomingTick}`}
+                className="absolute inset-0 flex items-center anim-pill-name-out"
+                style={{ gap: 6 }}
+              >
+                <p className="whitespace-nowrap" style={NAME_STYLE}>
+                  {outgoingExp.name}
+                </p>
+                {outgoingExp.externalUrl && (
+                  <ExternalLinkIcon
+                    href={outgoingExp.externalUrl}
+                    label={outgoingExp.name}
+                    interactive={false}
+                  />
+                )}
+              </div>
+            )}
+            <div
+              key={`in-${incomingTick}`}
+              className={`absolute inset-0 flex items-center ${incomingAnim}`}
+              style={{ gap: 6 }}
+            >
               <p className="whitespace-nowrap" style={NAME_STYLE}>
-                {outgoingExp.name}
+                {experience.name}
               </p>
-              {outgoingExp.externalUrl && (
+              {experience.externalUrl && (
                 <ExternalLinkIcon
-                  href={outgoingExp.externalUrl}
-                  label={outgoingExp.name}
+                  href={experience.externalUrl}
+                  label={experience.name}
                   interactive={false}
                 />
               )}
             </div>
-            <p className="whitespace-nowrap shrink-0" style={DATE_STYLE}>
-              {outgoingExp.date}
-            </p>
           </div>
-        )}
-        <div
-          key={`in-${incomingTick}`}
-          className={`absolute inset-0 flex items-center justify-between ${incomingAnim}`}
-          style={{ gap: 8 }}
-        >
-          <div className="flex items-center min-w-0" style={{ gap: 6 }}>
-            <p className="whitespace-nowrap" style={NAME_STYLE}>
-              {experience.name}
-            </p>
-            {experience.externalUrl && (
-              <ExternalLinkIcon
-                href={experience.externalUrl}
-                label={experience.name}
-                interactive={false}
-              />
+
+          {/* Industry + company — content swaps in place on prop
+              change. w-full so the column claims the pill's content
+              width instead of hugging its widest child. */}
+          <div className="w-full flex flex-col items-start" style={{ gap: 4 }}>
+            {experience.industry && (
+              <p
+                className="w-full"
+                style={{
+                  fontFamily: SOLWAY,
+                  fontWeight: 400,
+                  fontSize: fs(12),
+                  lineHeight: "16px",
+                  letterSpacing: "0.5px",
+                  color: "var(--color-experience-pill-text)",
+                }}
+              >
+                {experience.industry}
+              </p>
             )}
+            <p
+              className="w-full"
+              style={{
+                fontFamily: SOLWAY,
+                fontWeight: 300,
+                fontSize: fs(12),
+                lineHeight: "16px",
+                letterSpacing: "0.5px",
+                color: "var(--color-experience-pill-text)",
+              }}
+            >
+              {experience.short}
+            </p>
           </div>
+        </div>
+
+        {/* Right column — chevron pinned to the top, date pinned to
+            the bottom (Figma 604:9133). When there's no case-study
+            destination (ViaVia, the placeholder-only rows), the
+            chevron is omitted and the date sits alone on the right. */}
+        <div className="shrink-0 flex flex-col items-end justify-between">
+          {experience.caseStudy ? (
+            <SeeMoreArrow size={20} />
+          ) : (
+            <span aria-hidden style={{ height: 20 }} />
+          )}
           <p className="whitespace-nowrap shrink-0" style={DATE_STYLE}>
             {experience.date}
           </p>
         </div>
-      </div>
-
-      {/* Industry + company — content swaps in place on prop change.
-          w-full so the column claims the pill's content width instead
-          of hugging its widest child — without this a long industry
-          string never wraps and grows the column past the pill. */}
-      <div className="w-full flex flex-col items-start" style={{ gap: 4 }}>
-        {experience.industry && (
-          <p
-            className="w-full"
-            style={{
-              fontFamily: SOLWAY,
-              fontWeight: 400,
-              fontSize: fs(12),
-              lineHeight: "16px",
-              letterSpacing: "0.5px",
-              color: "var(--color-experience-pill-text)",
-            }}
-          >
-            {experience.industry}
-          </p>
-        )}
-        <p
-          className="w-full"
-          style={{
-            fontFamily: SOLWAY,
-            fontWeight: 300,
-            fontSize: fs(12),
-            lineHeight: "16px",
-            letterSpacing: "0.5px",
-            color: "var(--color-experience-pill-text)",
-          }}
-        >
-          {experience.short}
-        </p>
       </div>
 
       {/* Description — content swaps in place on prop change */}

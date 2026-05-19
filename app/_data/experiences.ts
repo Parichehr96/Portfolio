@@ -9,8 +9,9 @@ export type Experience = {
   /** One-sentence project description shown under the preview frame
    *  when the row is selected. */
   description?: string;
-  /** Optional per-project preview image. Falls back to profile-image
-   *  while the user hasn't supplied real previews yet. */
+  /** Optional per-project preview image. Experiences without a
+   *  `preview` or `previewVideo` render an "Under construction!"
+   *  placeholder (Figma 604:9139) inside the preview frame. */
   preview?: string;
   /** Optional looping preview video (WebM/MP4). When set, the Work
    *  preview frame renders a `<video>` instead of an `<img>`; the
@@ -137,5 +138,3 @@ export const EXPERIENCE_SECTIONS = [
   { label: "Supporting Case Studies -", start: 4, end: 6 },
   { label: "Early Works -", start: 6, end: 9 },
 ] as const;
-
-export const FALLBACK_PREVIEW = "/assets/profile-image.png";

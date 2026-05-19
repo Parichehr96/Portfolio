@@ -81,6 +81,12 @@
      darker in dark so the pill still reads as "lifted" from the page. */
   --color-experience-pill-bg: #F9F5EB;
   --color-experience-pill-text: #111323;
+  /* "See more" chevron on the selected experience pill (Figma 604:9126
+     desktop, 604:9128 mobile). Navy-dark on the cream pill in light;
+     cream on the navy-light pill in dark — slightly warmer than the
+     pure-white pill text it sits next to so the arrow reads as the
+     interactive accent. */
+  --color-pill-arrow: #1B2249;
   /* Custom scroll indicator (used by About bio + Work mobile list).
      Light: cream-dark track + navy-deep thumb. Dark per spec: navy-
      light track + cream thumb. */
@@ -184,6 +190,7 @@ body {
   --color-cta-card-secondary-hover-bg: rgba(249, 245, 235, 0.12);
   --color-experience-pill-bg: #28315F;
   --color-experience-pill-text: #FFFFFF;
+  --color-pill-arrow: #F9F5EB;
   --color-scroll-track: #28315F;
   --color-scroll-thumb: #F9F5EB;
   --color-cream-hover-overlay: rgba(249, 245, 235, 0.12);
